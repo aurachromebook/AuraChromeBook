@@ -2,8 +2,10 @@
 window.onload = function() {
     setTimeout(() => {
         const boot = document.getElementById('boot-screen');
-        boot.style.opacity = '0';
-        setTimeout(() => boot.style.display = 'none', 500);
+        if(boot) {
+            boot.style.opacity = '0';
+            setTimeout(() => boot.style.display = 'none', 500);
+        }
 
         if (localStorage.getItem('os_password')) {
             document.getElementById('lock-screen').style.display = 'flex';
@@ -28,7 +30,8 @@ function updateClock() {
     let hours = now.getHours(), minutes = now.getMinutes();
     hours = hours % 12 || 12; 
     minutes = minutes < 10 ? '0' + minutes : minutes;
-    document.getElementById('clock').innerText = hours + ':' + minutes;
+    const clock = document.getElementById('clock');
+    if(clock) clock.innerText = hours + ':' + minutes;
 }
 setInterval(updateClock, 1000); updateClock();
 
@@ -37,9 +40,13 @@ function initBattery() {
         navigator.getBattery().then(battery => {
             function updateLevel() {
                 const level = Math.round(battery.level * 100) + '%';
-                document.getElementById('taskbar-battery').innerText = battery.charging ? '⚡' : '🔋';
-                document.getElementById('qs-battery-text').innerText = level;
-                document.getElementById('qs-battery-icon').innerText = battery.charging ? '⚡' : '🔋';
+                const tbBattery = document.getElementById('taskbar-battery');
+                const qsBatText = document.getElementById('qs-battery-text');
+                const qsBatIcon = document.getElementById('qs-battery-icon');
+                
+                if(tbBattery) tbBattery.innerText = battery.charging ? '⚡' : '🔋';
+                if(qsBatText) qsBatText.innerText = level;
+                if(qsBatIcon) qsBatIcon.innerText = battery.charging ? '⚡' : '🔋';
             }
             updateLevel();
             battery.addEventListener('levelchange', updateLevel);
@@ -134,18 +141,18 @@ function saveSecuritySettings() {
     msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 3000);
 }
 
-// --- 5. Window Memory Management (LAZY LOAD FIX) ---
+// --- 5. Window Memory Management (IFRAME FIX) ---
 let highestZ = 10;
 function openApp(appId) {
     const appWindow = document.getElementById(appId);
     if(appWindow) {
-        // --- MEMORY FIX: Load iframe safely ---
+        // --- MEMORY FIX: Force iframe to load exactly when opened ---
         const iframe = appWindow.querySelector('iframe');
         if (iframe) {
-            const currentSrc = iframe.getAttribute('src');
-            // If the iframe is empty or wiped, load the actual game link
-            if (!currentSrc || currentSrc === '' || currentSrc === 'about:blank') {
-                iframe.setAttribute('src', iframe.getAttribute('data-src'));
+            const currentSrc = iframe.src || "";
+            // If it's empty or set to about:blank, inject the game's URL
+            if (currentSrc === "" || currentSrc.includes("about:blank") || currentSrc.includes(window.location.href)) {
+                iframe.src = iframe.getAttribute('data-src');
             }
         }
 
@@ -157,16 +164,21 @@ function openApp(appId) {
     launcherMenu.style.display = 'none';
 }
 
+function minimizeApp(appId) { 
+    document.getElementById(appId).classList.add('minimized'); 
+    updateTaskbarIndicator(appId, false); 
+}
+
 function closeApp(appId) {
     const appWindow = document.getElementById(appId);
     appWindow.style.display = 'none'; 
     appWindow.classList.remove('minimized');
     updateTaskbarIndicator(appId, false);
     
-    // --- MEMORY FIX: Wipe iframe to about:blank to clear RAM ---
+    // --- MEMORY FIX: Completely wipe iframe to free RAM ---
     const iframe = appWindow.querySelector('iframe');
     if(iframe) { 
-        iframe.setAttribute('src', 'about:blank'); 
+        iframe.src = 'about:blank'; 
     }
 }
 
@@ -183,7 +195,7 @@ function updateTaskbarIndicator(appId, isActive) {
     if(icon) isActive ? icon.classList.add('active') : icon.classList.remove('active');
 }
 
-// Window Dragging & Snapping
+// Dragging & Snapping
 const snapPreview = document.getElementById('snap-preview');
 let currentSnap = null;
 document.querySelectorAll('.window').forEach(win => {
@@ -239,7 +251,6 @@ function chromeReload() { const iframe = document.getElementById('chrome-frame')
 
 // Wallpaper Handling
 function setWallpaper(url) {
-    // Converts the small gallery thumbnail into a 2000px high-res background
     let highResUrl = url.replace("w=400", "w=2000");
     document.getElementById('desktop').style.backgroundImage = `url('${highResUrl}')`;
     localStorage.setItem('os_wallpaper', highResUrl);
