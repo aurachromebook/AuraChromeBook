@@ -148,4 +148,164 @@ function openApp(appId) {
         appWindow.style.display = 'flex'; 
         appWindow.classList.remove('minimized');
         bringToFront(appWindow); 
-        updateTaskbarIndicator(appId, true
+        updateTaskbarIndicator(appId, true);
+    }
+    launcherMenu.style.display = 'none';
+}
+
+function minimizeApp(appId) { 
+    // Minimizing does NOT wipe memory. Game stays running.
+    document.getElementById(appId).classList.add('minimized'); 
+    updateTaskbarIndicator(appId, false); 
+}
+
+function closeApp(appId) {
+    const appWindow = document.getElementById(appId);
+    appWindow.style.display = 'none'; 
+    appWindow.classList.remove('minimized');
+    updateTaskbarIndicator(appId, false);
+    
+    // --- MEMORY FIX: Wipe iframe completely from memory when closed ---
+    const iframe = appWindow.querySelector('iframe');
+    if(iframe) { 
+        iframe.src = ''; 
+    }
+}
+
+function toggleApp(appId) {
+    const appWindow = document.getElementById(appId);
+    if (appWindow.style.display === 'flex' && !appWindow.classList.contains('minimized')) {
+        if (appWindow.style.zIndex == highestZ) minimizeApp(appId); else bringToFront(appWindow);
+    } else openApp(appId);
+}
+
+function bringToFront(elmnt) { highestZ++; elmnt.style.zIndex = highestZ; }
+function updateTaskbarIndicator(appId, isActive) {
+    const icon = document.querySelector(`button[onclick*="'${appId}'"]`);
+    if(icon) isActive ? icon.classList.add('active') : icon.classList.remove('active');
+}
+
+// Window Dragging & Snapping
+const snapPreview = document.getElementById('snap-preview');
+let currentSnap = null;
+document.querySelectorAll('.window').forEach(win => {
+    dragElement(win); win.addEventListener('mousedown', () => bringToFront(win));
+});
+
+function dragElement(elmnt) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    const header = document.getElementById(elmnt.id + "-header");
+    if (header) header.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        if(e.target.tagName === 'BUTTON') return;
+        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
+        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
+        elmnt.classList.add('dragging');
+    }
+    function elementDrag(e) {
+        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        const th = 20; 
+        if (e.clientX < th) { showPreview(0, 0, '50%', '100%'); currentSnap = 'left'; } 
+        else if (e.clientX > window.innerWidth - th) { showPreview('50%', 0, '50%', '100%'); currentSnap = 'right'; } 
+        else if (e.clientY < th) { showPreview(0, 0, '100%', '100%'); currentSnap = 'top'; } 
+        else { snapPreview.style.display = 'none'; currentSnap = null; }
+    }
+    function showPreview(l, t, w, h) { snapPreview.style.display = 'block'; snapPreview.style.left = l; snapPreview.style.top = t; snapPreview.style.width = w; snapPreview.style.height = h; }
+    function closeDragElement() {
+        document.onmouseup = null; document.onmousemove = null; elmnt.classList.remove('dragging'); snapPreview.style.display = 'none';
+        if (currentSnap === 'left') { elmnt.style.left = '0'; elmnt.style.top = '0'; elmnt.style.width = '50vw'; elmnt.style.height = '100vh'; } 
+        else if (currentSnap === 'right') { elmnt.style.left = '50vw'; elmnt.style.top = '0'; elmnt.style.width = '50vw'; elmnt.style.height = '100vh'; } 
+        else if (currentSnap === 'top') { elmnt.style.left = '0'; elmnt.style.top = '0'; elmnt.style.width = '100vw'; elmnt.style.height = '100vh'; }
+        currentSnap = null;
+    }
+}
+
+// --- 6. Applications Logic ---
+let calcInput = "";
+function calcPress(val) { calcInput += val; document.getElementById('calc-display').value = calcInput; }
+function calcClear() { calcInput = ""; document.getElementById('calc-display').value = "0"; }
+function calcEval() { try { calcInput = eval(calcInput).toString(); document.getElementById('calc-display').value = calcInput; } catch(e) { document.getElementById('calc-display').value = "Error"; calcInput = ""; } }
+
+let chromeHistory = ["https://www.bing.com"], chromeIndex = 0;
+function navigateChrome() {
+    let url = document.getElementById('chrome-url').value;
+    url = url.startsWith('http') ? url : 'https://' + url;
+    chromeHistory = chromeHistory.slice(0, chromeIndex + 1); chromeHistory.push(url); chromeIndex++;
+    document.getElementById('chrome-frame').src = url; document.getElementById('chrome-url').value = url;
+}
+function chromeBack() { if (chromeIndex > 0) { chromeIndex--; document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; } }
+function chromeForward() { if (chromeIndex < chromeHistory.length - 1) { chromeIndex++; document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; } }
+function chromeReload() { const iframe = document.getElementById('chrome-frame'); iframe.src = iframe.src; }
+
+// Wallpaper Handling
+function setWallpaper(url) {
+    // Converts the small gallery thumbnail into a 2000px high-res background
+    let highResUrl = url.replace("w=400", "w=2000");
+    document.getElementById('desktop').style.backgroundImage = `url('${highResUrl}')`;
+    localStorage.setItem('os_wallpaper', highResUrl);
+}
+
+document.getElementById('wallpaper-upload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('desktop').style.backgroundImage = `url('${ev.target.result}')`;
+            try { localStorage.setItem('os_wallpaper', ev.target.result); } catch(err) { alert("Image applied for this session."); }
+        }; reader.readAsDataURL(file);
+    }
+});
+
+// --- 7. Taskbar & App Store Logic ---
+const taskbarIconsContainer = document.getElementById('app-icons');
+let draggedIcon = null;
+function makeIconDraggable(icon) {
+    icon.addEventListener('dragstart', function() { draggedIcon = this; setTimeout(() => this.classList.add('dragging-icon'), 0); });
+    icon.addEventListener('dragend', function() { setTimeout(() => { this.classList.remove('dragging-icon'); draggedIcon = null; }, 0); });
+    icon.addEventListener('dragover', (e) => e.preventDefault());
+    icon.addEventListener('drop', function(e) {
+        e.preventDefault();
+        if (draggedIcon !== this) {
+            let allIcons = [...taskbarIconsContainer.children];
+            allIcons.indexOf(draggedIcon) < allIcons.indexOf(this) ? this.after(draggedIcon) : this.before(draggedIcon);
+        }
+    });
+}
+
+function installApp(appId, iconSymbol, appName, buttonElement) {
+    if (document.getElementById('taskbar-' + appId)) return; 
+    const pCont = document.getElementById('progress-container-' + appId), pBar = document.getElementById('progress-bar-' + appId);
+    buttonElement.innerText = 'Installing...'; buttonElement.disabled = true; if(pCont) pCont.style.display = 'block';
+    
+    let progress = 0;
+    const dlInterval = setInterval(() => {
+        progress += Math.floor(Math.random() * 20) + 10; 
+        if (progress >= 100) {
+            progress = 100; clearInterval(dlInterval);
+            if(pBar) pBar.style.width = '100%';
+            buttonElement.innerText = 'Installed'; if(pCont) setTimeout(() => pCont.style.display = 'none', 500);
+            
+            restoreAppToTaskbar(appId, iconSymbol, appName); 
+            saveAppToStorage(appId, iconSymbol, appName);
+            
+            const launcherList = document.getElementById('launcher-list');
+            const item = document.createElement('div');
+            item.className = 'launcher-item';
+            item.onclick = () => openApp(appId);
+            item.innerHTML = `<div class="l-icon">${iconSymbol}</div><span class="l-text">${appName}</span>`;
+            launcherList.appendChild(item);
+        } else if(pBar) pBar.style.width = progress + '%';
+    }, 300); 
+}
+
+function restoreAppToTaskbar(appId, iconSymbol, appName) {
+    const btn = document.createElement('button'); btn.className = 'app-icon'; btn.id = 'taskbar-' + appId; btn.title = appName; btn.innerHTML = iconSymbol; btn.draggable = true; btn.onclick = () => toggleApp(appId);
+    taskbarIconsContainer.appendChild(btn); makeIconDraggable(btn);
+}
+
+function saveAppToStorage(appId, iconSymbol, appName) {
+    let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
+    savedApps.push({ id: appId, icon: iconSymbol, name: appName }); localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+}
