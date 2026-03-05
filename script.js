@@ -1,4 +1,4 @@
-// --- 1. Boot Sequence & Setup Logic ---
+// --- 1. Boot Sequence & OOBE Setup ---
 window.onload = function() {
     setTimeout(() => {
         const boot = document.getElementById('boot-screen');
@@ -7,17 +7,64 @@ window.onload = function() {
             setTimeout(() => boot.style.display = 'none', 500);
         }
 
-        // Setup Check
-        if (!localStorage.getItem('os_setup_complete')) {
-            document.getElementById('setup-screen').style.display = 'flex';
-        } else if (localStorage.getItem('os_password')) {
-            showLockScreen();
-        }
+        const isSetupComplete = localStorage.getItem('os_setup_complete');
         
-        loadUserData();
-
+        if (!isSetupComplete) {
+            document.getElementById('setup-screen').style.display = 'flex';
+        } else {
+            initializeDesktop();
+            if (localStorage.getItem('os_password')) {
+                document.getElementById('lock-username').innerText = localStorage.getItem('os_username') || 'User';
+                document.getElementById('lock-screen').style.display = 'flex';
+            }
+        }
     }, 2500);
+};
 
+// OOBE Setup Functions
+let tempUsername = '';
+let tempPassword = '';
+
+function processSetupStep1() {
+    const nameInput = document.getElementById('setup-name-input').value.trim();
+    if (nameInput === '') {
+        alert("Please enter a name to continue.");
+        return;
+    }
+    tempUsername = nameInput;
+    document.getElementById('setup-step-1').classList.remove('active');
+    document.getElementById('setup-step-2').classList.add('active');
+}
+
+function processSetupStep2(isSkipped) {
+    if (!isSkipped) {
+        const passInput = document.getElementById('setup-pass-input').value;
+        if (passInput === '') {
+            alert("Please enter a password or choose 'Skip'.");
+            return;
+        }
+        tempPassword = passInput;
+    }
+    document.getElementById('setup-step-2').classList.remove('active');
+    document.getElementById('setup-step-3').classList.add('active');
+}
+
+function finalizeSetup() {
+    localStorage.setItem('os_setup_complete', 'true');
+    localStorage.setItem('os_username', tempUsername);
+    if (tempPassword !== '') {
+        localStorage.setItem('os_password', tempPassword);
+    }
+    
+    document.getElementById('setup-screen').style.display = 'none';
+    
+    // Set dynamic name on lock screen for the future
+    document.getElementById('lock-username').innerText = tempUsername;
+    
+    initializeDesktop();
+}
+
+function initializeDesktop() {
     const savedWallpaper = localStorage.getItem('os_wallpaper');
     if(savedWallpaper) document.getElementById('desktop').style.backgroundImage = `url('${savedWallpaper}')`;
 
@@ -28,43 +75,14 @@ window.onload = function() {
 
     document.querySelectorAll('.app-icon').forEach(makeIconDraggable);
     initBattery();
-};
-
-function nextSetupStep(stepNum) {
-    document.querySelectorAll('.setup-box').forEach(box => box.style.display = 'none');
-    document.getElementById('setup-step-' + stepNum).style.display = 'block';
 }
 
-function finishSetup() {
-    const name = document.getElementById('setup-name').value || 'User';
-    const pass = document.getElementById('setup-password').value;
-    const q = document.getElementById('setup-question').value;
-    const a = document.getElementById('setup-answer').value;
-
-    localStorage.setItem('os_username', name);
-    if(pass) {
-        localStorage.setItem('os_password', pass);
-        if(q) localStorage.setItem('os_question', q);
-        if(a) localStorage.setItem('os_answer', a);
+// --- Factory Reset ---
+function factoryReset() {
+    if (confirm("WARNING: This will erase all settings, passwords, and installed apps. The system will reboot. Continue?")) {
+        localStorage.clear();
+        location.reload();
     }
-    localStorage.setItem('os_setup_complete', 'true');
-
-    document.getElementById('setup-screen').style.display = 'none';
-    loadUserData();
-}
-
-function loadUserData() {
-    const name = localStorage.getItem('os_username') || 'User';
-    document.getElementById('lock-username').innerText = name;
-    
-    // Also prepopulate the settings input if they want to update it later
-    const nameInput = document.getElementById('update-name');
-    if(nameInput) nameInput.value = name;
-}
-
-function showLockScreen() {
-    document.getElementById('lock-screen').style.display = 'flex';
-    document.getElementById('lock-username').innerText = localStorage.getItem('os_username') || 'User';
 }
 
 // --- 2. System UI ---
@@ -150,9 +168,14 @@ function filterLauncher() {
 }
 
 function lockSystem() {
-    if (localStorage.getItem('os_password')) showLockScreen();
-    else alert("Please set a password in Settings first!");
-    quickSettings.style.display = 'none'; contextMenu.style.display = 'none';
+    if (localStorage.getItem('os_password')) {
+        document.getElementById('lock-username').innerText = localStorage.getItem('os_username') || 'User';
+        document.getElementById('lock-screen').style.display = 'flex';
+    } else {
+        alert("Please set a password in Settings first!");
+    }
+    quickSettings.style.display = 'none'; 
+    contextMenu.style.display = 'none';
 }
 
 // --- 4. Security ---
@@ -174,19 +197,12 @@ function showSecurityQuestion() {
 }
 
 function saveSecuritySettings() {
-    const name = document.getElementById('update-name').value;
     const pass = document.getElementById('set-password').value;
     const q = document.getElementById('set-question').value;
     const a = document.getElementById('set-answer').value;
-    
-    if(name) {
-        localStorage.setItem('os_username', name);
-        loadUserData();
-    }
     if(pass) localStorage.setItem('os_password', pass);
     if(q) localStorage.setItem('os_question', q);
     if(a) localStorage.setItem('os_answer', a);
-    
     const msg = document.getElementById('security-save-msg');
     msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 3000);
 }
@@ -196,6 +212,7 @@ let highestZ = 10;
 function openApp(appId) {
     const appWindow = document.getElementById(appId);
     if(appWindow) {
+        // --- MEMORY FIX: Force iframe to load exactly when opened ---
         const iframe = appWindow.querySelector('iframe');
         if (iframe) {
             const currentSrc = iframe.src || "";
@@ -223,8 +240,11 @@ function closeApp(appId) {
     appWindow.classList.remove('minimized');
     updateTaskbarIndicator(appId, false);
     
+    // --- MEMORY FIX: Completely wipe iframe to free RAM ---
     const iframe = appWindow.querySelector('iframe');
-    if(iframe) iframe.src = 'about:blank'; 
+    if(iframe) { 
+        iframe.src = 'about:blank'; 
+    }
 }
 
 function toggleApp(appId) {
@@ -294,6 +314,7 @@ function chromeBack() { if (chromeIndex > 0) { chromeIndex--; document.getElemen
 function chromeForward() { if (chromeIndex < chromeHistory.length - 1) { chromeIndex++; document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; } }
 function chromeReload() { const iframe = document.getElementById('chrome-frame'); iframe.src = iframe.src; }
 
+// Wallpaper Handling
 function setWallpaper(url) {
     let highResUrl = url.replace("w=400", "w=2000");
     document.getElementById('desktop').style.backgroundImage = `url('${highResUrl}')`;
