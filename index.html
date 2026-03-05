@@ -16,26 +16,34 @@
 
     <div id="setup-screen" style="display: none;">
         <div class="setup-box" id="setup-step-1">
+            <div class="setup-icon">👋</div>
             <h2>Welcome to WebOS</h2>
-            <p>Let's get your workspace set up.</p>
-            <input type="text" id="setup-name" placeholder="Enter your display name">
-            <button onclick="nextSetupStep(2)">Next ➔</button>
+            <p>Let's get your workspace set up. What is your name?</p>
+            <input type="text" id="setup-name" placeholder="Enter your name" class="modern-input">
+            <button class="modern-btn setup-btn-full" onclick="nextSetupStep(2)">Next</button>
         </div>
+
         <div class="setup-box" id="setup-step-2" style="display: none;">
-            <h2>Security & Sign-in</h2>
-            <p>Would you like to lock your device with a password? (Optional)</p>
-            <input type="password" id="setup-pass" placeholder="Password (leave blank for none)">
-            <input type="text" id="setup-sec-q" placeholder="Security Question (If you forget)">
-            <input type="text" id="setup-sec-a" placeholder="Security Answer">
-            <button onclick="nextSetupStep(3)">Next ➔</button>
+            <div class="setup-icon">🔒</div>
+            <h2>Protect Your Device</h2>
+            <p>Would you like to set a password? (Leave blank to skip)</p>
+            <input type="password" id="setup-password" placeholder="New Password" class="modern-input">
+            <input type="text" id="setup-question" placeholder="Security Question (optional)" class="modern-input" style="margin-top: 10px;">
+            <input type="text" id="setup-answer" placeholder="Answer (optional)" class="modern-input" style="margin-top: 10px;">
+            <div class="setup-btn-row">
+                <button class="modern-btn outline-btn" onclick="nextSetupStep(3)">Skip</button>
+                <button class="modern-btn" onclick="nextSetupStep(3)">Next</button>
+            </div>
         </div>
-        <div class="setup-box" id="setup-step-3" style="display: none; width: 400px;">
+
+        <div class="setup-box" id="setup-step-3" style="display: none;">
+            <div class="setup-icon">📜</div>
             <h2>Terms of Use</h2>
-            <div class="tou-box">
+            <div class="terms-box">
                 This is a Chrome Simulation Website that is only for playing, and simulation use.<br><br>
                 If used for proxy or playing use, You will be banished and banned from the website forever.
             </div>
-            <button onclick="finishSetup()">Accept and Continue ➔</button>
+            <button class="modern-btn setup-btn-full" onclick="finishSetup()">Accept & Continue</button>
         </div>
     </div>
 
@@ -122,6 +130,8 @@
                 
                 <h3 class="settings-title">Security and Sign-in</h3>
                 <div class="settings-card">
+                    <p style="margin-bottom: 15px; font-size: 13px; color: #5f6368;">Update your password or change your name below.</p>
+                    <input type="text" id="update-name" placeholder="Update Name" class="modern-input"><br>
                     <input type="password" id="set-password" placeholder="New Password" class="modern-input"><br>
                     <input type="text" id="set-question" placeholder="Security Question (e.g., First pet's name?)" class="modern-input"><br>
                     <input type="text" id="set-answer" placeholder="Answer" class="modern-input"><br>
@@ -169,7 +179,6 @@
                         <div class="store-card"><div class="store-icon">📝</div><div class="store-info"><strong>Wordpad</strong><span>Productivity • 4.5 ★</span></div><button class="store-btn" disabled style="background: transparent; color: #01875f;">Installed</button></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
