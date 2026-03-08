@@ -1,11 +1,14 @@
-// --- 1. Notification System ---
+// --- 1. Notification System (Integrated into QS) ---
 const notificationMgr = {
     showNotification: function({title, message, icon}) {
-        const container = document.getElementById('notification-center');
+        const iconEmoji = icon === 'shield-alert' ? '🛡️' : icon === 'sparkles' ? '✨' : '🔔';
+        
+        // 1. Show floating toast bottom-right
+        const container = document.getElementById('notification-toast-container');
         const notif = document.createElement('div');
         notif.className = 'notification';
         notif.innerHTML = `
-            <div class="notif-icon">${icon === 'shield-alert' ? '🛡️' : icon === 'sparkles' ? '✨' : '🚀'}</div>
+            <div class="notif-icon">${iconEmoji}</div>
             <div class="notif-content">
                 <strong>${title}</strong>
                 <p>${message}</p>
@@ -13,13 +16,37 @@ const notificationMgr = {
         `;
         container.appendChild(notif);
         
-        // Remove after 7 seconds
+        // Remove toast after 7 seconds
         setTimeout(() => {
             notif.style.opacity = '0';
             setTimeout(() => notif.remove(), 300);
         }, 7000);
+
+        // 2. Add to Quick Settings Notification Center
+        const qsList = document.getElementById('qs-notif-list');
+        const noNotifs = qsList.querySelector('.qs-no-notifs');
+        if (noNotifs) noNotifs.remove();
+
+        const qsItem = document.createElement('div');
+        qsItem.className = 'qs-notif-item';
+        qsItem.innerHTML = `
+            <div class="notif-icon">${iconEmoji}</div>
+            <div class="notif-content">
+                <strong>${title}</strong>
+                <p>${message}</p>
+            </div>
+            <button class="qs-notif-close" onclick="this.parentElement.remove(); checkEmptyNotifs();">✕</button>
+        `;
+        qsList.prepend(qsItem); // Push to top
     }
 };
+
+function checkEmptyNotifs() {
+    const qsList = document.getElementById('qs-notif-list');
+    if (qsList.children.length === 0) {
+        qsList.innerHTML = '<div class="qs-no-notifs">No new notifications</div>';
+    }
+}
 
 function triggerInitialNotifications() {
     if (sessionStorage.getItem('notifs_shown')) return;
@@ -41,14 +68,6 @@ function triggerInitialNotifications() {
             icon: "shield-alert"
         });
     }, 5000);
-
-    setTimeout(() => {
-        notificationMgr.showNotification({
-            title: "System Update: Brand New Features",
-            message: "Added Window Maximizing, Uninstalling Apps, Draggable Desktop Icons, and Dark Mode!",
-            icon: "rocket"
-        });
-    }, 9000);
 }
 
 // --- 2. Boot Sequence & OOBE Setup ---
@@ -201,13 +220,13 @@ desktop.addEventListener('contextmenu', (e) => {
     const appIcon = e.target.closest('.app-icon');
     
     if(appIcon) {
-        // It's an app icon! Show uninstall option
+        // Show uninstall option for Taskbar apps
         selectedAppIdToUninstall = appIcon.id.replace('taskbar-', '');
         uninstallBtn.style.display = 'block';
         contextMenu.style.display = 'block';
         contextMenu.style.left = e.clientX + 'px';
-        contextMenu.style.top = (e.clientY - 100) + 'px'; // pop up above taskbar
-    } else if(e.target === desktop || e.target.id === 'desktop-icons-container') {
+        contextMenu.style.top = (e.clientY - 100) + 'px'; 
+    } else if(e.target === desktop || e.target.closest('#desktop-icons-container')) {
         // Regular desktop right click
         selectedAppIdToUninstall = null;
         uninstallBtn.style.display = 'none';
@@ -281,7 +300,7 @@ function unlockOS() {
         document.getElementById('lock-screen').style.display = 'none';
         document.getElementById('lock-password').value = '';
         document.getElementById('lock-error').style.display = 'none';
-        triggerInitialNotifications(); // trigger notifs if unlocking for first time this session
+        triggerInitialNotifications(); 
     } else document.getElementById('lock-error').style.display = 'block';
 }
 
@@ -419,7 +438,7 @@ function calcPress(val) { calcInput += val; document.getElementById('calc-displa
 function calcClear() { calcInput = ""; document.getElementById('calc-display').value = "0"; }
 function calcEval() { try { calcInput = eval(calcInput).toString(); document.getElementById('calc-display').value = calcInput; } catch(e) { document.getElementById('calc-display').value = "Error"; calcInput = ""; } }
 
-let chromeHistory = ["https://www.bing.com"], chromeIndex = 0;
+let chromeHistory = ["https://www.google.com/webhp?igu=1"], chromeIndex = 0;
 function navigateChrome() {
     let url = document.getElementById('chrome-url').value;
     url = url.startsWith('http') ? url : 'https://' + url;
