@@ -1,13 +1,15 @@
 // --- 1. Notification System ---
 const notificationMgr = {
     showNotification: function({title, message, icon}) {
-        const iconEmoji = icon === 'shield-alert' ? '🛡️' : icon === 'sparkles' ? '✨' : '🚀';
+        const iconUrl = icon === 'shield-alert' ? 'https://img.icons8.com/color/48/shield.png' : 
+                        icon === 'sparkles' ? 'https://img.icons8.com/color/48/sparkling.png' : 
+                        'https://img.icons8.com/color/48/bell.png';
         
         // 1. Show floating toast
         const container = document.getElementById('notification-toast-container');
         const notif = document.createElement('div');
         notif.className = 'notification';
-        notif.innerHTML = `<div class="notif-icon">${iconEmoji}</div><div class="notif-content"><strong>${title}</strong><p>${message}</p></div>`;
+        notif.innerHTML = `<div class="notif-icon"><img src="${iconUrl}" style="width:24px;"></div><div class="notif-content"><strong>${title}</strong><p>${message}</p></div>`;
         container.appendChild(notif);
         
         setTimeout(() => {
@@ -22,7 +24,7 @@ const notificationMgr = {
 
         const qsItem = document.createElement('div');
         qsItem.className = 'qs-notif-item';
-        qsItem.innerHTML = `<div class="notif-icon">${iconEmoji}</div><div class="notif-content"><strong>${title}</strong><p>${message}</p></div><button class="qs-notif-close" onclick="this.parentElement.remove(); checkEmptyNotifs();">✕</button>`;
+        qsItem.innerHTML = `<div class="notif-icon"><img src="${iconUrl}" style="width:24px;"></div><div class="notif-content"><strong>${title}</strong><p>${message}</p></div><button class="qs-notif-close" onclick="this.parentElement.remove(); checkEmptyNotifs();">✕</button>`;
         qsList.prepend(qsItem);
     }
 };
@@ -364,172 +366,4 @@ function dragElement(elmnt) {
         else if (e.clientY < th) { showPreview(0, 0, '100%', '100%'); currentSnap = 'top'; } 
         else { snapPreview.style.display = 'none'; currentSnap = null; }
     }
-    function showPreview(l, t, w, h) { snapPreview.style.display = 'block'; snapPreview.style.left = l; snapPreview.style.top = t; snapPreview.style.width = w; snapPreview.style.height = h; }
-    function closeDragElement() {
-        document.onmouseup = null; document.onmousemove = null; elmnt.classList.remove('dragging'); snapPreview.style.display = 'none';
-        if (currentSnap === 'left') { elmnt.style.left = '0'; elmnt.style.top = '0'; elmnt.style.width = '50vw'; elmnt.style.height = '100vh'; } 
-        else if (currentSnap === 'right') { elmnt.style.left = '50vw'; elmnt.style.top = '0'; elmnt.style.width = '50vw'; elmnt.style.height = '100vh'; } 
-        else if (currentSnap === 'top') { elmnt.classList.add('fullscreen'); elmnt.style.width=''; elmnt.style.height=''; elmnt.style.top=''; elmnt.style.left=''; }
-        currentSnap = null;
-    }
-}
-
-// Draggable Desktop Icons Logic
-function dragDesktopIcon(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    elmnt.onmousedown = dragMouseDown;
-
-    function dragMouseDown(e) {
-        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
-        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
-    }
-    function elementDrag(e) {
-        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-    function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
-}
-
-// --- 6. Local File Explorer & Notepad ---
-let currentNotepadFile = null;
-
-function notepadSaveAs() {
-    let name = prompt("Enter file name (e.g. MyNotes):");
-    if(!name) return;
-    if(!name.endsWith('.txt')) name += '.txt';
-    currentNotepadFile = name;
-    notepadSave();
-}
-
-function notepadSave() {
-    if(!currentNotepadFile) { notepadSaveAs(); return; }
-    let content = document.getElementById('wordpad-editor').innerHTML;
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
-    files[currentNotepadFile] = content;
-    localStorage.setItem('aura_files', JSON.stringify(files));
-    notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
-    renderFiles();
-}
-
-function notepadOpen() {
-    let name = prompt("Enter the exact file name to open:");
-    if(!name) return;
-    if(!name.endsWith('.txt')) name += '.txt';
-    
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
-    if(files[name]) {
-        document.getElementById('wordpad-editor').innerHTML = files[name];
-        currentNotepadFile = name;
-    } else { alert("File not found!"); }
-}
-
-function renderFiles() {
-    const grid = document.getElementById('file-explorer-grid');
-    if(!grid) return;
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
-    grid.innerHTML = '';
-    for(let name in files) {
-        grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
-    }
-}
-
-window.openFileFromExplorer = function(name) {
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
-    document.getElementById('wordpad-editor').innerHTML = files[name];
-    currentNotepadFile = name;
-    openApp('wordpad-window'); 
-};
-
-
-// --- 7. Applications Logic ---
-let calcInput = "";
-function calcPress(val) { calcInput += val; document.getElementById('calc-display').value = calcInput; }
-function calcClear() { calcInput = ""; document.getElementById('calc-display').value = "0"; }
-function calcEval() { try { calcInput = eval(calcInput).toString(); document.getElementById('calc-display').value = calcInput; } catch(e) { document.getElementById('calc-display').value = "Error"; calcInput = ""; } }
-
-let chromeHistory = ["https://www.google.com/webhp?igu=1"], chromeIndex = 0;
-function navigateChrome() {
-    let url = document.getElementById('chrome-url').value;
-    url = url.startsWith('http') ? url : 'https://' + url;
-    chromeHistory = chromeHistory.slice(0, chromeIndex + 1); chromeHistory.push(url); chromeIndex++;
-    document.getElementById('chrome-frame').src = url; document.getElementById('chrome-url').value = url;
-}
-function chromeBack() { if (chromeIndex > 0) { chromeIndex--; document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; } }
-function chromeForward() { if (chromeIndex < chromeHistory.length - 1) { chromeIndex++; document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; } }
-function chromeReload() { const iframe = document.getElementById('chrome-frame'); iframe.src = iframe.src; }
-
-function setWallpaper(url) {
-    let highResUrl = url.replace("w=400", "w=2000");
-    document.getElementById('desktop').style.backgroundImage = `url('${highResUrl}')`;
-    localStorage.setItem('os_wallpaper', highResUrl);
-}
-
-document.getElementById('wallpaper-upload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            document.getElementById('desktop').style.backgroundImage = `url('${ev.target.result}')`;
-            try { localStorage.setItem('os_wallpaper', ev.target.result); } catch(err) { alert("Image applied for this session."); }
-        }; reader.readAsDataURL(file);
-    }
-});
-
-// --- 8. Taskbar & Play Store Logic ---
-function switchStoreTab(tabId) {
-    document.querySelectorAll('.play-tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.store-tab-content').forEach(content => content.classList.remove('active'));
-    document.querySelector(`[onclick="switchStoreTab('${tabId}')"]`).classList.add('active');
-    document.getElementById(`store-${tabId}-tab`).classList.add('active');
-}
-
-const taskbarIconsContainer = document.getElementById('app-icons');
-let draggedIcon = null;
-function makeIconDraggable(icon) {
-    icon.addEventListener('dragstart', function() { draggedIcon = this; setTimeout(() => this.classList.add('dragging-icon'), 0); });
-    icon.addEventListener('dragend', function() { setTimeout(() => { this.classList.remove('dragging-icon'); draggedIcon = null; }, 0); });
-    icon.addEventListener('dragover', (e) => e.preventDefault());
-    icon.addEventListener('drop', function(e) {
-        e.preventDefault();
-        if (draggedIcon !== this) {
-            let allIcons = [...taskbarIconsContainer.children];
-            allIcons.indexOf(draggedIcon) < allIcons.indexOf(this) ? this.after(draggedIcon) : this.before(draggedIcon);
-        }
-    });
-}
-
-function installApp(appId, iconSymbol, appName, buttonElement) {
-    if (document.getElementById('taskbar-' + appId)) return; 
-    const pCont = document.getElementById('progress-container-' + appId), pBar = document.getElementById('progress-bar-' + appId);
-    buttonElement.innerText = 'Installing...'; buttonElement.disabled = true; if(pCont) pCont.style.display = 'block';
-    
-    let progress = 0;
-    const dlInterval = setInterval(() => {
-        progress += Math.floor(Math.random() * 20) + 10; 
-        if (progress >= 100) {
-            progress = 100; clearInterval(dlInterval);
-            if(pBar) pBar.style.width = '100%';
-            buttonElement.innerText = 'Installed'; if(pCont) setTimeout(() => pCont.style.display = 'none', 500);
-            
-            restoreAppToTaskbar(appId, iconSymbol, appName); 
-            saveAppToStorage(appId, iconSymbol, appName);
-            
-            const launcherList = document.getElementById('launcher-list');
-            const item = document.createElement('div');
-            item.className = 'launcher-item';
-            item.onclick = () => openApp(appId);
-            item.innerHTML = `<div class="l-icon">${iconSymbol}</div><span class="l-text">${appName}</span>`;
-            launcherList.appendChild(item);
-        } else if(pBar) pBar.style.width = progress + '%';
-    }, 300); 
-}
-
-function restoreAppToTaskbar(appId, iconSymbol, appName) {
-    const btn = document.createElement('button'); btn.className = 'app-icon'; btn.id = 'taskbar-' + appId; btn.title = appName; btn.innerHTML = iconSymbol; btn.draggable = true; btn.onclick = () => toggleApp(appId);
-    taskbarIconsContainer.appendChild(btn); makeIconDraggable(btn);
-}
-
-function saveAppToStorage(appId, iconSymbol, appName) {
-    let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
-    savedApps.push({ id: appId, icon: iconSymbol, name: appName }); localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
-}
+    function showPreview(l, t, w, h) { snapPreview.style.display = 'block';
