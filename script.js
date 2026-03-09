@@ -1,22 +1,15 @@
-// --- 1. Notification System (Integrated into QS) ---
+// --- 1. Notification System ---
 const notificationMgr = {
     showNotification: function({title, message, icon}) {
-        const iconEmoji = icon === 'shield-alert' ? '🛡️' : icon === 'sparkles' ? '✨' : '🔔';
+        const iconEmoji = icon === 'shield-alert' ? '🛡️' : icon === 'sparkles' ? '✨' : '🚀';
         
-        // 1. Show floating toast bottom-right
+        // 1. Show floating toast
         const container = document.getElementById('notification-toast-container');
         const notif = document.createElement('div');
         notif.className = 'notification';
-        notif.innerHTML = `
-            <div class="notif-icon">${iconEmoji}</div>
-            <div class="notif-content">
-                <strong>${title}</strong>
-                <p>${message}</p>
-            </div>
-        `;
+        notif.innerHTML = `<div class="notif-icon">${iconEmoji}</div><div class="notif-content"><strong>${title}</strong><p>${message}</p></div>`;
         container.appendChild(notif);
         
-        // Remove toast after 7 seconds
         setTimeout(() => {
             notif.style.opacity = '0';
             setTimeout(() => notif.remove(), 300);
@@ -29,15 +22,8 @@ const notificationMgr = {
 
         const qsItem = document.createElement('div');
         qsItem.className = 'qs-notif-item';
-        qsItem.innerHTML = `
-            <div class="notif-icon">${iconEmoji}</div>
-            <div class="notif-content">
-                <strong>${title}</strong>
-                <p>${message}</p>
-            </div>
-            <button class="qs-notif-close" onclick="this.parentElement.remove(); checkEmptyNotifs();">✕</button>
-        `;
-        qsList.prepend(qsItem); // Push to top
+        qsItem.innerHTML = `<div class="notif-icon">${iconEmoji}</div><div class="notif-content"><strong>${title}</strong><p>${message}</p></div><button class="qs-notif-close" onclick="this.parentElement.remove(); checkEmptyNotifs();">✕</button>`;
+        qsList.prepend(qsItem);
     }
 };
 
@@ -64,7 +50,7 @@ function triggerInitialNotifications() {
         const firstTuesdayOfDec = 2; // Mar 10th, 2026
         notificationMgr.showNotification({
             title: "System Announcement",
-            message: `Safety is coming to Aura OS. You will be flagged if you use swear words or nasty usernames. Coming on December ${firstTuesdayOfDec}nd.`,
+            message: `Safety is coming to Aura OS. You will be flagged if you use swear words or nasty usernames. Coming on March 10th 2026.`,
             icon: "shield-alert"
         });
     }, 5000);
@@ -72,7 +58,6 @@ function triggerInitialNotifications() {
 
 // --- 2. Boot Sequence & OOBE Setup ---
 window.onload = function() {
-    // Check saved theme
     if(localStorage.getItem('os_theme') === 'light') {
         document.body.setAttribute('data-theme', 'light');
         document.getElementById('theme-text').innerText = "Light Theme";
@@ -131,6 +116,11 @@ function finalizeSetup() {
     document.getElementById('lock-username').innerText = tempUsername;
     
     initializeDesktop();
+    document.getElementById('welcome-modal').style.display = 'flex';
+}
+
+function closeWelcomeModal() {
+    document.getElementById('welcome-modal').style.display = 'none';
     triggerInitialNotifications();
 }
 
@@ -146,10 +136,11 @@ function initializeDesktop() {
     document.querySelectorAll('.app-icon').forEach(makeIconDraggable);
     document.querySelectorAll('.desktop-icon').forEach(dragDesktopIcon);
     initBattery();
+    renderFiles();
 }
 
 function factoryReset() {
-    if (confirm("WARNING: This will erase all settings, passwords, and installed apps. The system will reboot. Continue?")) {
+    if (confirm("WARNING: This will erase all settings, passwords, files, and apps. Continue?")) {
         localStorage.clear();
         location.reload();
     }
@@ -188,7 +179,6 @@ function initBattery() {
                 const tbBattery = document.getElementById('taskbar-battery');
                 const qsBatText = document.getElementById('qs-battery-text');
                 const qsBatIcon = document.getElementById('qs-battery-icon');
-                
                 if(tbBattery) tbBattery.innerText = battery.charging ? '⚡' : '🔋';
                 if(qsBatText) qsBatText.innerText = level;
                 if(qsBatIcon) qsBatIcon.innerText = battery.charging ? '⚡' : '🔋';
@@ -215,19 +205,14 @@ let selectedAppIdToUninstall = null;
 
 desktop.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    
-    // Check if right clicking an app icon on the taskbar
     const appIcon = e.target.closest('.app-icon');
-    
     if(appIcon) {
-        // Show uninstall option for Taskbar apps
         selectedAppIdToUninstall = appIcon.id.replace('taskbar-', '');
         uninstallBtn.style.display = 'block';
         contextMenu.style.display = 'block';
         contextMenu.style.left = e.clientX + 'px';
         contextMenu.style.top = (e.clientY - 100) + 'px'; 
     } else if(e.target === desktop || e.target.closest('#desktop-icons-container')) {
-        // Regular desktop right click
         selectedAppIdToUninstall = null;
         uninstallBtn.style.display = 'none';
         contextMenu.style.display = 'block';
@@ -236,50 +221,31 @@ desktop.addEventListener('contextmenu', (e) => {
     }
 });
 
-// Handle the uninstallation
 uninstallBtn.addEventListener('click', () => {
     if(selectedAppIdToUninstall) {
-        // Remove from taskbar
         const tbIcon = document.getElementById('taskbar-' + selectedAppIdToUninstall);
         if(tbIcon) tbIcon.remove();
         
-        // Remove from launcher
-        const launcherItems = document.querySelectorAll('.launcher-item');
-        launcherItems.forEach(item => {
-            if(item.getAttribute('onclick') === `openApp('${selectedAppIdToUninstall}')`) {
-                item.remove();
-            }
+        document.querySelectorAll('.launcher-item').forEach(item => {
+            if(item.getAttribute('onclick') === `openApp('${selectedAppIdToUninstall}')`) item.remove();
         });
         
-        // Reset App Store button
         const storeBtn = document.getElementById('install-btn-' + selectedAppIdToUninstall);
-        if(storeBtn) {
-            storeBtn.innerText = 'Install';
-            storeBtn.disabled = false;
-        }
+        if(storeBtn) { storeBtn.innerText = 'Install'; storeBtn.disabled = false; }
         
-        // Remove from local storage
         let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
         savedApps = savedApps.filter(app => app.id !== selectedAppIdToUninstall);
         localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
         
-        notificationMgr.showNotification({
-            title: "App Uninstalled",
-            message: "The application has been successfully removed.",
-            icon: "sparkles"
-        });
+        notificationMgr.showNotification({ title: "App Uninstalled", message: "Application removed successfully.", icon: "sparkles" });
     }
     contextMenu.style.display = 'none';
 });
 
 document.addEventListener('click', (e) => {
     if(!contextMenu.contains(e.target)) contextMenu.style.display = 'none';
-    if(!quickSettings.contains(e.target) && !document.getElementById('status-area').contains(e.target)) {
-        quickSettings.style.display = 'none';
-    }
-    if(!launcherMenu.contains(e.target) && !document.getElementById('launcher-btn').contains(e.target)) {
-        launcherMenu.style.display = 'none';
-    }
+    if(!quickSettings.contains(e.target) && !document.getElementById('status-area').contains(e.target)) quickSettings.style.display = 'none';
+    if(!launcherMenu.contains(e.target) && !document.getElementById('launcher-btn').contains(e.target)) launcherMenu.style.display = 'none';
 });
 
 function toggleQuickSettings() { quickSettings.style.display = quickSettings.style.display === 'none' ? 'block' : 'none'; launcherMenu.style.display = 'none'; }
@@ -323,7 +289,7 @@ function saveSecuritySettings() {
     msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 3000);
 }
 
-// --- 5. Window Memory Management & Maximizing ---
+// --- 5. Window Memory Management ---
 let highestZ = 10;
 function openApp(appId) {
     const appWindow = document.getElementById(appId);
@@ -350,7 +316,7 @@ function closeApp(appId) {
     const appWindow = document.getElementById(appId);
     appWindow.style.display = 'none'; 
     appWindow.classList.remove('minimized');
-    appWindow.classList.remove('fullscreen'); // reset maximize state
+    appWindow.classList.remove('fullscreen');
     updateTaskbarIndicator(appId, false);
     
     const iframe = appWindow.querySelector('iframe');
@@ -384,7 +350,7 @@ function dragElement(elmnt) {
 
     function dragMouseDown(e) {
         if(e.target.tagName === 'BUTTON') return;
-        if(elmnt.classList.contains('fullscreen')) return; // Disable dragging if maximized
+        if(elmnt.classList.contains('fullscreen')) return; 
         e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
         document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
         elmnt.classList.add('dragging');
@@ -414,25 +380,68 @@ function dragDesktopIcon(elmnt) {
     elmnt.onmousedown = dragMouseDown;
 
     function dragMouseDown(e) {
-        e.preventDefault();
-        pos3 = e.clientX; pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
+        e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
+        document.onmouseup = closeDragElement; document.onmousemove = elementDrag;
     }
     function elementDrag(e) {
-        e.preventDefault();
-        pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
-        pos3 = e.clientX; pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px"; elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
     }
-    function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
+    function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
+}
+
+// --- 6. Local File Explorer & Notepad ---
+let currentNotepadFile = null;
+
+function notepadSaveAs() {
+    let name = prompt("Enter file name (e.g. MyNotes):");
+    if(!name) return;
+    if(!name.endsWith('.txt')) name += '.txt';
+    currentNotepadFile = name;
+    notepadSave();
+}
+
+function notepadSave() {
+    if(!currentNotepadFile) { notepadSaveAs(); return; }
+    let content = document.getElementById('wordpad-editor').innerHTML;
+    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    files[currentNotepadFile] = content;
+    localStorage.setItem('aura_files', JSON.stringify(files));
+    notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
+    renderFiles();
+}
+
+function notepadOpen() {
+    let name = prompt("Enter the exact file name to open:");
+    if(!name) return;
+    if(!name.endsWith('.txt')) name += '.txt';
+    
+    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    if(files[name]) {
+        document.getElementById('wordpad-editor').innerHTML = files[name];
+        currentNotepadFile = name;
+    } else { alert("File not found!"); }
+}
+
+function renderFiles() {
+    const grid = document.getElementById('file-explorer-grid');
+    if(!grid) return;
+    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    grid.innerHTML = '';
+    for(let name in files) {
+        grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
     }
 }
 
-// --- 6. Applications Logic ---
+window.openFileFromExplorer = function(name) {
+    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
+    document.getElementById('wordpad-editor').innerHTML = files[name];
+    currentNotepadFile = name;
+    openApp('wordpad-window'); 
+};
+
+
+// --- 7. Applications Logic ---
 let calcInput = "";
 function calcPress(val) { calcInput += val; document.getElementById('calc-display').value = calcInput; }
 function calcClear() { calcInput = ""; document.getElementById('calc-display').value = "0"; }
@@ -449,7 +458,6 @@ function chromeBack() { if (chromeIndex > 0) { chromeIndex--; document.getElemen
 function chromeForward() { if (chromeIndex < chromeHistory.length - 1) { chromeIndex++; document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; } }
 function chromeReload() { const iframe = document.getElementById('chrome-frame'); iframe.src = iframe.src; }
 
-// Wallpaper Handling
 function setWallpaper(url) {
     let highResUrl = url.replace("w=400", "w=2000");
     document.getElementById('desktop').style.backgroundImage = `url('${highResUrl}')`;
@@ -467,7 +475,7 @@ document.getElementById('wallpaper-upload').addEventListener('change', function(
     }
 });
 
-// --- 7. Taskbar & Play Store Logic ---
+// --- 8. Taskbar & Play Store Logic ---
 function switchStoreTab(tabId) {
     document.querySelectorAll('.play-tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.store-tab-content').forEach(content => content.classList.remove('active'));
