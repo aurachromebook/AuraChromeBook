@@ -132,50 +132,6 @@
             </div>
         </div>
 
-        <div class="window" id="messages-window" style="display: none; width: 800px; height: 500px;">
-            <div class="window-header" id="messages-window-header"><span class="window-title">💬 Aura Messages</span><div><button class="win-btn" onclick="minimizeApp('messages-window')">−</button><button class="win-btn" onclick="maximizeApp('messages-window')">□</button><button class="win-btn close-btn" onclick="closeApp('messages-window')">✕</button></div></div>
-            <div class="window-content msg-app-bg">
-                <div id="msg-auth-view" class="msg-view active">
-                    <div class="msg-auth-card">
-                        <h2>Aura Messages</h2>
-                        <p>Sign in or create an account to chat with friends.</p>
-                        <input type="text" id="msg-username" placeholder="Username" class="modern-input">
-                        <input type="password" id="msg-password" placeholder="Password" class="modern-input">
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button class="modern-btn" onclick="window.msgLogin()">Login</button>
-                            <button class="modern-btn" style="background: var(--sys-surface); color: var(--sys-primary); border: 1px solid var(--sys-primary);" onclick="window.msgSignup()">Create Account</button>
-                        </div>
-                        <p id="msg-auth-error" style="color: #ea4335; font-size: 12px; margin-top: 10px; display: none;"></p>
-                    </div>
-                </div>
-
-                <div id="msg-warning-view" class="msg-view">
-                    <div class="msg-auth-card" style="border-color: #ea4335;">
-                        <h2 style="color: #ea4335;">⚠️ Warning</h2>
-                        <p>This is under development.<br><strong>Please Don’t Forget Your Password</strong>, You will lose the ability to sign in forever.</p>
-                        <button class="modern-btn" style="background: #ea4335; width: 100%;" onclick="window.msgAcknowledgeWarning()">Okay, I understand</button>
-                    </div>
-                </div>
-
-                <div id="msg-main-view" class="msg-view" style="flex-direction: row; height: 100%;">
-                    <div class="msg-sidebar">
-                        <div class="msg-sidebar-header"><span id="msg-my-name" style="font-weight: bold;">User</span><button onclick="window.msgLogout()" style="background: transparent; border: none; color: var(--sys-text-muted); cursor: pointer;">Logout</button></div>
-                        <div class="msg-add-friend"><input type="text" id="msg-add-input" placeholder="Add Friend (Username)"><button onclick="window.msgAddFriend()">+</button></div>
-                        <div class="msg-friends-list" id="msg-friends-list"></div>
-                    </div>
-                    <div class="msg-chat-area">
-                        <div class="msg-chat-header"><span id="msg-current-chat-name">Select a friend to chat</span><button class="msg-report-btn" onclick="alert('User reported. Our safety team will review this chat.')">🚩 Report</button></div>
-                        <div class="msg-chat-history" id="msg-chat-history"></div>
-                        <div class="msg-chat-input">
-                            <button class="msg-img-btn" onclick="alert('Coming Soon')">📷</button>
-                            <input type="text" id="msg-text-input" placeholder="Message..." onkeypress="if(event.key === 'Enter') window.msgSend()">
-                            <button class="msg-send-btn" onclick="window.msgSend()">Send</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="window" id="chrome-window" style="display: none;">
             <div class="window-header" id="chrome-window-header"><span class="window-title">🌐 Google Chrome</span><div><button class="win-btn" onclick="minimizeApp('chrome-window')">−</button><button class="win-btn" onclick="maximizeApp('chrome-window')">□</button><button class="win-btn close-btn" onclick="closeApp('chrome-window')">✕</button></div></div>
             <div class="browser-toolbar">
@@ -213,14 +169,12 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 3.5 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Version 3.6 (Latest)</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
+                        <li>Replaced Aura Messages with Discord Integration</li>
+                        <li>Removed Firebase backend dependency</li>
                         <li>Added Smash Carts game to App Store</li>
                         <li>Fixed keyboard/mouse support (WASD) for 3D games</li>
-                        <li>Safety Era Updates & Notifications</li>
-                        <li>File Explorer & Notepad Saving</li>
-                        <li>Aura Messages App (Firebase Integrated)</li>
-                        <li>Window Maximizing & Uninstalling Apps</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -250,7 +204,6 @@
                     <h2 class="play-section-title">Recommended for you</h2>
                     <div class="store-grid">
                         <div class="store-card"><div class="store-icon">🏎️</div><div class="store-info"><strong>Smash Carts</strong><span>Action • 4.8 ★</span></div><button id="install-btn-smashcarts-window" class="store-btn" onclick="installApp('smashcarts-window', '🏎️', 'Smash Carts', this)">Install</button><div class="progress-container" id="progress-container-smashcarts-window"><div class="progress-bar" id="progress-bar-smashcarts-window"></div></div></div>
-
                         <div class="store-card"><div class="store-icon">🐻</div><div class="store-info"><strong>Five Nights</strong><span>Action • 4.5 ★</span></div><button id="install-btn-fnae-window" class="store-btn" onclick="installApp('fnae-window', '🐻', 'Five Nights', this)">Install</button><div class="progress-container" id="progress-container-fnae-window"><div class="progress-bar" id="progress-bar-fnae-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">⛏️</div><div class="store-info"><strong>Eaglercraft</strong><span>Adventure • 4.8 ★</span></div><button id="install-btn-eaglercraft-window" class="store-btn" onclick="installApp('eaglercraft-window', '⛏️', 'Eaglercraft', this)">Install</button><div class="progress-container" id="progress-container-eaglercraft-window"><div class="progress-bar" id="progress-bar-eaglercraft-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">👵</div><div class="store-info"><strong>Granny</strong><span>Horror • 4.3 ★</span></div><button id="install-btn-granny-window" class="store-btn" onclick="installApp('granny-window', '👵', 'Granny', this)">Install</button><div class="progress-container" id="progress-container-granny-window"><div class="progress-bar" id="progress-bar-granny-window"></div></div></div>
@@ -266,7 +219,7 @@
                 <div id="store-apps-tab" class="store-tab-content">
                     <h2 class="play-section-title">Essential Apps</h2>
                     <div class="store-grid">
-                        <div class="store-card"><div class="store-icon" style="color: #5865F2;">💬</div><div class="store-info"><strong>Aura Messages</strong><span>Social • 4.8 ★</span></div><button id="install-btn-messages-window" class="store-btn" onclick="installApp('messages-window', '💬', 'Aura Messages', this)">Install</button><div class="progress-container" id="progress-container-messages-window"><div class="progress-bar" id="progress-bar-messages-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon" style="color: #5865F2;">💬</div><div class="store-info"><strong>Discord</strong><span>Social • 4.9 ★</span></div><button id="install-btn-discord-window" class="store-btn" onclick="installApp('discord-window', '💬', 'Discord', this)">Install</button><div class="progress-container" id="progress-container-discord-window"><div class="progress-bar" id="progress-bar-discord-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🎬</div><div class="store-info"><strong>AuraFlix</strong><span>Entertainment • 4.7 ★</span></div><button id="install-btn-auraflix-window" class="store-btn" onclick="installApp('auraflix-window', '🎬', 'AuraFlix', this)">Install</button><div class="progress-container" id="progress-container-auraflix-window"><div class="progress-bar" id="progress-bar-auraflix-window"></div></div></div>
                         <div class="store-card"><div class="store-icon" style="color: #ff3b30;">🎵</div><div class="store-info"><strong>Aura Music</strong><span>Audio • 4.6 ★</span></div><button id="install-btn-auramusic-window" class="store-btn" onclick="installApp('auramusic-window', '🎵', 'Aura Music', this)">Install</button><div class="progress-container" id="progress-container-auramusic-window"><div class="progress-bar" id="progress-bar-auramusic-window"></div></div></div>
                         
@@ -277,12 +230,13 @@
             </div>
         </div>
 
+        <div class="window" id="discord-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title" style="color: #5865F2;">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Discord.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; microphone; camera; clipboard-read; clipboard-write;"></iframe></div></div>
+        
         <div class="window" id="auraflix-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="auraflix-window-header"><span class="window-title">🎬 AuraFlix</span><div><button class="win-btn" onclick="minimizeApp('auraflix-window')">−</button><button class="win-btn" onclick="maximizeApp('auraflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auraflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen"></iframe></div></div>
         <div class="window" id="auramusic-window" style="display: none; width: 600px; height: 500px;"><div class="window-header" id="auramusic-window-header"><span class="window-title">🎵 Aura Music</span><div><button class="win-btn" onclick="minimizeApp('auramusic-window')">−</button><button class="win-btn" onclick="maximizeApp('auramusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auramusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen"></iframe></div></div>
         
         <div class="window" id="smashcarts-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="smashcarts-window-header"><span class="window-title">🏎️ Smash Carts</span><div><button class="win-btn" onclick="minimizeApp('smashcarts-window')">−</button><button class="win-btn" onclick="maximizeApp('smashcarts-window')">□</button><button class="win-btn close-btn" onclick="closeApp('smashcarts-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/smash carts.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="eaglercraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="eaglercraft-window-header"><span class="window-title">⛏️ Eaglercraft</span><div><button class="win-btn" onclick="minimizeApp('eaglercraft-window')">−</button><button class="win-btn" onclick="maximizeApp('eaglercraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('eaglercraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Eaglercraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        
         <div class="window" id="fnae-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fnae-window-header"><span class="window-title">🐻 Five Nights</span><div><button class="win-btn" onclick="minimizeApp('fnae-window')">−</button><button class="win-btn" onclick="maximizeApp('fnae-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fnae-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Five Nights at Epstein's.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="granny-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny-window-header"><span class="window-title">👵 Granny</span><div><button class="win-btn" onclick="minimizeApp('granny-window')">−</button><button class="win-btn" onclick="maximizeApp('granny-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Granny.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="escaperoad-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad-window-header"><span class="window-title">🚗 Escape Road</span><div><button class="win-btn" onclick="minimizeApp('escaperoad-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
@@ -354,158 +308,5 @@
     </div>
 
     <script src="script.js"></script>
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp, doc, setDoc, getDoc, updateDoc, arrayUnion, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const cfg={apiKey:"AIzaSyB_wEHBTj2vYiXeoESIGgGCatnWgqW5P1w",authDomain:"w3chat-82711.firebaseapp.com",projectId:"w3chat-82711",storageBucket:"w3chat-82711.firebasestorage.app",messagingSenderId:"36226332250",appId:"1:36226332250:web:0514fee75633359ea50a63"};
-        let app, auth, db, currentUser = null, currentChatId = null;
-        
-        try { app=initializeApp(cfg); auth=getAuth(app); db=getFirestore(app); } catch(e) {}
-
-        window.msgLogin = async function() {
-            const u = document.getElementById('msg-username').value.trim().toLowerCase();
-            const p = document.getElementById('msg-password').value;
-            const err = document.getElementById('msg-auth-error');
-            if(!u || !p) { err.innerText = "Please fill out all fields."; err.style.display="block"; return; }
-            try {
-                await signInWithEmailAndPassword(auth, u+"@auraos.local", p);
-                err.style.display="none";
-            } catch(e) { err.innerText = "Login failed. Check your password."; err.style.display="block"; }
-        }
-
-        window.msgSignup = async function() {
-            const u = document.getElementById('msg-username').value.trim().toLowerCase();
-            const p = document.getElementById('msg-password').value;
-            const err = document.getElementById('msg-auth-error');
-            if(!u || p.length < 6) { err.innerText = "Username required, password min 6 chars."; err.style.display="block"; return; }
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, u+"@auraos.local", p);
-                await setDoc(doc(db, "users", cred.user.uid), { username: u, friends: [], requests: [] });
-                err.style.display="none";
-                
-                document.querySelectorAll('.msg-view').forEach(v => v.classList.remove('active'));
-                document.getElementById('msg-warning-view').classList.add('active');
-            } catch(e) { err.innerText = "Username may already exist."; err.style.display="block"; }
-        }
-
-        window.msgAcknowledgeWarning = function() {
-            document.querySelectorAll('.msg-view').forEach(v => v.classList.remove('active'));
-            document.getElementById('msg-main-view').classList.add('active');
-        }
-
-        window.msgLogout = function() { signOut(auth); }
-
-        window.msgAddFriend = async function() {
-            const input = document.getElementById('msg-add-input');
-            const targetUsername = input.value.trim().toLowerCase();
-            if(!targetUsername || targetUsername === currentUser.username) return;
-            
-            try {
-                const q = query(collection(db, "users"), where("username", "==", targetUsername));
-                onSnapshot(q, (snap) => {
-                    if(!snap.empty) {
-                        const targetUserDoc = snap.docs[0];
-                        updateDoc(doc(db, "users", targetUserDoc.id), { requests: arrayUnion(currentUser.username) });
-                        alert("Friend request sent to " + targetUsername + "!");
-                        input.value = "";
-                    } else { alert("User not found."); }
-                });
-            } catch(e) { console.error(e); }
-        }
-
-        window.msgSend = async function() {
-            if(!currentChatId) return;
-            const input = document.getElementById('msg-text-input');
-            const text = input.value.trim();
-            if(!text) return;
-            await addDoc(collection(db, "messages"), { chatId: currentChatId, sender: currentUser.username, text: text, timestamp: serverTimestamp() });
-            input.value = "";
-        }
-
-        if(auth) {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    const uDoc = await getDoc(doc(db, "users", user.uid));
-                    if(uDoc.exists()) {
-                        currentUser = Object.assign({uid: user.uid}, uDoc.data());
-                        document.getElementById('msg-my-name').innerText = currentUser.username;
-                        
-                        if(document.getElementById('msg-warning-view').classList.contains('active') === false) {
-                            document.querySelectorAll('.msg-view').forEach(v => v.classList.remove('active'));
-                            document.getElementById('msg-main-view').classList.add('active');
-                        }
-                        setupFriendListeners();
-                    }
-                } else {
-                    currentUser = null;
-                    document.querySelectorAll('.msg-view').forEach(v => v.classList.remove('active'));
-                    document.getElementById('msg-auth-view').classList.add('active');
-                }
-            });
-        }
-
-        let activeChatUnsub = null;
-        function setupFriendListeners() {
-            onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
-                const data = docSnap.data();
-                if(!data) return;
-                
-                const incomingReqs = data.requests || [];
-                if(incomingReqs.length > 0 && incomingReqs.length > (currentUser.requests?.length || 0)) {
-                    window.notificationMgr.showNotification({ title: "New Friend Request", message: `${incomingReqs[incomingReqs.length-1]} sent you a request!`, icon: "sparkles" });
-                }
-                currentUser.requests = incomingReqs;
-
-                const flist = document.getElementById('msg-friends-list');
-                flist.innerHTML = "";
-                
-                incomingReqs.forEach(req => {
-                    flist.innerHTML += `<div class="msg-friend-item" style="background:rgba(234,67,53,0.1)">
-                        <span>${req} (Req)</span>
-                        <button onclick="window.msgAcceptReq('${req}')" style="background:var(--sys-primary); color:#fff; border:none; padding:2px 8px; border-radius:10px;">Accept</button>
-                    </div>`;
-                });
-
-                (data.friends || []).forEach(friend => {
-                    flist.innerHTML += `<div class="msg-friend-item" onclick="window.msgOpenChat('${friend}')"><span>👤 ${friend}</span></div>`;
-                });
-            });
-        }
-
-        window.msgAcceptReq = async function(reqName) {
-            await updateDoc(doc(db, "users", currentUser.uid), { friends: arrayUnion(reqName), requests: [] });
-            const q = query(collection(db, "users"), where("username", "==", reqName));
-            onSnapshot(q, (snap) => {
-                if(!snap.empty) {
-                    updateDoc(doc(db, "users", snap.docs[0].id), { friends: arrayUnion(currentUser.username) });
-                }
-            });
-        }
-
-        window.msgOpenChat = function(friendName) {
-            document.getElementById('msg-current-chat-name').innerText = "Chatting with: " + friendName;
-            const arr = [currentUser.username, friendName].sort();
-            currentChatId = arr[0] + "_" + arr[1];
-
-            if(activeChatUnsub) activeChatUnsub();
-            
-            const q = query(collection(db, "messages"), where("chatId", "==", currentChatId), orderBy("timestamp", "asc"));
-            activeChatUnsub = onSnapshot(q, (snap) => {
-                const hist = document.getElementById('msg-chat-history');
-                hist.innerHTML = "";
-                snap.forEach(d => {
-                    const msg = d.data();
-                    const isMe = msg.sender === currentUser.username;
-                    hist.innerHTML += `<div class="msg-bubble ${isMe ? 'me' : 'them'}">
-                        <small style="font-size:10px; opacity:0.7;">${msg.sender}</small><br>${msg.text}
-                    </div>`;
-                });
-                hist.scrollTop = hist.scrollHeight;
-            });
-        }
-    </script>
 </body>
 </html>
