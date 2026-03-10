@@ -1,19 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- This was inpired by Discord, and was created by EyesHD 
-Discord: erroryt_eren
-Roblox: Eren_Hacketo
-Tiktok: @eyeshd-offical
-
-Made by EyesHD | V1.6 BETA
-[NOTE] IF YOU COPY W3Chat, YOU WILL BE SUED OR YOUR SITE WILL BE TAKEN DOWN. 
-You can make an link of W3chat, Just incase if this link is blocked for you. 
-
-JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Classes</title>
+    <title>Auracord</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,9 +12,11 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         ::-webkit-scrollbar { width:8px; height:8px; background:#2b2d31; }
         ::-webkit-scrollbar-thumb { background:#1a1b1e; border-radius:4px; }
         
+        /* SERVER ICONS & PILLS */
         .s-icon { transition:0.2s; background-size:cover; background-position:center; cursor:pointer; width:48px; height:48px; border-radius:50%; background:#36393f; color:#dcddde; display:flex; align-items:center; justify-content:center; margin-bottom:8px; position:relative; }
         .s-icon:hover, .s-icon.active { border-radius:30%; background:var(--brand); color:white; }
         
+        /* White Unread Pill */
         .unread-pill { position: absolute; left: -14px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background: white; border-radius: 0 4px 4px 0; display: none; transition: 0.2s; }
         .s-icon:hover .unread-pill { height: 20px; display: block; }
         .s-icon.unread .unread-pill { display: block; height: 8px; }
@@ -58,6 +50,7 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         .control-btn.active { background: #fff; color: #36393f; }
         #updates-sidebar { transition: transform 0.3s ease-in-out; }
         .admin-tab.active { border-bottom: 2px solid #5865F2; color: white; }
+        /* Toast Container */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { background: #2f3136; border-left: 4px solid #5865F2; padding: 12px 20px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transform: translateX(100%); transition: transform 0.3s ease-out; color: white; min-width: 250px; pointer-events: auto; }
         .toast.show { transform: translateX(0); }
@@ -68,20 +61,77 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         .reaction-pill:hover { border-color: #5865F2; }
         .reaction-pill.active { background: rgba(88, 101, 242, 0.15); border-color: #5865F2; }
         .mobile-hide { display: none; } @media(min-width:768px){ .mobile-hide{ display:flex; } }
+        
+        /* Table Styles for Nitro */
         .nitro-table th, .nitro-table td { padding: 10px; text-align: left; border-bottom: 1px solid #3f4147; }
         .nitro-table th { color: #b9bbbe; font-size: 12px; text-transform: uppercase; }
         .nitro-table td { color: white; font-size: 14px; }
         .check-icon { color: #3ba55c; }
         .cross-icon { color: #ed4245; }
+        
+        /* DM Alert Modal */
         #dm-alert-modal { animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Profile Card */
+        .profile-card { background: #18191c; border-radius: 8px; width: 300px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.6); animation: popIn 0.2s ease; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .profile-banner { height: 60px; background-size: cover; background-position: center; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 6px solid #18191c; margin-top: -40px; margin-left: 16px; background: #36393f; position: relative; overflow: hidden; }
+        .profile-body { padding: 16px; padding-top: 8px; }
+        .profile-username { font-size: 20px; font-weight: bold; color: white; display: flex; align-items: center; gap: 4px; }
+        .profile-badges { display: flex; gap: 4px; margin-top: 8px; }
+        .badge { width: 22px; height: 22px; background: #202225; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .badge.nitro { background: linear-gradient(45deg, #ff00cc, #3333ff); }
+        
+        /* Boost Progress Bar */
+        .boost-bar { height: 8px; background: #202225; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+        .boost-fill { height: 100%; background: linear-gradient(90deg, #ff73fa, #ffc0ff); transition: width 0.3s; }
+        .boost-btn { background: linear-gradient(90deg, #ff73fa, #ffc0ff); color: black; font-weight: bold; padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; }
+        .boost-btn:hover { opacity: 0.9; }
+        .boost-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Shiny Nitro Name */
+        .shiny-name { background: linear-gradient(45deg, #ff00cc, #3333ff, #ff00cc); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s linear infinite; }
+        @keyframes shine { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     </style>
 </head>
-<body class="flex h-screen w-screen select-none text-sm" onclick="window.enableAudio()">
+<body class="flex h-screen w-screen select-none text-sm" onclick="window.enableAudio(); window.closeProfileCard(event);">
 
     <div id="toast-container"></div>
     <audio id="remote-audio" autoplay></audio>
 
+    <!-- Profile Card Popup -->
+    <div id="profile-card" class="hidden fixed z-[100]" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="profile-card">
+            <div id="profile-banner" class="profile-banner" style="background: linear-gradient(45deg, #5865F2, #7289da);"></div>
+            <div class="flex justify-between items-start">
+                <div id="profile-avatar" class="profile-avatar flex items-center justify-center text-white text-2xl font-bold">
+                    <img id="profile-avatar-img" class="hidden w-full h-full object-cover">
+                    <span id="profile-avatar-text">U</span>
+                </div>
+            </div>
+            <div class="profile-body">
+                <div id="profile-username" class="profile-username">
+                    Username
+                    <span id="profile-nitro-badge" class="hidden"><i class="fas fa-rocket text-pink-500"></i></span>
+                    <span id="profile-bot-badge" class="hidden bot-tag"><i class="fas fa-check"></i> BOT</span>
+                </div>
+                <div id="profile-handle" class="text-[#b9bbbe] text-sm mb-2">@username</div>
+                <div id="profile-badges" class="profile-badges mb-3"></div>
+                <div class="border-t border-[#3f4147] pt-3">
+                    <div class="text-[#b9bbbe] text-xs font-bold uppercase mb-1">About Me</div>
+                    <div id="profile-about" class="text-[#dcddde] text-sm">No about me yet.</div>
+                </div>
+                <div id="profile-actions" class="flex gap-2 mt-4">
+                    <button onclick="window.sendFriendRequestFromCard()" class="flex-1 bg-[#5865F2] text-white py-2 rounded text-sm font-medium hover:bg-[#4752c4]">Add Friend</button>
+                    <button onclick="window.startDMFromCard()" class="flex-1 bg-[#3ba55c] text-white py-2 rounded text-sm font-medium hover:bg-[#2d7d46]">Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DM Alert Modal -->
     <div id="dm-alert-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center bg-black bg-opacity-80">
         <div class="bg-[#36393f] rounded p-6 shadow-2xl border border-[#202225] w-96 text-center">
             <div class="mb-4"><i class="fas fa-envelope text-4xl text-[#5865F2]"></i></div>
@@ -97,6 +147,8 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             <div class="flex-1 flex flex-col items-center justify-center text-center px-4">
                 <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 uppercase">Imagine a Place...</h1>
                 <p class="text-white text-lg max-w-2xl mb-8 opacity-90">Where you and your friends can spend time together.</p>
+                
+                <!-- Showcase Video -->
                 <div class="w-full max-w-4xl bg-black rounded-xl overflow-hidden shadow-2xl mb-8 border-4 border-[#2f3136] relative">
                     <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded font-bold uppercase text-xs z-10">New: Mobile Support</div>
                     <video autoplay loop muted playsinline class="w-full h-auto opacity-80">
@@ -104,11 +156,13 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                         Your browser does not support the video tag.
                     </video>
                 </div>
+                
                 <button onclick="window.showLogin()" class="bg-[#2f3136] text-white px-8 py-3 rounded-full hover:shadow-xl transition font-bold text-lg">Open W3Chat</button>
             </div>
         </div>
     </div>
 
+    <!-- CALL OVERLAY -->
     <div id="call-overlay" class="hidden fixed inset-0 z-[100] bg-black flex flex-col">
         <div class="absolute top-4 left-4 z-50"><button onclick="window.endVoiceCall()" class="bg-red-500 text-white px-4 py-2 rounded font-bold shadow-lg hover:bg-red-600 transition"><i class="fas fa-phone-slash mr-2"></i> End Call</button></div>
         <div id="jitsi-container" class="w-full h-full bg-black"></div>
@@ -161,7 +215,22 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
 
             <div id="content-area" class="flex-1 overflow-hidden relative flex flex-col">
                 <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar flex flex-col"></div>
-                <div id="friends-view" class="hidden absolute inset-0 bg-[#36393f] flex flex-col"><div class="p-4 border-b border-[#26272d] flex items-center justify-between"><h2 class="text-white font-bold">Friends</h2><div class="flex space-x-2"><button onclick="window.openModal('create-group-dm-modal')" class="bg-[#2f3136] text-white px-3 py-1 rounded text-xs">New Group</button><button onclick="window.openModal('add-friend-modal')" class="bg-green-600 text-white px-3 py-1 rounded text-xs">Add Friend</button></div></div><div id="friends-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div></div>
+                <div id="friends-view" class="hidden absolute inset-0 bg-[#36393f] flex flex-col">
+                    <div class="p-4 border-b border-[#26272d] flex items-center justify-between">
+                        <h2 class="text-white font-bold">Friends</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="window.openModal('create-group-dm-modal')" class="bg-[#2f3136] text-white px-3 py-1 rounded text-xs">New Group</button>
+                            <button onclick="window.openModal('add-friend-modal')" class="bg-green-600 text-white px-3 py-1 rounded text-xs">Add Friend</button>
+                        </div>
+                    </div>
+                    <div class="flex border-b border-[#26272d]">
+                        <button onclick="window.switchFriendsTab('online')" id="tab-online" class="px-4 py-2 text-[#b9bbbe] hover:text-white border-b-2 border-transparent hover:border-[#b9bbbe]">Online</button>
+                        <button onclick="window.switchFriendsTab('all')" id="tab-all" class="px-4 py-2 text-[#b9bbbe] hover:text-white border-b-2 border-transparent hover:border-[#b9bbbe]">All</button>
+                        <button onclick="window.switchFriendsTab('pending')" id="tab-pending" class="px-4 py-2 text-[#b9bbbe] hover:text-white border-b-2 border-transparent hover:border-[#b9bbbe]">Pending</button>
+                        <button onclick="window.switchFriendsTab('blocked')" id="tab-blocked" class="px-4 py-2 text-[#b9bbbe] hover:text-white border-b-2 border-transparent hover:border-[#b9bbbe]">Blocked</button>
+                    </div>
+                    <div id="friends-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+                </div>
             </div>
             <div id="typing-indicator" class="px-4 py-1 h-6 text-xs text-[#dcddde] font-bold typing-dots hidden"></div>
             <div id="input-area" class="px-4 pb-6 pt-0">
@@ -198,16 +267,25 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         </div>
     </div>
 
-    <div id="create-server-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6 relative"><button onclick="window.closeModal('create-server-modal')" class="absolute top-2 right-2 text-white">x</button><h2 class="text-white font-bold mb-4">Create Server</h2><input id="new-server-name" class="w-full bg-[#202225] p-2 text-white rounded mb-2" placeholder="Name"><input id="new-server-icon" class="w-full bg-[#202225] p-2 text-white rounded mb-2" placeholder="Icon URL"><input type="file" id="new-server-file" class="text-xs text-gray-400 mb-4"><div class="flex justify-between"><button onclick="window.closeModal('create-server-modal');window.openModal('join-server-modal')" class="text-blue-400 text-xs">Join</button><button onclick="window.handleCreateServer()" class="bg-[#5865F2] text-white px-4 py-1 rounded">Create</button></div></div></div>
-    <div id="join-server-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6 relative"><button onclick="window.closeModal('join-server-modal')" class="absolute top-2 right-2 text-white">x</button><h2 class="text-white font-bold mb-4">Join Server</h2><input id="join-invite-code" class="w-full bg-[#202225] p-2 text-white rounded mb-4" placeholder="Code"><button onclick="window.handleJoinServer()" class="bg-green-600 w-full py-1 rounded text-white">Join</button></div></div>
+    <!-- MODALS & PICKERS -->
+    <div id="create-server-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-white font-bold mb-4">Create Server</h2><input id="new-server-name" class="w-full bg-[#202225] p-2 text-white rounded mb-2" placeholder="Name"><input id="new-server-icon" class="w-full bg-[#202225] p-2 text-white rounded mb-2" placeholder="Icon URL"><input type="file" id="new-server-file" class="text-xs text-gray-400 mb-4"><div class="flex justify-between"><button onclick="window.closeModal('create-server-modal');window.openModal('join-server-modal')" class="text-blue-400 text-xs">Join</button><button onclick="window.handleCreateServer()" class="bg-[#5865F2] text-white px-4 py-1 rounded">Create</button></div><button onclick="window.closeModal('create-server-modal')" class="absolute top-2 right-2 text-white">x</button></div></div>
+    <div id="join-server-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-white font-bold mb-4">Join Server</h2><input id="join-invite-code" class="w-full bg-[#202225] p-2 text-white rounded mb-4" placeholder="Code"><button onclick="window.handleJoinServer()" class="bg-green-600 w-full py-1 rounded text-white">Join</button><button onclick="window.closeModal('join-server-modal')" class="absolute top-2 right-2 text-white">x</button></div></div>
     <div id="create-category-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-lg font-bold text-white mb-4">Create Category</h2><input id="new-category-name" class="w-full bg-[#202225] p-2 text-white rounded mb-4" placeholder="CATEGORY NAME"><div class="flex justify-end"><button onclick="window.closeModal('create-category-modal')" class="text-white mr-2">Cancel</button><button onclick="window.handleCreateCategory()" class="bg-[#5865F2] text-white px-4 py-1 rounded">Create</button></div></div></div>
-    <div id="add-friend-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-lg font-bold text-white mb-2">Add Friend</h2><input id="friend-username-input" class="w-full bg-[#202225] p-2 text-white rounded mb-4" placeholder="Username"><div class="flex justify-end"><button onclick="window.closeModal('add-friend-modal')" class="text-white mr-2">Cancel</button><button onclick="window.sendFriendRequest()" class="bg-[#3ba55c] text-white px-4 py-1 rounded">Send</button></div></div></div>
-    <div id="create-group-dm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6 relative"><button onclick="window.closeModal('create-group-dm-modal')" class="absolute top-2 right-2 text-white">x</button><h2 class="text-lg font-bold text-white mb-2">Create Group DM</h2><div id="group-friend-list" class="max-h-40 overflow-y-auto mb-4"></div><button id="create-group-btn" class="bg-[#5865F2] w-full py-1 rounded text-white">Create</button></div></div>
+    <div id="add-friend-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-lg font-bold text-white mb-2">Add Friend</h2><input id="friend-username-input" class="w-full bg-[#202225] p-2 text-white rounded mb-4" placeholder="Username#0000"><div class="flex justify-end"><button onclick="window.closeModal('add-friend-modal')" class="text-white mr-2">Cancel</button><button onclick="window.sendFriendRequest()" class="bg-[#3ba55c] text-white px-4 py-1 rounded">Send</button></div></div></div>
+    <div id="create-group-dm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-lg font-bold text-white mb-2">Create Group DM</h2><div id="group-friend-list" class="max-h-40 overflow-y-auto mb-4"></div><button id="create-group-btn" class="bg-[#5865F2] w-full py-1 rounded text-white">Create</button><button onclick="window.closeModal('create-group-dm-modal')" class="absolute top-2 right-2 text-white">x</button></div></div>
     <div id="invite-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6 text-center"><input id="invite-code-display" class="bg-[#202225] w-full p-2 text-white rounded mb-2" readonly><button onclick="window.copyInviteCode()" id="copy-btn" class="bg-[#5865F2] w-full py-1 rounded text-white">Copy</button><div id="invite-friends-list" class="mt-4 text-left max-h-40 overflow-y-auto"></div><button onclick="window.closeModal('invite-modal')" class="text-gray-400 mt-2">Close</button></div></div>
     <div id="create-channel-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"><div class="bg-[#36393f] rounded w-96 p-6"><h2 class="text-lg font-bold text-white mb-4">Create Channel</h2><input id="new-channel-name" class="w-full bg-[#202225] p-2 text-white rounded mb-4" placeholder="Name"><div class="mb-4"><label class="text-xs font-bold text-[#b9bbbe]">Category</label><select id="new-channel-category" class="w-full bg-[#202225] text-white p-2 rounded"></select></div><label class="flex items-center text-white mb-4"><input type="checkbox" id="new-channel-readonly" class="mr-2"> Read-Only</label><div class="flex justify-end"><button onclick="window.closeModal('create-channel-modal')" class="text-white mr-2">Cancel</button><button onclick="window.handleCreateChannel()" class="bg-[#5865F2] text-white px-4 py-1 rounded">Create</button></div></div></div>
     
-    <div id="server-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"><div class="bg-[#36393f] rounded w-[600px] h-[500px] flex"><div class="w-1/3 bg-[#2f3136] p-4"><div class="text-white font-bold mb-4">SETTINGS</div><div class="flex flex-col gap-2 mb-4"><button onclick="window.showServerSettingsTab('roles')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Roles</button><button onclick="window.showServerSettingsTab('integrations')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Integrations</button><button onclick="window.showServerSettingsTab('bans')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Bans</button></div><button onclick="window.closeModal('server-settings-modal')" class="text-red-500">Exit</button></div><div class="flex-1 p-6 overflow-y-auto">
-        <div id="settings-tab-roles">
+    <div id="server-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"><div class="bg-[#36393f] rounded w-[600px] h-[500px] flex"><div class="w-1/3 bg-[#2f3136] p-4"><div class="text-white font-bold mb-4">SETTINGS</div><div class="flex flex-col gap-2 mb-4"><button onclick="window.showServerSettingsTab('overview')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Overview</button><button onclick="window.showServerSettingsTab('roles')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Roles</button><button onclick="window.showServerSettingsTab('integrations')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Integrations</button><button onclick="window.showServerSettingsTab('boosts')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Server Boost</button><button onclick="window.showServerSettingsTab('bans')" class="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded text-left">Bans</button></div><button onclick="window.closeModal('server-settings-modal')" class="text-red-500">Exit</button></div><div class="flex-1 p-6 overflow-y-auto">
+        <div id="settings-tab-overview">
+            <h2 class="text-white font-bold mb-4">Server Overview</h2>
+            <div class="space-y-4">
+                <div><label class="text-xs text-[#b9bbbe] uppercase">Server Name</label><input id="edit-server-name" class="w-full bg-[#202225] p-2 text-white rounded mt-1"></div>
+                <div><label class="text-xs text-[#b9bbbe] uppercase">Server Icon</label><input id="edit-server-icon" class="w-full bg-[#202225] p-2 text-white rounded mt-1" placeholder="Image URL"></div>
+                <button onclick="window.saveServerSettings()" class="bg-[#5865F2] text-white px-4 py-2 rounded">Save Changes</button>
+            </div>
+        </div>
+        <div id="settings-tab-roles" class="hidden">
             <h2 class="text-white font-bold mb-4">Roles</h2><div class="bg-[#2f3136] p-4 rounded mb-4"><input id="role-name-input" class="bg-[#202225] p-2 text-white w-full mb-2" placeholder="Name"><input type="color" id="role-color-input" class="mb-2"><div class="text-white space-y-1"><label class="block"><input type="checkbox" id="perm-manage"> Manage Channels</label><label class="block"><input type="checkbox" id="perm-kick"> Kick Members</label><label class="block"><input type="checkbox" id="perm-delete"> Delete Messages</label><label class="block"><input type="checkbox" id="perm-admin"> Admin</label></div><button onclick="window.createRole()" class="bg-green-600 w-full py-1 rounded text-white mt-2">Create Role</button></div><div id="roles-list" class="space-y-2"></div>
         </div>
         <div id="settings-tab-integrations" class="hidden">
@@ -217,6 +295,33 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                  <button id="toggle-mody-btn" onclick="window.toggleMody()" class="bg-green-500 text-white px-3 py-1 rounded text-xs">Install</button>
              </div>
         </div>
+        <div id="settings-tab-boosts" class="hidden">
+            <h2 class="text-white font-bold mb-4">Server Boost Status</h2>
+            <div class="bg-[#2f3136] p-4 rounded mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-white font-bold">Level <span id="boost-level">0</span></span>
+                    <span class="text-[#b9bbbe] text-sm"><span id="boost-count">0</span> boosts</span>
+                </div>
+                <div class="boost-bar"><div id="boost-progress" class="boost-fill" style="width: 0%"></div></div>
+                <div class="text-[#b9bbbe] text-xs mt-2" id="boost-next">2 more boosts to reach Level 1</div>
+            </div>
+            <div class="space-y-2 mb-4">
+                <div class="flex items-center justify-between bg-[#202225] p-3 rounded">
+                    <div class="flex items-center"><i class="fas fa-image text-[#ff73fa] mr-3"></i><span class="text-white text-sm">Server Banner</span></div>
+                    <span id="perk-banner" class="text-xs text-[#72767d]">Level 1</span>
+                </div>
+                <div class="flex items-center justify-between bg-[#202225] p-3 rounded">
+                    <div class="flex items-center"><i class="fas fa-link text-[#ff73fa] mr-3"></i><span class="text-white text-sm">Vanity URL</span></div>
+                    <span id="perk-vanity" class="text-xs text-[#72767d]">Level 3</span>
+                </div>
+                <div class="flex items-center justify-between bg-[#202225] p-3 rounded">
+                    <div class="flex items-center"><i class="fas fa-paint-brush text-[#ff73fa] mr-3"></i><span class="text-white text-sm">Invite Background</span></div>
+                    <span id="perk-invite" class="text-xs text-[#72767d]">Level 2</span>
+                </div>
+            </div>
+            <button id="boost-server-btn" onclick="window.boostServer()" class="boost-btn w-full">Boost This Server</button>
+            <div id="boosters-list" class="mt-4 space-y-1"></div>
+        </div>
         <div id="settings-tab-bans" class="hidden">
              <h2 class="text-white font-bold mb-4">Bans</h2>
              <div id="banned-users-list" class="space-y-2"></div>
@@ -225,7 +330,7 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
     
     <div id="channel-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"><div class="bg-[#36393f] rounded w-[500px] h-[400px] flex flex-col p-4"><div class="flex justify-between mb-4"><h2 class="text-white font-bold">Permissions</h2><button onclick="window.closeModal('channel-settings-modal')" class="text-gray-400">x</button></div><div id="channel-roles-list" class="flex-1 overflow-y-auto"></div></div></div>
     <div id="member-action-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"><div class="bg-[#36393f] rounded p-4 w-64"><h3 id="action-username" class="text-white font-bold mb-2">User</h3><div id="action-roles-list" class="mb-2"></div><button onclick="window.reportUser()" class="w-full bg-yellow-600 text-white py-1 rounded mb-1">Report</button><button onclick="window.toggleBlockUser()" id="block-btn-text" class="w-full bg-gray-600 text-white py-1 rounded mb-1">Block</button><button id="kick-btn" onclick="window.kickUser()" class="w-full bg-orange-600 text-white py-1 rounded mb-1">Kick</button><button id="ban-btn" onclick="window.banUser()" class="w-full bg-red-600 text-white py-1 rounded mb-1">Ban</button><button onclick="window.removeFriend()" id="remove-friend-btn" class="w-full bg-red-800 text-white py-1 rounded mb-1 hidden">Unfriend</button><button onclick="window.closeModal('member-action-modal')" class="w-full text-gray-400 py-1">Cancel</button></div></div>
-    <div id="user-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"><div class="bg-[#36393f] rounded w-[600px] flex"><div class="w-1/3 bg-[#2f3136] p-4"><div class="text-white font-bold mb-4">USER SETTINGS</div><div onclick="window.logout()" class="text-red-500 cursor-pointer mb-4">Log Out</div><div onclick="window.showNitroModal()" class="text-[#ff73fa] font-bold cursor-pointer">Nitro</div></div><div class="flex-1 p-6"><input id="edit-username-input" class="bg-[#202225] p-2 text-white w-full mb-2" placeholder="Username"><input id="edit-avatar-input" class="bg-[#202225] p-2 text-white w-full mb-2" placeholder="Avatar URL"><select id="edit-status-input" class="bg-[#202225] p-2 text-white w-full mb-2"><option value="online">Online</option><option value="idle">Idle</option><option value="offline">Invisible</option></select><div class="mb-2"><label class="text-xs text-gray-400">Profile Banner (Nitro Only)</label><input type="color" id="edit-banner-color" class="w-full h-8 bg-transparent"></div><input type="file" id="edit-avatar-file" class="text-gray-400 text-xs mb-4"><button onclick="window.saveProfile()" class="bg-green-600 w-full py-1 rounded text-white">Save</button><button onclick="window.closeModal('user-settings-modal')" class="text-gray-400 w-full mt-2">Close</button></div></div></div>
+    <div id="user-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"><div class="bg-[#36393f] rounded w-[600px] flex"><div class="w-1/3 bg-[#2f3136] p-4"><div class="text-white font-bold mb-4">USER SETTINGS</div><div onclick="window.logout()" class="text-red-500 cursor-pointer mb-4">Log Out</div><div onclick="window.showNitroModal()" class="text-[#ff73fa] font-bold cursor-pointer">Nitro</div></div><div class="flex-1 p-6"><input id="edit-username-input" class="bg-[#202225] p-2 text-white w-full mb-2" placeholder="Username"><input id="edit-avatar-input" class="bg-[#202225] p-2 text-white w-full mb-2" placeholder="Avatar URL"><select id="edit-status-input" class="bg-[#202225] p-2 text-white w-full mb-2"><option value="online">Online</option><option value="idle">Idle</option><option value="dnd">Do Not Disturb</option><option value="offline">Invisible</option></select><div class="mb-2"><label class="text-xs text-gray-400">Profile Banner (Nitro Only)</label><input type="color" id="edit-banner-color" class="w-full h-8 bg-transparent"></div><input type="file" id="edit-avatar-file" class="text-gray-400 text-xs mb-4"><button onclick="window.saveProfile()" class="bg-green-600 w-full py-1 rounded text-white">Save</button><button onclick="window.closeModal('user-settings-modal')" class="text-gray-400 w-full mt-2">Close</button></div></div></div>
     <div id="admin-panel-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"><div class="bg-[#36393f] rounded w-[800px] h-[600px] flex flex-col p-6 relative shadow-2xl"><div class="flex justify-between items-center mb-6 border-b border-[#202225] pb-4"><h2 class="text-white font-extrabold text-2xl flex items-center"><i class="fas fa-shield-alt text-red-500 mr-3"></i> ADMIN</h2><div class="flex gap-4"><button onclick="window.loadAdminView('users')" class="admin-tab active text-gray-400 font-bold hover:text-white pb-2">USERS</button><button onclick="window.loadAdminView('reports')" class="admin-tab text-gray-400 font-bold hover:text-white pb-2">REPORTS</button></div><button onclick="window.closeModal('admin-panel-modal')" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button></div><div class="flex gap-4 mb-4"><input id="admin-search" onkeyup="window.filterAdminUsers()" class="bg-[#202225] p-3 text-white flex-1 rounded font-medium" placeholder="Search"><div class="flex gap-2"><button onclick="window.openBroadcastModal()" class="bg-[#5865F2] text-white px-4 py-2 rounded font-bold shadow hover:bg-blue-600">Broadcast</button><button onclick="window.openPostUpdateModal()" class="bg-yellow-600 text-white px-4 py-2 rounded font-bold shadow hover:bg-yellow-700">Update</button></div></div><div id="admin-users-list" class="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar"></div></div></div>
     <div id="admin-user-action-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-90"><div class="bg-[#2f3136] rounded w-96 p-6 shadow-2xl border border-[#202225]"><h3 id="adm-act-title" class="text-white font-bold text-lg mb-4">Manage User</h3><div id="adm-btns"></div><div id="adm-history" class="mt-4 border-t border-[#202225] pt-2 text-xs text-gray-400 max-h-32 overflow-y-auto"></div><div class="mt-4"><input id="mod-reason" class="w-full bg-[#202225] p-2 text-white text-xs rounded mb-2" placeholder="Reason (Required)"><select id="mod-duration" class="w-full bg-[#202225] p-2 text-white text-xs rounded mb-2"><option value="">Duration (Temp Ban Only)</option><option value="3600000">1 Hour</option><option value="86400000">1 Day</option><option value="604800000">1 Week</option></select></div><button onclick="window.closeModal('admin-user-action-modal')" class="w-full text-gray-400 py-2 mt-2">Cancel</button></div></div>
     <div id="broadcast-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-90"><div class="bg-[#36393f] rounded w-[500px] p-6 shadow-2xl"><h2 class="text-white font-extrabold text-xl mb-4">Broadcast</h2><textarea id="broadcast-input" class="w-full bg-[#202225] p-3 text-white rounded mb-4 h-32 resize-none" placeholder="Message..."></textarea><div class="flex justify-end gap-2"><button onclick="window.closeModal('broadcast-modal')" class="text-gray-400">Cancel</button><button onclick="window.sendBroadcast()" class="bg-[#5865F2] text-white px-6 py-2 rounded font-bold">Send</button></div></div></div>
@@ -236,6 +341,7 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         <div class="bg-[#36393f] rounded w-[600px] p-6 text-center max-h-[90vh] overflow-y-auto">
             <h2 class="text-3xl font-extrabold nitro-gradient mb-4">W3Chat Nitro</h2>
             <p class="text-gray-300 mb-6">Enhance your experience with exclusive perks!</p>
+            
             <table class="w-full text-left nitro-table mb-6">
                 <thead>
                     <tr>
@@ -245,27 +351,54 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>Server Limit</td><td>10</td><td><span class="text-[#ff73fa] font-bold">100</span></td></tr>
-                    <tr><td>Character Limit</td><td>1,000</td><td><span class="text-[#ff73fa] font-bold">10,000</span></td></tr>
-                    <tr><td>Profile Banner</td><td>Solid Color</td><td><span class="nitro-gradient">Gradient</span></td></tr>
-                    <tr><td>Nitro Badge</td><td><i class="fas fa-times cross-icon"></i></td><td><i class="fas fa-check check-icon"></i></td></tr>
-                    <tr><td>File Upload Limit</td><td>5 MB</td><td><span class="text-[#ff73fa] font-bold">50 MB</span></td></tr>
+                    <tr>
+                        <td>Server Limit</td>
+                        <td>10</td>
+                        <td><span class="text-[#ff73fa] font-bold">100</span></td>
+                    </tr>
+                    <tr>
+                        <td>Character Limit</td>
+                        <td>1,000</td>
+                        <td><span class="text-[#ff73fa] font-bold">10,000</span></td>
+                    </tr>
+                    <tr>
+                        <td>Profile Banner</td>
+                        <td>Solid Color</td>
+                        <td><span class="nitro-gradient">Gradient</span></td>
+                    </tr>
+                    <tr>
+                        <td>Nitro Badge</td>
+                        <td><i class="fas fa-times cross-icon"></i></td>
+                        <td><i class="fas fa-check check-icon"></i></td>
+                    </tr>
+                    <tr>
+                        <td>File Upload Limit</td>
+                        <td>5 MB</td>
+                        <td><span class="text-[#ff73fa] font-bold">50 MB</span></td>
+                    </tr>
+                    <tr>
+                        <td>Shiny Name</td>
+                        <td><i class="fas fa-times cross-icon"></i></td>
+                        <td><i class="fas fa-check check-icon"></i></td>
+                    </tr>
                 </tbody>
             </table>
+            
             <div class="flex gap-4 justify-center mb-6">
                 <div class="nitro-card p-4 rounded flex-1">
                     <div class="text-lg font-bold text-white">Monthly</div>
                     <div class="text-2xl font-bold nitro-gradient">$9.99<span class="text-sm text-gray-400">/mo</span></div>
-                    <button onclick="window.showToast('Nitro is coming soon!', 'info')" class="bg-[#5865F2] text-white w-full py-2 rounded mt-2 hover:bg-[#4752c4] transition">Subscribe</button>
+                    <button onclick="window.purchaseNitro('monthly')" class="bg-[#5865F2] text-white w-full py-2 rounded mt-2 hover:bg-[#4752c4] transition">Subscribe</button>
                 </div>
                 <div class="nitro-card p-4 rounded flex-1 relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-[#ff73fa] text-black text-xs font-bold px-2 py-0.5">BEST VALUE</div>
                     <div class="text-lg font-bold text-white">Yearly</div>
                     <div class="text-2xl font-bold nitro-gradient">$99.99<span class="text-sm text-gray-400">/yr</span></div>
                     <div class="text-xs text-gray-400 mt-1">2 Months Free!</div>
-                    <button onclick="window.showToast('Nitro is coming soon!', 'info')" class="bg-gradient-to-r from-[#ff00cc] to-[#3333ff] text-white w-full py-2 rounded mt-2 hover:opacity-90 transition">Subscribe</button>
+                    <button onclick="window.purchaseNitro('yearly')" class="bg-gradient-to-r from-[#ff00cc] to-[#3333ff] text-white w-full py-2 rounded mt-2 hover:opacity-90 transition">Subscribe</button>
                 </div>
             </div>
+            
             <button onclick="window.closeModal('nitro-modal')" class="text-gray-400 hover:text-white">Close</button>
         </div>
     </div>
@@ -276,35 +409,324 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp, updateDoc, arrayUnion, arrayRemove, doc, getDoc, setDoc, getDocs, deleteDoc, deleteField, increment, limit, startAfter } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const cfg={apiKey:"AIzaSyB_wEHBTj2vYiXeoESIGgGCatnWgqW5P1w",authDomain:"w3chat-82711.firebaseapp.com",projectId:"w3chat-82711",storageBucket:"w3chat-82711.firebasestorage.app",messagingSenderId:"36226332250",appId:"1:36226332250:web:0514fee75633359ea50a63"};
-        let app,auth,db;
-        try{app=initializeApp(cfg);auth=getAuth(app);db=getFirestore(app);}catch(e){}
+        let app,auth,db;try{app=initializeApp(cfg);auth=getAuth(app);db=getFirestore(app);}catch(e){}
 
         let cur=null,sId=null,activeServerData=null,cId=null,cData=null,isDM=false,uCache={},call=null,pc=null,ls=null,repId=null,target=null,subs={},audioCtx=null,rec=null,recChunks=[],lastMsgTime=0;
         let lastMsgDoc=null, loadingMore=false;
         let deviceToken = localStorage.getItem('w3chat_dtoken');
         if(!deviceToken){ deviceToken = crypto.randomUUID(); localStorage.setItem('w3chat_dtoken', deviceToken); }
+        let currentProfileUser = null;
+        let friendsTab = 'online';
 
         const getEl=id=>document.getElementById(id);
         const toB64=f=>new Promise((r,j)=>{const rd=new FileReader();rd.readAsDataURL(f);rd.onload=()=>r(rd.result);rd.onerror=j;});
         const compressImg=(f)=>{return new Promise(r=>{const i=new Image();i.src=URL.createObjectURL(f);i.onload=()=>{const c=document.createElement('canvas'),ctx=c.getContext('2d'),m=800,s=m/i.width;c.width=s<1?i.width*s:i.width;c.height=s<1?i.height*s:i.height;ctx.drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',0.7));};});};
 
-        // --- GLOBAL FUNCTION DEFINITIONS (All exposed to window) ---
+        // --- GLOBAL FUNCTION DEFINITIONS ---
         window.getEl = getEl;
-        window.openModal = id => getEl(id).classList.remove('hidden');
-        window.closeModal = id => getEl(id).classList.add('hidden');
-        window.toggleMemberList = () => getEl('member-list').classList.toggle('hidden');
-        window.showMobileSidebar = () => {getEl('server-rail').classList.remove('hidden');getEl('sidebar-panel').classList.remove('-translate-x-full');getEl('main-panel').classList.add('translate-x-full');};
-        window.addEmoji = e => { getEl('message-input').value += e; };
+        window.openModal=id=>getEl(id).classList.remove('hidden');
+        window.closeModal=id=>getEl(id).classList.add('hidden');
+        window.toggleMemberList=()=>getEl('member-list').classList.toggle('hidden');
+        window.showMobileSidebar=()=>{getEl('server-rail').classList.remove('hidden');getEl('sidebar-panel').classList.remove('-translate-x-full');getEl('main-panel').classList.add('translate-x-full');};
+        window.addEmoji=(e)=>{ getEl('message-input').value += e; };
         
-        window.enableAudio = () => {if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();};
-        window.playNotification = () => {let f=500,t='sine',d=0.2;if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.setValueAtTime(f,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+d);o.stop(audioCtx.currentTime+d);};
-        window.playRingtone = () => {if(window.rInt)return;window.rInt=setInterval(()=>window.playNotification(),2000);};
-        window.stopRingtone = () => {if(window.rInt){clearInterval(window.rInt);window.rInt=null;}};
-        window.showNitroModal = () => {window.openModal('nitro-modal');};
+        window.enableAudio=()=>{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();};
+        window.playNotification=()=>{let f=500,t='sine',d=0.2;if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.setValueAtTime(f,audioCtx.currentTime);o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+d);o.stop(audioCtx.currentTime+d);};
+        window.playRingtone=()=>{if(window.rInt)return;window.rInt=setInterval(()=>window.playNotification(),2000);};
+        window.stopRingtone=()=>{if(window.rInt){clearInterval(window.rInt);window.rInt=null;}};
+        window.showNitroModal=()=>{window.openModal('nitro-modal');};
 
-        window.showLogin = () => {getEl('auth-screen').classList.remove('hidden');getEl('landing-page').classList.add('hidden');};
-        window.hideLogin = () => {getEl('auth-screen').classList.add('hidden');getEl('landing-page').classList.remove('hidden');};
-        window.copyInviteCode = () => {const e=getEl('invite-code-display');e.select();document.execCommand('copy');getEl('copy-btn').textContent="Copied!";};
+        window.showLogin=()=>{getEl('auth-screen').classList.remove('hidden');getEl('landing-page').classList.add('hidden');};
+        window.hideLogin=()=>{getEl('auth-screen').classList.add('hidden');getEl('landing-page').classList.remove('hidden');};
+        window.copyInviteCode=()=>{const e=getEl('invite-code-display');e.select();document.execCommand('copy');getEl('copy-btn').textContent="Copied!";};
+
+        // Nitro Functions
+        window.purchaseNitro = async (plan) => {
+            if(!cur) return;
+            try {
+                await updateDoc(doc(db, "users", cur.uid), {
+                    isNitro: true,
+                    nitroSince: serverTimestamp(),
+                    nitroPlan: plan
+                });
+                cur.isNitro = true;
+                window.showToast(`Welcome to Nitro! (${plan} plan)`, 'success');
+                window.closeModal('nitro-modal');
+                updateFoot();
+            } catch(err) {
+                window.showToast("Purchase failed: " + err.message, 'error');
+            }
+        };
+
+        // Boost Functions
+        window.boostServer = async () => {
+            if(!activeServerData || !cur) return;
+            if(cur.isBoosting?.includes(activeServerData.id)) {
+                window.showToast("You're already boosting this server!", 'error');
+                return;
+            }
+            try {
+                await updateDoc(doc(db, "servers", activeServerData.id), {
+                    boosts: increment(1),
+                    boosters: arrayUnion({uid: cur.uid, since: Date.now()})
+                });
+                await updateDoc(doc(db, "users", cur.uid), {
+                    isBoosting: arrayUnion(activeServerData.id)
+                });
+                window.showToast("Server boosted! 🚀", 'success');
+                window.loadBoostsTab();
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
+
+        window.loadBoostsTab = async () => {
+            if(!activeServerData) return;
+            const boosts = activeServerData.boosts || 0;
+            const level = boosts >= 14 ? 3 : boosts >= 7 ? 2 : boosts >= 2 ? 1 : 0;
+            const nextThreshold = level === 0 ? 2 : level === 1 ? 7 : level === 2 ? 14 : null;
+            const progress = nextThreshold ? (boosts / nextThreshold) * 100 : 100;
+            
+            getEl('boost-level').textContent = level;
+            getEl('boost-count').textContent = boosts;
+            getEl('boost-progress').style.width = progress + '%';
+            getEl('boost-next').textContent = nextThreshold ? `${nextThreshold - boosts} more boosts to reach Level ${level + 1}` : 'Max level reached!';
+            
+            // Update perk indicators
+            getEl('perk-banner').innerHTML = level >= 1 ? '<i class="fas fa-check text-green-500"></i>' : '<span class="text-[#72767d]">Level 1</span>';
+            getEl('perk-invite').innerHTML = level >= 2 ? '<i class="fas fa-check text-green-500"></i>' : '<span class="text-[#72767d]">Level 2</span>';
+            getEl('perk-vanity').innerHTML = level >= 3 ? '<i class="fas fa-check text-green-500"></i>' : '<span class="text-[#72767d]">Level 3</span>';
+            
+            // Update boost button
+            const isBoosting = cur.isBoosting?.includes(activeServerData.id);
+            const btn = getEl('boost-server-btn');
+            btn.textContent = isBoosting ? 'Boosting ✓' : 'Boost This Server';
+            btn.disabled = isBoosting;
+            
+            // Load boosters list
+            const list = getEl('boosters-list');
+            list.innerHTML = '<div class="text-[#b9bbbe] text-xs font-bold uppercase mb-2">Boosters</div>';
+            if(activeServerData.boosters) {
+                for(const booster of activeServerData.boosters) {
+                    const u = await getU(booster.uid);
+                    list.innerHTML += `<div class="flex items-center gap-2 text-sm text-white mb-1"><i class="fas fa-rocket text-[#ff73fa]"></i> ${u.username}</div>`;
+                }
+            }
+        };
+
+        // Profile Card Functions
+        window.openProfileCard = async (user, event) => {
+            if(event) event.stopPropagation();
+            currentProfileUser = user;
+            const card = getEl('profile-card');
+            const banner = getEl('profile-banner');
+            const avatar = getEl('profile-avatar');
+            const avatarImg = getEl('profile-avatar-img');
+            const avatarText = getEl('profile-avatar-text');
+            const username = getEl('profile-username');
+            const handle = getEl('profile-handle');
+            const badges = getEl('profile-badges');
+            const about = getEl('profile-about');
+            const nitroBadge = getEl('profile-nitro-badge');
+            const botBadge = getEl('profile-bot-badge');
+            const actions = getEl('profile-actions');
+            
+            // Set banner
+            if(user.bannerColor) {
+                banner.style.background = user.isNitro && user.bannerColor.includes('gradient') 
+                    ? user.bannerColor 
+                    : `linear-gradient(45deg, ${user.bannerColor}, ${user.bannerColor}dd)`;
+            } else {
+                banner.style.background = 'linear-gradient(45deg, #5865F2, #7289da)';
+            }
+            
+            // Set avatar
+            if(user.avatar) {
+                avatarImg.src = user.avatar;
+                avatarImg.classList.remove('hidden');
+                avatarText.classList.add('hidden');
+            } else {
+                avatarImg.classList.add('hidden');
+                avatarText.classList.remove('hidden');
+                avatarText.textContent = user.username?.substring(0,2).toUpperCase() || 'U';
+            }
+            
+            // Set username with shiny effect if Nitro
+            if(user.isNitro) {
+                username.innerHTML = `<span class="shiny-name">${user.username}</span>`;
+                nitroBadge.classList.remove('hidden');
+            } else {
+                username.textContent = user.username;
+                nitroBadge.classList.add('hidden');
+            }
+            
+            // Bot badge
+            if(user.isBot) {
+                botBadge.classList.remove('hidden');
+            } else {
+                botBadge.classList.add('hidden');
+            }
+            
+            handle.textContent = `@${user.username?.toLowerCase().replace(/\s/g, '')}`;
+            about.textContent = user.about || 'No about me yet.';
+            
+            // Badges
+            badges.innerHTML = '';
+            if(user.isNitro) {
+                badges.innerHTML += `<div class="badge nitro" title="Nitro Subscriber"><i class="fas fa-rocket text-white"></i></div>`;
+            }
+            if(user.uid === activeServerData?.ownerId) {
+                badges.innerHTML += `<div class="badge" style="background:#faa61a" title="Server Owner"><i class="fas fa-crown text-white"></i></div>`;
+            }
+            
+            // Actions
+            if(user.uid === cur.uid) {
+                actions.classList.add('hidden');
+            } else {
+                actions.classList.remove('hidden');
+                const isFriend = cur.friends?.includes(user.uid);
+                actions.innerHTML = `
+                    <button onclick="${isFriend ? `window.removeFriendFromCard('${user.uid}')` : `window.sendFriendRequestFromCard('${user.uid}')`}" class="flex-1 ${isFriend ? 'bg-red-600 hover:bg-red-700' : 'bg-[#5865F2] hover:bg-[#4752c4]'} text-white py-2 rounded text-sm font-medium">${isFriend ? 'Remove Friend' : 'Add Friend'}</button>
+                    <button onclick="window.startDMFromCard('${user.uid}')" class="flex-1 bg-[#3ba55c] text-white py-2 rounded text-sm font-medium hover:bg-[#2d7d46]">Message</button>
+                `;
+            }
+            
+            // Position card
+            if(event) {
+                const rect = card.getBoundingClientRect();
+                let x = event.clientX;
+                let y = event.clientY;
+                if(x + 300 > window.innerWidth) x = window.innerWidth - 320;
+                if(y + 400 > window.innerHeight) y = window.innerHeight - 420;
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+                card.style.transform = 'none';
+            } else {
+                card.style.left = '50%';
+                card.style.top = '50%';
+                card.style.transform = 'translate(-50%, -50%)';
+            }
+            
+            card.classList.remove('hidden');
+        };
+
+        window.closeProfileCard = (e) => {
+            if(e && e.target.closest('#profile-card')) return;
+            getEl('profile-card').classList.add('hidden');
+        };
+
+        window.sendFriendRequestFromCard = async (uid) => {
+            const targetUid = uid || currentProfileUser?.uid;
+            if(!targetUid) return;
+            await window.sendFriendRequestTo(targetUid);
+            getEl('profile-card').classList.add('hidden');
+        };
+
+        window.startDMFromCard = async (uid) => {
+            const targetUid = uid || currentProfileUser?.uid;
+            if(!targetUid) return;
+            const u = await getU(targetUid);
+            await window.startDM(targetUid, u);
+            getEl('profile-card').classList.add('hidden');
+        };
+
+        window.removeFriendFromCard = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", cur.uid), {friends: arrayRemove(uid)});
+                await updateDoc(doc(db, "users", uid), {friends: arrayRemove(cur.uid)});
+                window.showToast("Friend removed", 'success');
+                getEl('profile-card').classList.add('hidden');
+                loadFriends();
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
+
+        // Friends System
+        window.switchFriendsTab = (tab) => {
+            friendsTab = tab;
+            document.querySelectorAll('#friends-view button[id^="tab-"]').forEach(b => {
+                b.classList.remove('text-white', 'border-[#5865F2]');
+                b.classList.add('text-[#b9bbbe]', 'border-transparent');
+            });
+            const activeBtn = getEl(`tab-${tab}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-[#b9bbbe]', 'border-transparent');
+                activeBtn.classList.add('text-white', 'border-[#5865F2]');
+            }
+            loadFriends();
+        };
+
+        window.sendFriendRequest = async () => {
+            const input = getEl('friend-username-input');
+            const val = input.value.trim();
+            if(!val) return;
+            
+            // Parse username#discriminator
+            const parts = val.split('#');
+            const username = parts[0];
+            const disc = parts[1] || '0000';
+            
+            try {
+                const q = query(collection(db, "users"), where("username", "==", username));
+                const snap = await getDocs(q);
+                if(snap.empty) {
+                    window.showToast("User not found", 'error');
+                    return;
+                }
+                const targetDoc = snap.docs[0];
+                const targetId = targetDoc.id;
+                
+                if(targetId === cur.uid) {
+                    window.showToast("You can't add yourself!", 'error');
+                    return;
+                }
+                
+                await window.sendFriendRequestTo(targetId);
+                input.value = '';
+                window.closeModal('add-friend-modal');
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
+
+        window.sendFriendRequestTo = async (targetId) => {
+            try {
+                await updateDoc(doc(db, "users", targetId), {
+                    requests: arrayUnion(cur.uid)
+                });
+                window.showToast("Friend request sent!", 'success');
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
+
+        window.accReq = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", cur.uid), {
+                    friends: arrayUnion(uid),
+                    requests: arrayRemove(uid)
+                });
+                await updateDoc(doc(db, "users", uid), {
+                    friends: arrayUnion(cur.uid)
+                });
+                window.showToast("Friend added!", 'success');
+                loadFriends();
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
+
+        window.declineReq = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", cur.uid), {
+                    requests: arrayRemove(uid)
+                });
+                loadFriends();
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
 
         window.handleLogin = async (e) => {
             e.preventDefault();
@@ -323,11 +745,14 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                             status: 'online',
                             friends: [],
                             requests: [],
+                            blocked: [],
                             deviceToken: deviceToken,
                             lastReadUpdateId: 0,
                             history: [],
                             isNitro: false,
-                            bannerColor: '#000000'
+                            isBoosting: [],
+                            bannerColor: '#000000',
+                            about: ''
                         });
                     } catch (e2) { getEl('login-msg').textContent=e2.message; }
                 } else {
@@ -338,143 +763,250 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         };
 
         window.handleForgotPassword = async () => {
-            const em = getEl('email').value;
-            if(!em) return window.showToast('Enter your email first', 'error');
+            const email = getEl('email').value;
+            if(!email) {
+                window.showToast("Please enter your email address first", "error");
+                return;
+            }
             try {
-                await sendPasswordResetEmail(auth, em);
-                window.showToast('Password reset email sent!', 'success');
-            } catch(e) {
-                window.showToast(e.message, 'error');
+                await sendPasswordResetEmail(auth, email);
+                window.showToast("Password reset email sent!", "success");
+            } catch(err) {
+                window.showToast(err.message, "error");
             }
         };
 
-        window.handleTyping = () => {
-            // Placeholder for typing indicator logic
-            console.log('Typing...');
-        };
-
-        window.handleCreateServer = async () => {
-            if(!cur) return;
-            const name = getEl('new-server-name').value;
-            const icon = getEl('new-server-icon').value;
-            const file = getEl('new-server-file').files[0];
-            if(!name) return window.showToast('Server name required', 'error');
+        window.handleDrop = async (e, targetChannel, isCategory = false) => {
+            e.preventDefault();
+            e.stopPropagation();
             
-            let iconUrl = icon;
-            if(file) {
-                try { iconUrl = await compressImg(file); } catch(e) {}
+            const cid = e.dataTransfer.getData('cid');
+            if(!cid) return;
+            
+            try {
+                const channelRef = doc(db, "channels", cid);
+                if(isCategory) {
+                    const categoryName = e.target.closest('div')?.textContent?.trim() || targetChannel;
+                    if(categoryName && categoryName !== '+ Create Category') {
+                        await updateDoc(channelRef, { category: categoryName });
+                    } else {
+                        await updateDoc(channelRef, { category: deleteField() });
+                    }
+                } else if(targetChannel) {
+                    const batch = [];
+                    const targetRef = doc(db, "channels", targetChannel.id);
+                    const currentSnap = await getDoc(channelRef);
+                    const targetSnap = await getDoc(targetRef);
+                    
+                    if(currentSnap.exists() && targetSnap.exists()) {
+                        const currentPos = currentSnap.data().position || 0;
+                        const targetPos = targetSnap.data().position || 0;
+                        
+                        await updateDoc(channelRef, { position: targetPos });
+                        await updateDoc(targetRef, { position: currentPos });
+                    }
+                }
+            } catch(err) {
+                console.error("Drop error:", err);
             }
             
-            const inviteCode = Math.random().toString(36).substring(2, 10);
-            await addDoc(collection(db, "servers"), {
-                name: name,
-                icon: iconUrl || '',
-                ownerId: cur.uid,
-                members: [cur.uid],
-                inviteCode: inviteCode,
-                createdAt: serverTimestamp(),
-                roles: {},
-                userRoles: {},
-                bannedUsers: []
-            });
-            window.closeModal('create-server-modal');
-            window.showToast('Server created!', 'success');
-        };
-
-        window.handleJoinServer = async () => {
-            const code = getEl('join-invite-code').value.trim();
-            if(!code) return window.showToast('Enter invite code', 'error');
-            
-            const q = query(collection(db, "servers"), where("inviteCode", "==", code));
-            const snap = await getDocs(q);
-            if(snap.empty) return window.showToast('Invalid code', 'error');
-            
-            const serverDoc = snap.docs[0];
-            const serverData = serverDoc.data();
-            
-            if(serverData.bannedUsers?.includes(cur.uid)) return window.showToast('You are banned from this server', 'error');
-            if(serverData.members.includes(cur.uid)) return window.showToast('Already a member', 'error');
-            
-            await updateDoc(doc(db, "servers", serverDoc.id), {
-                members: arrayUnion(cur.uid)
-            });
-            window.closeModal('join-server-modal');
-            window.showToast('Joined server!', 'success');
-        };
-
-        window.joinInv = async (code) => {
-            getEl('join-invite-code').value = code;
-            await window.handleJoinServer();
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
         };
 
         window.handleCreateCategory = async () => {
+            const name = getEl('new-category-name').value.trim();
+            if(!name) {
+                window.showToast("Category name is required", "error");
+                return;
+            }
+            if(!sId) {
+                window.showToast("No server selected", "error");
+                return;
+            }
+            
+            try {
+                await addDoc(collection(db, "channels"), {
+                    name: name,
+                    type: 'category',
+                    serverId: sId,
+                    createdAt: serverTimestamp()
+                });
+                window.closeModal('create-category-modal');
+                getEl('new-category-name').value = '';
+                window.showToast("Category created!", "success");
+            } catch(err) {
+                window.showToast(err.message, "error");
+            }
+        };
+
+        window.sendBroadcast = async () => {
+            const msg = getEl('broadcast-input').value.trim();
+            if(!msg) {
+                window.showToast("Message cannot be empty", "error");
+                return;
+            }
+            
+            try {
+                await setDoc(doc(db, "system", "broadcast"), {
+                    message: msg,
+                    ts: serverTimestamp(),
+                    sender: cur.uid
+                });
+                window.closeModal('broadcast-modal');
+                getEl('broadcast-input').value = '';
+                window.showToast("Broadcast sent!", "success");
+            } catch(err) {
+                window.showToast(err.message, "error");
+            }
+        };
+
+        window.openPostUpdateModal = () => {
+            window.openModal('post-update-modal');
+        };
+
+        window.loadInviteFriends = async () => {
+            const list = getEl('invite-friends-list');
+            if(!cur || !cur.friends) {
+                list.innerHTML = '<div class="text-gray-400 text-sm">No friends to invite</div>';
+                return;
+            }
+            
+            list.innerHTML = '<div class="text-gray-400 text-sm mb-2">Invite friends:</div>';
+            
+            for(const friendId of cur.friends) {
+                const friend = await getU(friendId);
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-[#2f3136] p-2 rounded mb-1";
+                div.innerHTML = `
+                    <span class="text-white text-sm">${friend.username}</span>
+                    <button onclick="window.inviteFriend('${friendId}')" class="bg-[#5865F2] text-white px-2 py-1 rounded text-xs">Invite</button>
+                `;
+                list.appendChild(div);
+            }
+        };
+
+        window.openServerSettings = () => {
             if(!activeServerData) return;
-            const name = getEl('new-category-name').value;
-            if(!name) return;
-            await addDoc(collection(db, "channels"), {
-                serverId: sId,
-                type: 'category',
-                name: name,
-                position: 0
-            });
-            window.closeModal('create-category-modal');
+            window.openModal('server-settings-modal');
+            window.showServerSettingsTab('overview');
         };
 
-        window.handleCreateChannel = async () => {
+        window.openChannelSettings = () => {
+            if(!cId || !cData) return;
+            window.openModal('channel-settings-modal');
+            const list = getEl('channel-roles-list');
+            list.innerHTML = '';
+            
+            if(activeServerData && activeServerData.roles) {
+                Object.entries(activeServerData.roles).forEach(([id, role]) => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-[#2f3136] p-2 rounded mb-2";
+                    div.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full mr-2" style="background:${role.color}"></div>
+                            <span class="text-white text-sm">${role.name}</span>
+                        </div>
+                        <input type="checkbox" class="channel-perm-check" data-role="${id}" ${cData.allowedRoles?.includes(id) ? 'checked' : ''}>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        };
+
+        window.inviteFriend = async (friendId) => {
+            if(!cId || !activeServerData) return;
+            try {
+                const dmId = [cur.uid, friendId].sort().join('_');
+                await addDoc(collection(db, "messages"), {
+                    content: `INVITE: ${activeServerData.name} (${activeServerData.inviteCode})`,
+                    userId: 'system',
+                    channelId: dmId,
+                    createdAt: serverTimestamp()
+                });
+                window.showToast("Invite sent!", "success");
+            } catch(err) {
+                window.showToast(err.message, "error");
+            }
+        };
+
+        window.showServerSettingsTab = (tab) => {
+            document.getElementById('settings-tab-overview').classList.add('hidden');
+            document.getElementById('settings-tab-roles').classList.add('hidden');
+            document.getElementById('settings-tab-integrations').classList.add('hidden');
+            document.getElementById('settings-tab-boosts').classList.add('hidden');
+            document.getElementById('settings-tab-bans').classList.add('hidden');
+            document.getElementById(`settings-tab-${tab}`).classList.remove('hidden');
+            
+            if(tab === 'bans') window.loadBans();
+            if(tab === 'boosts') window.loadBoostsTab();
+            if(tab === 'overview') {
+                getEl('edit-server-name').value = activeServerData.name || '';
+                getEl('edit-server-icon').value = activeServerData.icon || '';
+            }
+        };
+
+        window.saveServerSettings = async () => {
             if(!activeServerData) return;
-            const name = getEl('new-channel-name').value;
-            const cat = getEl('new-channel-category').value;
-            const ro = getEl('new-channel-readonly').checked;
-            if(!name) return;
-            await addDoc(collection(db, "channels"), {
-                serverId: sId,
-                type: 'text',
-                name: name,
-                category: cat,
-                readOnly: ro,
-                position: 0
-            });
-            window.closeModal('create-channel-modal');
-            window.showToast('Channel created!', 'success');
+            try {
+                await updateDoc(doc(db, "servers", activeServerData.id), {
+                    name: getEl('edit-server-name').value,
+                    icon: getEl('edit-server-icon').value
+                });
+                window.showToast("Settings saved!", "success");
+            } catch(err) {
+                window.showToast(err.message, "error");
+            }
         };
 
-        window.handleCreateCategory = async () => {
+        window.loadBans = async () => {
             if(!activeServerData) return;
-            const name = getEl('new-category-name').value;
-            if(!name) return;
-            await addDoc(collection(db, "channels"), {
-                serverId: sId,
-                type: 'category',
-                name: name,
-                position: 0
-            });
-            window.closeModal('create-category-modal');
+            const list = getEl('banned-users-list');
+            list.innerHTML = '';
+            
+            if(!activeServerData.bannedUsers || activeServerData.bannedUsers.length === 0) {
+                list.innerHTML = '<div class="text-gray-400 text-sm">No banned users</div>';
+                return;
+            }
+            
+            for(const uid of activeServerData.bannedUsers) {
+                const user = await getU(uid);
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-[#2f3136] p-2 rounded mb-1";
+                div.innerHTML = `
+                    <span class="text-white text-sm">${user.username}</span>
+                    <button onclick="window.unbanUser('${uid}')" class="bg-green-600 text-white px-2 py-1 rounded text-xs">Unban</button>
+                `;
+                list.appendChild(div);
+            }
         };
 
-        window.sendFriendRequest = async () => {
-            const username = getEl('friend-username-input').value;
-            if(!username) return;
-            const q = query(collection(db, "users"), where("username", "==", username));
-            const snap = await getDocs(q);
-            if(snap.empty) return window.showToast('User not found', 'error');
-            const targetId = snap.docs[0].id;
-            if(targetId === cur.uid) return window.showToast('Cannot add yourself', 'error');
-            await updateDoc(doc(db, "users", targetId), {
-                requests: arrayUnion(cur.uid)
-            });
-            window.closeModal('add-friend-modal');
-            window.showToast('Friend request sent!', 'success');
+        window.unbanUser = async (uid) => {
+            if(!activeServerData) return;
+            try {
+                await updateDoc(doc(db, "servers", sId), {
+                    bannedUsers: arrayRemove(uid)
+                });
+                window.showToast("User unbanned", "success");
+                window.loadBans();
+            } catch(err) {
+                window.showToast(err.message, "error");
+            }
         };
 
-        window.accReq = async (uid) => {
-            await updateDoc(doc(db, "users", cur.uid), {
-                friends: arrayUnion(uid),
-                requests: arrayRemove(uid)
-            });
-            await updateDoc(doc(db, "users", uid), {
-                friends: arrayUnion(cur.uid)
-            });
-        };
+        async function getU(uid){if(uCache[uid]&&Date.now()-uCache[uid]._t<60000)return uCache[uid];const s=await getDoc(doc(db,"users",uid));const d=s.exists()?s.data():{username:'Unknown',color:'#777',status:'offline'};const u={uid:uid,...d,_t:Date.now()};uCache[uid]=u;return u;}
+        
+        function updateFoot(){
+            if(!cur)return;
+            const nameEl = getEl('current-username');
+            if(cur.isNitro) {
+                nameEl.innerHTML = `<span class="shiny-name">${cur.username}</span>`;
+            } else {
+                nameEl.textContent = cur.username;
+            }
+            getEl('current-discriminator').textContent=`#${cur.uid.substring(0,4)}`;
+            const img=getEl('current-user-img'),icon=getEl('current-user-icon');if(cur.avatar){img.src=cur.avatar;img.classList.remove('hidden');icon.classList.add('hidden');}else{img.classList.add('hidden');icon.classList.remove('hidden');getEl('current-user-avatar').style.backgroundColor=cur.color||'#5865F2';}
+            getEl('connection-status').className=`status-dot status-${cur.status||'online'}`;getEl('edit-username-input').value=cur.username;getEl('edit-avatar-input').value=cur.avatar||'';getEl('edit-status-input').value=cur.status||'online';getEl('edit-banner-color').value=cur.bannerColor||'#000000';
+        }
 
         window.startDM = async (uid, uData) => {
             if(!cur) return;
@@ -521,12 +1053,12 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                 width: "100%",
                 height: "100%",
                 parentNode: document.querySelector('#jitsi-container'),
-                userInfo: { displayName: cur ? cur.username : 'User' },
+                userInfo: { displayName: cur.username },
                 configOverwrite: { startWithVideoMuted: true, prejoinPageEnabled: false },
                 interfaceConfigOverwrite: { FILM_STRIP_MAX_HEIGHT: 120 }
             };
             
-            if(isDM && cur) {
+            if(isDM) {
                 setDoc(doc(db,"channels",cId), {
                     activeCall: { status: 'ringing', caller: cur.uid, ts: serverTimestamp(), parts: [cur.uid] }
                 }, { merge: true });
@@ -536,66 +1068,6 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             s.src = `https://${domain}/external_api.js`;
             s.onload = () => { window.jitsiApi = new JitsiMeetExternalAPI(domain, options); };
             document.body.appendChild(s);
-        };
-
-        window.endVoiceCall = () => {
-            getEl('call-overlay').classList.add('hidden');
-            if(window.jitsiApi) {
-                window.jitsiApi.dispose();
-                window.jitsiApi = null;
-            }
-            if(isDM && cId) {
-                updateDoc(doc(db, "channels", cId), { activeCall: deleteField() });
-            }
-        };
-
-        window.answerVoiceCall = () => {
-            getEl('incoming-call-banner').classList.add('hidden');
-            window.stopRingtone();
-            window.startVoiceCall();
-        };
-
-        window.declineVoiceCall = () => {
-            getEl('incoming-call-banner').classList.add('hidden');
-            window.stopRingtone();
-            if(cId) {
-                updateDoc(doc(db, "channels", cId), { activeCall: deleteField() });
-            }
-        };
-
-        window.expandCall = () => {
-            getEl('call-overlay').classList.remove('hidden');
-        };
-
-        window.toggleRecording = () => {
-            const btn = getEl('record-btn');
-            if(!rec) {
-                navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                    rec = new MediaRecorder(stream);
-                    recChunks = [];
-                    rec.ondataavailable = e => recChunks.push(e.data);
-                    rec.onstop = async () => {
-                        const blob = new Blob(recChunks, { type: 'audio/webm' });
-                        const reader = new FileReader();
-                        reader.onloadend = async () => {
-                            await addDoc(collection(db, "messages"), {
-                                content: reader.result,
-                                userId: cur.uid,
-                                channelId: cId,
-                                fileName: 'voice-message.webm',
-                                createdAt: serverTimestamp()
-                            });
-                        };
-                        reader.readAsDataURL(blob);
-                    };
-                    rec.start();
-                    btn.classList.add('recording');
-                });
-            } else {
-                rec.stop();
-                rec = null;
-                btn.classList.remove('recording');
-            }
         };
 
         window.renderDiscovery = async () => {
@@ -693,113 +1165,8 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             }
         };
 
-        window.openAdminAction = async (uid, username, isBanned) => {
-            target = { uid, username };
-            getEl('adm-act-title').textContent = `Manage ${username}`;
-            const btns = getEl('adm-btns');
-            btns.innerHTML = '';
-            
-            if(isBanned) {
-                btns.innerHTML += `<button onclick="window.unbanUser('${uid}')" class="w-full bg-green-600 text-white py-2 rounded mb-2">Unban User</button>`;
-            } else {
-                btns.innerHTML += `<button onclick="window.banUser('${uid}')" class="w-full bg-red-600 text-white py-2 rounded mb-2">Ban User</button>`;
-                btns.innerHTML += `<button onclick="window.tempBanUser('${uid}')" class="w-full bg-orange-600 text-white py-2 rounded mb-2">Temp Ban</button>`;
-            }
-            
-            const userDoc = await getDoc(doc(db, "users", uid));
-            if(userDoc.exists()) {
-                const data = userDoc.data();
-                const hist = data.history || [];
-                getEl('adm-history').innerHTML = hist.map(h => `<div>${h}</div>`).join('') || 'No history';
-            }
-            
-            window.openModal('admin-user-action-modal');
-        };
-
-        window.banUser = async (uid) => {
-            const reason = getEl('mod-reason').value;
-            if(!reason) return window.showToast('Reason required', 'error');
-            await updateDoc(doc(db, "users", uid), { 
-                isPlatformBanned: true,
-                history: arrayUnion(`Banned: ${reason} (${new Date().toLocaleString()})`)
-            });
-            window.closeModal('admin-user-action-modal');
-            window.showToast('User banned', 'success');
-            window.loadAdminView('users');
-        };
-
-        window.tempBanUser = async (uid) => {
-            const reason = getEl('mod-reason').value;
-            const duration = getEl('mod-duration').value;
-            if(!reason || !duration) return window.showToast('Reason and duration required', 'error');
-            const expires = new Date(Date.now() + parseInt(duration));
-            await updateDoc(doc(db, "users", uid), { 
-                banExpires: expires,
-                history: arrayUnion(`Temp banned until ${expires.toLocaleString()}: ${reason}`)
-            });
-            window.closeModal('admin-user-action-modal');
-            window.showToast('User temp banned', 'success');
-        };
-
-        window.unbanUser = async (uid) => {
-            await updateDoc(doc(db, "users", uid), { 
-                isPlatformBanned: false,
-                banExpires: null,
-                history: arrayUnion(`Unbanned: ${new Date().toLocaleString()}`)
-            });
-            window.closeModal('admin-user-action-modal');
-            window.showToast('User unbanned', 'success');
-            window.loadAdminView('users');
-        };
-
-        window.deleteReport = async (rid) => {
-            await deleteDoc(doc(db, "reports", rid));
-            window.showToast('Report dismissed', 'success');
-            window.loadAdminView('reports');
-        };
-
         window.openBroadcastModal = () => {
             window.openModal('broadcast-modal');
-        };
-
-        window.sendBroadcast = async () => {
-            const msg = getEl('broadcast-input').value;
-            if(!msg) return;
-            await setDoc(doc(db, "system", "broadcast"), {
-                message: msg,
-                ts: serverTimestamp()
-            });
-            window.closeModal('broadcast-modal');
-            getEl('broadcast-input').value = '';
-            window.showToast('Broadcast sent!', 'success');
-        };
-
-        window.openPostUpdateModal = () => {
-            window.openModal('post-update-modal');
-        };
-
-        window.postUpdate = async () => {
-            const title = getEl('upd-title').value;
-            const desc = getEl('upd-desc').value;
-            if(!title || !desc) return;
-            await addDoc(collection(db, "system_updates"), {
-                id: Date.now(),
-                title: title,
-                desc: desc,
-                ts: serverTimestamp()
-            });
-            window.closeModal('post-update-modal');
-            getEl('upd-title').value = '';
-            getEl('upd-desc').value = '';
-            window.showToast('Update posted!', 'success');
-        };
-
-        window.insertTag = (open, close) => {
-            const ta = getEl('upd-desc');
-            const start = ta.selectionStart;
-            const end = ta.selectionEnd;
-            const text = ta.value;
-            ta.value = text.substring(0, start) + open + text.substring(start, end) + close + text.substring(end);
         };
 
         window.filterAdminUsers = () => {
@@ -848,290 +1215,12 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             getEl('dm-alert-modal').classList.add('hidden');
         };
 
-        window.openServerSettings = () => {
-            window.openModal('server-settings-modal');
-            window.showServerSettingsTab('roles');
-        };
-
-        window.showServerSettingsTab = (tab) => {
-            document.getElementById('settings-tab-roles').classList.add('hidden');
-            document.getElementById('settings-tab-integrations').classList.add('hidden');
-            document.getElementById('settings-tab-bans').classList.add('hidden');
-            document.getElementById(`settings-tab-${tab}`).classList.remove('hidden');
-            
-            if(tab === 'bans' && activeServerData) {
-                const list = getEl('banned-users-list');
-                list.innerHTML = '';
-                if(activeServerData.bannedUsers) {
-                    activeServerData.bannedUsers.forEach(async uid => {
-                        const u = await getU(uid);
-                        list.innerHTML += `<div class="flex justify-between bg-[#202225] p-2 rounded"><span>${u.username}</span><button onclick="window.unbanServerUser('${uid}')" class="text-green-500 text-xs">Unban</button></div>`;
-                    });
-                }
-            }
-            if(tab === 'integrations') {
-                const btn = getEl('toggle-mody-btn');
-                if(activeServerData?.autoModEnabled) {
-                    btn.textContent = 'Uninstall';
-                    btn.className = 'bg-red-500 text-white px-3 py-1 rounded text-xs';
-                } else {
-                    btn.textContent = 'Install';
-                    btn.className = 'bg-green-500 text-white px-3 py-1 rounded text-xs';
-                }
-            }
-            if(tab === 'roles') {
-                const list = getEl('roles-list');
-                list.innerHTML = '';
-                if(activeServerData?.roles) {
-                    Object.entries(activeServerData.roles).forEach(([id, r]) => {
-                        list.innerHTML += `<div class="bg-[#202225] p-2 rounded flex justify-between items-center"><span style="color:${r.color}">${r.name}</span><button onclick="window.deleteRole('${id}')" class="text-red-500 text-xs"><i class="fas fa-trash"></i></button></div>`;
-                    });
-                }
-            }
-        };
-
-        window.createRole = async () => {
-            const name = getEl('role-name-input').value;
-            const color = getEl('role-color-input').value;
-            const perms = {
-                manage: getEl('perm-manage').checked,
-                kick: getEl('perm-kick').checked,
-                delete: getEl('perm-delete').checked,
-                admin: getEl('perm-admin').checked
-            };
-            if(!name) return;
-            const rid = 'role_' + Date.now();
-            await updateDoc(doc(db, "servers", sId), {
-                [`roles.${rid}`]: { name, color, ...perms, priority: Object.keys(activeServerData.roles || {}).length }
-            });
-            window.showToast('Role created!', 'success');
-            getEl('role-name-input').value = '';
-        };
-
-        window.deleteRole = async (rid) => {
-            await updateDoc(doc(db, "servers", sId), {
-                [`roles.${rid}`]: deleteField()
-            });
-            window.showServerSettingsTab('roles');
-        };
-
-        window.toggleMody = async () => {
-            const newState = !activeServerData.autoModEnabled;
-            await updateDoc(doc(db, "servers", sId), { autoModEnabled: newState });
-            activeServerData.autoModEnabled = newState;
-            window.showServerSettingsTab('integrations');
-            window.showToast(newState ? 'Mody installed!' : 'Mody uninstalled', 'success');
-        };
-
-        window.unbanServerUser = async (uid) => {
-            await updateDoc(doc(db, "servers", sId), {
-                bannedUsers: arrayRemove(uid)
-            });
-            window.showServerSettingsTab('bans');
-        };
-
-        window.openChannelSettings = () => {
-            window.openModal('channel-settings-modal');
-            const list = getEl('channel-roles-list');
-            list.innerHTML = '';
-            if(activeServerData?.roles) {
-                Object.entries(activeServerData.roles).forEach(([id, r]) => {
-                    list.innerHTML += `<div class="flex justify-between bg-[#202225] p-2 rounded mb-2"><span style="color:${r.color}">${r.name}</span><input type="checkbox" onchange="window.toggleChannelPerm('${id}', this.checked)"></div>`;
-                });
-            }
-        };
-
-        window.toggleChannelPerm = async (rid, allowed) => {
-            // Placeholder for channel permission logic
-        };
-
-        window.loadInviteFriends = async () => {
-            const list = getEl('invite-friends-list');
-            list.innerHTML = '';
-            if(!cur?.friends) return;
-            for(const fid of cur.friends) {
-                const f = await getU(fid);
-                list.innerHTML += `<div class="flex justify-between bg-[#202225] p-2 rounded mb-1"><span>${f.username}</span><button onclick="window.inviteFriend('${fid}')" class="bg-[#5865F2] text-white px-2 py-1 rounded text-xs">Invite</button></div>`;
-            }
-        };
-
-        window.inviteFriend = async (fid) => {
-            if(!cId || !cur) return;
-            await addDoc(collection(db, "messages"), {
-                content: `INVITE: ${activeServerData.name} (${activeServerData.inviteCode})`,
-                userId: cur.uid,
-                channelId: [cur.uid, fid].sort().join('_'),
-                createdAt: serverTimestamp()
-            });
-            window.showToast('Invite sent!', 'success');
-        };
-
-        window.openMemberMenu = (e, u) => {
-            target = u;
-            getEl('action-username').textContent = u.username;
-            const isOwner = activeServerData?.ownerId === cur?.uid;
-            const isAdmin = activeServerData?.userRoles?.[cur?.uid]?.some(r => activeServerData.roles?.[r]?.admin);
-            getEl('kick-btn').classList.toggle('hidden', !isOwner && !isAdmin);
-            getEl('ban-btn').classList.toggle('hidden', !isOwner && !isAdmin);
-            getEl('remove-friend-btn').classList.toggle('hidden', !cur?.friends?.includes(u.uid));
-            
-            const rolesList = getEl('action-roles-list');
-            rolesList.innerHTML = '';
-            if(isOwner && activeServerData?.roles) {
-                Object.entries(activeServerData.roles).forEach(([rid, r]) => {
-                    const hasRole = activeServerData.userRoles?.[u.uid]?.includes(rid);
-                    rolesList.innerHTML += `<button onclick="window.toggleUserRole('${u.uid}', '${rid}')" class="text-xs ${hasRole ? 'bg-green-600' : 'bg-gray-600'} text-white px-2 py-1 rounded mb-1 w-full">${r.name}</button>`;
-                });
-            }
-            window.openModal('member-action-modal');
-        };
-
-        window.toggleUserRole = async (uid, rid) => {
-            const hasRole = activeServerData.userRoles?.[uid]?.includes(rid);
-            if(hasRole) {
-                await updateDoc(doc(db, "servers", sId), {
-                    [`userRoles.${uid}`]: arrayRemove(rid)
-                });
-            } else {
-                await updateDoc(doc(db, "servers", sId), {
-                    [`userRoles.${uid}`]: arrayUnion(rid)
-                });
-            }
-            window.openMemberMenu(null, target);
-        };
-
-        window.reportUser = () => {
-            window.closeModal('member-action-modal');
-            window.openModal('report-modal');
-        };
-
-        window.submitReport = async () => {
-            const reason = getEl('report-reason').value;
-            if(!reason || !target) return;
-            await addDoc(collection(db, "reports"), {
-                reporter: cur.uid,
-                target: target.uid,
-                reason: reason,
-                ts: serverTimestamp()
-            });
-            window.closeModal('report-modal');
-            getEl('report-reason').value = '';
-            window.showToast('Report submitted', 'success');
-        };
-
-        window.toggleBlockUser = async () => {
-            if(!target) return;
-            const isBlocked = cur.blocked?.includes(target.uid);
-            if(isBlocked) {
-                await updateDoc(doc(db, "users", cur.uid), {
-                    blocked: arrayRemove(target.uid)
-                });
-            } else {
-                await updateDoc(doc(db, "users", cur.uid), {
-                    blocked: arrayUnion(target.uid)
-                });
-            }
-            window.closeModal('member-action-modal');
-            window.showToast(isBlocked ? 'User unblocked' : 'User blocked', 'success');
-        };
-
-        window.kickUser = async () => {
-            if(!target || !activeServerData) return;
-            await updateDoc(doc(db, "servers", sId), {
-                members: arrayRemove(target.uid)
-            });
-            window.closeModal('member-action-modal');
-            window.showToast('User kicked', 'success');
-        };
-
-        window.banUser = async () => {
-            if(!target || !activeServerData) return;
-            await updateDoc(doc(db, "servers", sId), {
-                members: arrayRemove(target.uid),
-                bannedUsers: arrayUnion(target.uid)
-            });
-            window.closeModal('member-action-modal');
-            window.showToast('User banned from server', 'success');
-        };
-
-        window.removeFriend = async () => {
-            if(!target) return;
-            await updateDoc(doc(db, "users", cur.uid), {
-                friends: arrayRemove(target.uid)
-            });
-            await updateDoc(doc(db, "users", target.uid), {
-                friends: arrayRemove(cur.uid)
-            });
-            window.closeModal('member-action-modal');
-            window.showToast('Friend removed', 'success');
-        };
-
-        window.saveProfile = async () => {
-            if(!cur) return;
-            const username = getEl('edit-username-input').value;
-            const avatar = getEl('edit-avatar-input').value;
-            const status = getEl('edit-status-input').value;
-            const banner = getEl('edit-banner-color').value;
-            const file = getEl('edit-avatar-file').files[0];
-            
-            let avatarUrl = avatar;
-            if(file) {
-                try { avatarUrl = await compressImg(file); } catch(e) {}
-            }
-            
-            await updateDoc(doc(db, "users", cur.uid), {
-                username: username || cur.username,
-                avatar: avatarUrl || cur.avatar,
-                status: status,
-                bannerColor: banner
-            });
-            window.closeModal('user-settings-modal');
-            window.showToast('Profile saved!', 'success');
-        };
-
-        window.initReply = (mid, content, username) => {
-            repId = { id: mid, content, username };
-            getEl('reply-bar').classList.remove('hidden');
-            getEl('reply-username').textContent = username;
-        };
-
-        window.cancelReply = () => {
-            repId = null;
-            getEl('reply-bar').classList.add('hidden');
-        };
-
-        window.deleteMessage = async (mid) => {
-            await deleteDoc(doc(db, "messages", mid));
-        };
-
-        async function getU(uid){
-            if(uCache[uid]&&Date.now()-uCache[uid]._t<60000)return uCache[uid];
-            const s=await getDoc(doc(db,"users",uid));
-            const d=s.exists()?s.data():{username:'Unknown',color:'#777',status:'offline'};
-            const u={uid:uid,...d,_t:Date.now()};
-            uCache[uid]=u;
-            return u;
-        }
-        
-        function updateFoot(){
-            if(!cur)return;
-            getEl('current-username').textContent=cur.username;
-            getEl('current-discriminator').textContent=`#${cur.uid.substring(0,4)}`;
-            const img=getEl('current-user-img'),icon=getEl('current-user-icon');
-            if(cur.avatar){img.src=cur.avatar;img.classList.remove('hidden');icon.classList.add('hidden');}
-            else{img.classList.add('hidden');icon.classList.remove('hidden');getEl('current-user-avatar').style.backgroundColor=cur.color||'#5865F2';}
-            getEl('connection-status').className=`status-dot status-${cur.status||'online'}`;
-            getEl('edit-username-input').value=cur.username;
-            getEl('edit-avatar-input').value=cur.avatar||'';
-            getEl('edit-status-input').value=cur.status||'online';
-            getEl('edit-banner-color').value=cur.bannerColor||'#000000';
-            if(cur.isNitro) getEl('current-username').innerHTML = `<span class="nitro-gradient">${cur.username}</span> <i class="fas fa-rocket text-pink-500 text-xs"></i>`;
-        }
-
         function renderMems(s){
             const l=getEl('member-list');l.innerHTML='';
+            
             const memberList = [...(s.members||[])];
-            if(activeServerData?.autoModEnabled) memberList.push('mody_bot');
+            if(activeServerData.autoModEnabled) memberList.push('mody_bot');
+
             Promise.all(memberList.map(uid => uid === 'mody_bot' ? {uid:'mody', username:'Mody', color:'#5865F2', isBot:true, status:'online'} : getU(uid))).then(us=>{
                 const g={Online:[],Offline:[]};
                 if(activeServerData?.roles)Object.values(activeServerData.roles).sort((a,b)=>a.priority-b.priority).forEach(r=>g[r.name]=[]);
@@ -1148,9 +1237,10 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                     const h=document.createElement('div');h.className="text-[#96989d] text-xs font-bold uppercase mb-2 mt-4 px-2";h.textContent=`${n} — ${a.length}`;l.appendChild(h);
                     a.forEach(x=>{
                         const d=document.createElement('div');d.className="flex items-center px-2 py-1.5 rounded hover:bg-[#35373c] cursor-pointer opacity-90 hover:opacity-100";
-                        d.onclick=e=>window.openMemberMenu(e,x.u);
+                        d.onclick=e=>window.openProfileCard(x.u, e);
                         const badge = x.u.isBot ? '<span class="bot-tag"><i class="fas fa-check"></i> BOT</span>' : (x.u.isNitro ? '<i class="fas fa-rocket text-pink-500 ml-1 text-xs"></i>' : '');
-                        d.innerHTML=`<div class="relative mr-3"><div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden"><img src="${x.u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none'"></div><div class="status-dot status-${x.u.status==='idle'?'idle':x.u.status==='offline'?'offline':'online'}"></div></div><div class="text-sm font-medium" style="color:${n==='Offline'?'#747f8d':x.c}">${x.u.username} ${s.ownerId===x.u.uid?'<i class="fas fa-crown text-yellow-500 ml-1"></i>':''} ${badge}</div>`;
+                        const nameClass = x.u.isNitro ? 'shiny-name' : '';
+                        d.innerHTML=`<div class="relative mr-3"><div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden"><img src="${x.u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none'"></div><div class="status-dot status-${x.u.status==='idle'?'idle':x.u.status==='offline'?'offline':'online'}"></div></div><div class="text-sm font-medium ${nameClass}" style="color:${n==='Offline'?'#747f8d':x.c}">${x.u.username} ${s.ownerId===x.u.uid?'<i class="fas fa-crown text-yellow-500 ml-1"></i>':''} ${badge}</div>`;
                         l.appendChild(d);
                     });
                 });
@@ -1175,19 +1265,20 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                 if(txt.match(/\.(jpeg|jpg|gif|png)$/i)) txt=`<img src="${m.content}" class="max-w-xs rounded mt-2">`; 
             }
             const d=document.createElement('div');d.className="msg flex pr-4 pl-4 py-1 mt-1 hover:bg-[#32353b] group relative";let rep='';if(m.replyTo)rep=`<div class="text-xs text-[#b9bbbe] mb-1 flex items-center"><div class="w-8 border-t-2 border-l-2 border-[#4f545c] h-3 mr-1 rounded-tl-md"></div> <span class="font-bold text-white mr-1">${m.replyTo.username}</span>: ${m.replyTo.content.substring(0,30)}...</div>`;
-            const own=activeServerData?.ownerId===cur?.uid;const roles=activeServerData?.roles||{};const del=own||(activeServerData?.userRoles?.[cur?.uid]||[]).some(r=>roles[r]?.deleteMessages)||m.userId===cur?.uid;
+            const own=activeServerData?.ownerId===cur.uid;const roles=activeServerData?.roles||{};const del=own||(activeServerData?.userRoles?.[cur.uid]||[]).some(r=>roles[r]?.deleteMessages)||m.userId===cur.uid;
             let reacts = '';
             if(m.reactions) {
                 reacts = `<div class="flex flex-wrap gap-1 mt-1 ml-14">`;
                 Object.entries(m.reactions).forEach(([emoji, users]) => {
                     if(users.length > 0) {
-                         const amI = users.includes(cur?.uid);
+                         const amI = users.includes(cur.uid);
                          reacts += `<div class="reaction-pill ${amI?'active':''}" onclick="window.toggleReaction('${m.id}','${emoji}')"><span>${emoji}</span> <span class="font-bold text-xs">${users.length}</span></div>`;
                     }
                 });
                 reacts += `</div>`;
             }
-            d.innerHTML=`<div class="w-10 h-10 rounded-full mr-4 bg-gray-600 overflow-hidden shrink-0 mt-1"><img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none'"></div><div class="flex-1 min-w-0">${rep}<div><span class="font-medium hover:underline cursor-pointer mr-2" style="color:${col}" onclick="window.openMemberMenu(event,{uid:'${u.uid}',username:'${u.username}'})">${u.username}</span><span class="text-xs text-[#72767d]">${m.createdAt?.toDate().toLocaleTimeString()||''}</span></div><div class="text-[#dcddde] whitespace-pre-wrap leading-6 markdown">${txt}</div>${reacts}</div><div class="acts absolute right-4 -top-2 bg-[#36393f] shadow-md border border-[#2f3136] rounded flex items-center p-1 hidden group-hover:flex"><i class="fas fa-smile text-[#b9bbbe] hover:text-white px-2 cursor-pointer" onmouseenter="window.showReactionPicker(this, '${m.id}')"></i><i class="fas fa-reply text-[#b9bbbe] hover:text-white px-2 cursor-pointer" onclick="window.initReply('${m.id}','${m.content.replace(/'/g,"\\'")}','${u.username}')"></i>${m.userId===cur?.uid?`<i class="fas fa-pencil-alt text-[#b9bbbe] hover:text-white px-2 cursor-pointer" onclick="window.startEditMessage('${m.id}','${m.content.replace(/'/g,"\\'")}', this)"></i>`:''}${del?`<i class="fas fa-trash text-[#ed4245] hover:text-red-400 px-2 cursor-pointer" onclick="window.deleteMessage('${m.id}')"></i>`:''}</div>`;
+            const nameClass = u.isNitro ? 'shiny-name' : '';
+            d.innerHTML=`<div class="w-10 h-10 rounded-full mr-4 bg-gray-600 overflow-hidden shrink-0 mt-1 cursor-pointer" onclick="window.openProfileCard(await window.getU('${u.uid}'), event)"><img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none'"></div><div class="flex-1 min-w-0">${rep}<div><span class="font-medium hover:underline cursor-pointer mr-2 ${nameClass}" style="color:${col}" onclick="window.openProfileCard(await window.getU('${u.uid}'), event)">${u.username}</span><span class="text-xs text-[#72767d]">${m.createdAt?.toDate().toLocaleTimeString()||''}</span></div><div class="text-[#dcddde] whitespace-pre-wrap leading-6 markdown">${txt}</div>${reacts}</div><div class="acts absolute right-4 -top-2 bg-[#36393f] shadow-md border border-[#2f3136] rounded flex items-center p-1 hidden group-hover:flex"><i class="fas fa-smile text-[#b9bbbe] hover:text-white px-2 cursor-pointer" onmouseenter="window.showReactionPicker(this, '${m.id}')"></i><i class="fas fa-reply text-[#b9bbbe] hover:text-white px-2 cursor-pointer" onclick="window.initReply('${m.id}','${m.content.replace(/'/g,"\\'")}','${u.username}')"></i>${m.userId===cur.uid?`<i class="fas fa-pencil-alt text-[#b9bbbe] hover:text-white px-2 cursor-pointer" onclick="window.startEditMessage('${m.id}','${m.content.replace(/'/g,"\\'")}', this)"></i>`:''}${del?`<i class="fas fa-trash text-[#ed4245] hover:text-red-400 px-2 cursor-pointer" onclick="window.deleteMessage('${m.id}')"></i>`:''}</div>`;
             if(m.content.includes("INVITE:")) d.querySelector('.markdown').innerHTML=`<div class="bg-[#2f3136] p-4 rounded mt-2 border-l-4 border-[#5865F2] w-64"><div class="font-bold text-[#b9bbbe] text-xs mb-2">YOU'VE BEEN INVITED</div><div class="font-bold text-white mb-2">${m.content.split('INVITE: ')[1].split(' (')[0]}</div><button onclick="window.joinInv('${m.content.split('(')[1].split(')')[0]}')" class="bg-[#3ba55c] text-white w-full py-2 rounded font-bold hover:bg-green-600">Join</button></div>`;
             if(prepend) c.prepend(d); else c.appendChild(d);
         }
@@ -1204,7 +1295,7 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                 msgs.sort((a,b)=>(a.createdAt?.toMillis()||0)-(b.createdAt?.toMillis()||0));
                 const displayMsgs = msgs.slice(-50);
                 c.innerHTML='';
-                displayMsgs.forEach(x=>{if(!cur?.blocked?.includes(x.userId))rMsg(x,c,false);});
+                displayMsgs.forEach(x=>{if(!cur.blocked?.includes(x.userId))rMsg(x,c,false);});
                 setTimeout(()=>c.scrollTop=c.scrollHeight, 50);
             });
         }
@@ -1223,18 +1314,16 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             p.classList.remove('hidden');
             setTimeout(()=>p.classList.add('hidden'), 3000);
         };
-        
         window.toggleReaction = async (mid, emoji) => {
              const mRef = doc(db, "messages", mid);
              const mSnap = await getDoc(mRef);
              if(!mSnap.exists()) return;
              const r = mSnap.data().reactions || {};
              const users = r[emoji] || [];
-             if(users.includes(cur?.uid)) { r[emoji] = users.filter(u => u !== cur?.uid); } 
-             else { if(!r[emoji]) r[emoji] = []; r[emoji].push(cur?.uid); }
+             if(users.includes(cur.uid)) { r[emoji] = users.filter(u => u !== cur.uid); } 
+             else { if(!r[emoji]) r[emoji] = []; r[emoji].push(cur.uid); }
              await updateDoc(mRef, { reactions: r });
         };
-        
         window.showToast = (msg, type='info') => {
              const c = getEl('toast-container');
              const d = document.createElement('div');
@@ -1244,51 +1333,24 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
              setTimeout(()=>d.classList.add('show'), 10);
              setTimeout(()=>{ d.classList.remove('show'); setTimeout(()=>d.remove(), 300); }, 3000);
         };
-        
         window.startEditMessage = (mid, content, el) => {
              const container = el.closest('.msg').querySelector('.markdown');
              const originalHTML = container.innerHTML;
              container.innerHTML = `<input type="text" class="bg-[#202225] text-white p-1 rounded w-full border border-blue-500" value="${content}"><div class="text-[10px] mt-1"><span class="text-blue-400 cursor-pointer hover:underline" onclick="window.saveEdit('${mid}', this.parentElement.previousElementSibling.value)">Save</span> • <span class="text-gray-400 cursor-pointer hover:underline" onclick="this.closest('.markdown').innerHTML='${originalHTML.replace(/'/g,"\\'").replace(/"/g,'&quot;')}'">Cancel</span></div>`;
         };
-        
         window.saveEdit = async (mid, newContent) => { await updateDoc(doc(db,"messages",mid), { content: newContent }); };
         
-        function initCallG(){
-            if(subs.call)subs.call();
-            subs.call=onSnapshot(query(collection(db,"channels"),where("members","array-contains",cur?.uid)),s=>{
-                let f=false;
-                s.forEach(d=>{
-                    const dt=d.data();
-                    if(dt.activeCall&&dt.activeCall.status==='ringing'&&dt.activeCall.caller!==cur?.uid){
-                        f=true;call=dt.activeCall;cId=d.id;
-                        getEl('incoming-call-banner').classList.remove('hidden');
-                        window.playRingtone();
-                    }
-                });
-                if(!f){getEl('incoming-call-banner').classList.add('hidden');window.stopRingtone();}
-            });
-        }
-        
-        function initNotif(){
-            if(subs.notif)subs.notif();
-            subs.notif=onSnapshot(query(collection(db,`users/${cur?.uid}/notifications`)),s=>{
-                let c=0;
-                s.forEach(d=>{if(d.data().type==='dm')c++;});
-                if(c>0){getEl('home-badge').classList.remove('hidden');getEl('home-badge').textContent=c;}
-                else getEl('home-badge').classList.add('hidden');
-                if(!s.empty&&s.docChanges().some(x=>x.type==='added'))window.playNotification();
-            });
-        }
-        
+        function initCallG(){if(subs.call)subs.call();subs.call=onSnapshot(query(collection(db,"channels"),where("members","array-contains",cur.uid)),s=>{let f=false;s.forEach(d=>{const dt=d.data();if(dt.activeCall&&dt.activeCall.status==='ringing'&&dt.activeCall.caller!==cur.uid){f=true;call=dt.activeCall;cId=d.id;getEl('incoming-call-banner').classList.remove('hidden');window.playRingtone();}});if(!f){getEl('incoming-call-banner').classList.add('hidden');window.stopRingtone();}});}
+        function initNotif(){if(subs.notif)subs.notif();subs.notif=onSnapshot(query(collection(db,`users/${cur.uid}/notifications`)),s=>{let c=0;s.forEach(d=>{if(d.data().type==='dm')c++;});if(c>0){getEl('home-badge').classList.remove('hidden');getEl('home-badge').textContent=c;}else getEl('home-badge').classList.add('hidden');if(!s.empty&&s.docChanges().some(x=>x.type==='added'))window.playNotification();});}
         function initUpdates(){
             onSnapshot(collection(db,"system_updates"), s => {
                 const l=getEl('updates-list');l.innerHTML='';
                 let unseen = 0;
                 const updates = [];
-                s.forEach(d => updates.push(d.data()));
-                updates.sort((a,b) => b.id - a.id);
+                s.forEach(d => updates.push({id: d.id, ...d.data()}));
+                updates.sort((a,b) => (b.ts?.toMillis()||0) - (a.ts?.toMillis()||0));
                 updates.forEach(u => {
-                    if(!cur?.lastReadUpdateId || u.id > cur.lastReadUpdateId) unseen++;
+                    if(!cur.lastReadUpdateId || u.ts?.toMillis() > cur.lastReadUpdateId) unseen++;
                     l.innerHTML += `<div class="bg-[#36393f] p-3 rounded border-l-4 border-yellow-500 shadow mb-2"><div class="text-white font-bold text-lg mb-1">${u.title}</div><div class="text-[#dcddde] text-sm whitespace-pre-wrap">${u.desc}</div><div class="text-[#72767d] text-xs mt-2 text-right">${u.ts ? new Date(u.ts.toMillis()).toLocaleDateString() : 'Just now'}</div></div>`;
                 });
                 const b=getEl('update-badge');
@@ -1298,94 +1360,22 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
         
         function initApp(){
             if(!cur) return;
-            subs.srv=onSnapshot(query(collection(db,"servers"),where("members","array-contains",cur.uid)),s=>{
-                const l=getEl('server-list');l.innerHTML='';
-                s.forEach(d=>{if(!d.data().bannedUsers?.includes(cur.uid))renderSI(d.id,d.data(),l);});
-            });
+            subs.srv=onSnapshot(query(collection(db,"servers"),where("members","array-contains",cur.uid)),s=>{const l=getEl('server-list');l.innerHTML='';s.forEach(d=>{if(!d.data().bannedUsers?.includes(cur.uid))renderSI(d.id,d.data(),l);});});
             window.renderHome();
         }
         
         function renderSI(id,d,l){
             const b=document.createElement('div');b.className=`s-icon ${sId===id&&!isDM?'active':''}`;
             b.innerHTML = `<div class="unread-pill" id="unread-${id}"></div>`;
-            if(d.icon){b.style.backgroundImage=`url('${d.icon}')`;b.style.backgroundSize='cover';}
-            else b.innerHTML+=`<span class="font-bold text-sm">${d.name.substring(0,2)}</span>`;
+            if(d.icon){b.style.backgroundImage=`url('${d.icon}')`;b.style.backgroundSize='cover';}else{b.innerHTML+=`<span class="font-bold text-sm">${d.name.substring(0,2)}</span>`;}
             b.onclick=()=>window.selServ(id);l.appendChild(b);
         }
-        
         window.selServ = (id) => {
-            isDM=false;sId=id;getEl('dm-actions').classList.add('hidden');
-            if(subs.as)subs.as();
-            subs.as=onSnapshot(doc(db,"servers",id),s=>{
-                if(s.exists()){
-                    activeServerData={id:s.id,...s.data()};
-                    renderMems(activeServerData);
-                    const own=activeServerData.ownerId===cur?.uid;
-                    const adm=own||(activeServerData.userRoles?.[cur?.uid]||[]).some(r=>activeServerData.roles?.[r]?.admin);
-                    getEl('server-settings-icon').classList.toggle('hidden',!own);
-                    getEl('invite-icon').classList.remove('hidden');
-                    getEl('channel-settings-btn').classList.toggle('hidden',!adm);
-                    getEl('sidebar-header').textContent=activeServerData.name;
-                    getEl('invite-code-display').value=activeServerData.inviteCode;
-                }
-            });
-            if(subs.ch)subs.ch();
-            subs.ch=onSnapshot(query(collection(db,"channels"),where("serverId","==",id)),s=>{
-                const l=getEl('channels-list');l.innerHTML='';
-                const chs=[];s.forEach(d=>chs.push({id:d.id,...d.data()}));
-                chs.sort((a,b)=>(a.position||0)-(b.position||0));
-                const cats={},noc=[];
-                chs.forEach(c=>{if(c.type==='category')cats[c.name]=[];else if(c.category&&cats[c.category])cats[c.category].push(c);else noc.push(c);});
-                const own=activeServerData?.ownerId===cur?.uid;
-                const adm=own||(activeServerData?.userRoles?.[cur?.uid]||[]).some(r=>activeServerData?.roles?.[r]?.manageChannels||activeServerData?.roles?.[r]?.admin);
-                if(adm){
-                    const b=document.createElement('div');b.className="text-[#00aff4] text-xs px-4 cursor-pointer mb-2 hover:underline";
-                    b.textContent="+ Create Category";
-                    b.onclick=()=>window.openModal('create-category-modal');
-                    l.appendChild(b);
-                }
-                const rC=c=>{
-                    const d=document.createElement('div');d.className=`ch-item px-2 py-1 mx-2 rounded cursor-pointer text-[#96989d] mb-0.5 flex justify-between group ${cId===c.id?'active text-white':''}`;
-                    d.innerHTML=`<span><i class="fas fa-hashtag text-lg mr-1.5 opacity-60"></i> <span class="truncate">${c.name}</span></span>`;
-                    d.onclick=()=>window.selChan(c.id,c);
-                    return d;
-                };
-                noc.forEach(c=>l.appendChild(rC(c)));
-                for(const[n,cs]of Object.entries(cats)){
-                    const h=document.createElement('div');h.className="flex justify-between px-2 pt-4 pb-1 text-[#96989d] text-xs font-bold uppercase hover:text-white cursor-pointer";
-                    h.innerHTML=`<span><i class="fas fa-chevron-down text-[10px] mr-1"></i> ${n}</span> <i class="fas fa-plus cursor-pointer hover:text-white ${adm?'':'hidden'}" onclick="event.stopPropagation();window.openModal('create-channel-modal');getEl('new-channel-category').value='${n}'"></i>`;
-                    l.appendChild(h);cs.forEach(c=>l.appendChild(rC(c)));
-                }
-                const sel=getEl('new-channel-category');
-                sel.innerHTML='<option value="">No Category</option>';
-                Object.keys(cats).forEach(k=>sel.innerHTML+=`<option value="${k}">${k}</option>`);
-                if(chs.length>0&&(!cId||isDM))window.selChan(chs[0].id,chs[0]);
-            });
-            if(window.innerWidth<768){
-                getEl('server-rail').classList.remove('hidden');
-                getEl('sidebar-panel').classList.remove('-translate-x-full');
-                getEl('main-panel').classList.add('translate-x-full');
-            }
+            isDM=false;sId=id;getEl('dm-actions').classList.add('hidden');if(subs.as)subs.as();subs.as=onSnapshot(doc(db,"servers",id),s=>{if(s.exists()){activeServerData={id:s.id,...s.data()};renderMems(activeServerData);const own=activeServerData.ownerId===cur.uid;const adm=own||(activeServerData.userRoles?.[cur.uid]||[]).some(r=>activeServerData.roles?.[r]?.admin);getEl('server-settings-icon').classList.toggle('hidden',!own);getEl('invite-icon').classList.remove('hidden');getEl('channel-settings-btn').classList.toggle('hidden',!adm);getEl('sidebar-header').textContent=activeServerData.name;getEl('invite-code-display').value=activeServerData.inviteCode;}});if(subs.ch)subs.ch();subs.ch=onSnapshot(query(collection(db,"channels"),where("serverId","==",id)),s=>{const l=getEl('channels-list');l.innerHTML='';const chs=[];s.forEach(d=>chs.push({id:d.id,...d.data()}));chs.sort((a,b)=>(a.position||0)-(b.position||0));const cats={},noc=[];chs.forEach(c=>{if(c.type==='category')cats[c.name]=[];else if(c.category&&cats[c.category])cats[c.category].push(c);else noc.push(c);});const own=activeServerData?.ownerId===cur.uid;const adm=own||(activeServerData?.userRoles?.[cur.uid]||[]).some(r=>activeServerData?.roles?.[r]?.manageChannels||activeServerData?.roles?.[r]?.admin);if(adm){const b=document.createElement('div');b.className="text-[#00aff4] text-xs px-4 cursor-pointer mb-2 hover:underline";b.textContent="+ Create Category";b.ondragover=e=>e.preventDefault();b.ondrop=e=>window.handleDrop(e,null,true);b.onclick=()=>window.openModal('create-category-modal');l.appendChild(b);}const rC=c=>{const d=document.createElement('div');d.className=`ch-item px-2 py-1 mx-2 rounded cursor-pointer text-[#96989d] mb-0.5 flex justify-between group ${cId===c.id?'active text-white':''}`;if(adm){d.draggable=true;d.ondragstart=e=>e.dataTransfer.setData('cid',c.id);d.ondragover=e=>{e.preventDefault();d.classList.add('drag-over');};d.ondragleave=()=>d.classList.remove('drag-over');d.ondrop=e=>window.handleDrop(e,c);}d.innerHTML=`<span><i class="fas fa-hashtag text-lg mr-1.5 opacity-60"></i> <span class="truncate">${c.name}</span></span>`;d.onclick=()=>window.selChan(c.id,c);return d;};noc.forEach(c=>l.appendChild(rC(c)));for(const[n,cs]of Object.entries(cats)){const h=document.createElement('div');h.className="flex justify-between px-2 pt-4 pb-1 text-[#96989d] text-xs font-bold uppercase hover:text-white cursor-pointer";h.ondragover=e=>e.preventDefault();h.ondrop=e=>window.handleDrop(e,n,true);h.innerHTML=`<span><i class="fas fa-chevron-down text-[10px] mr-1"></i> ${n}</span> <i class="fas fa-plus cursor-pointer hover:text-white ${adm?'':'hidden'}" onclick="event.stopPropagation();window.openModal('create-channel-modal');getEl('new-channel-category').value='${n}'"></i>`;l.appendChild(h);cs.forEach(c=>l.appendChild(rC(c)));}const sel=getEl('new-channel-category');sel.innerHTML='<option value="">No Category</option>';Object.keys(cats).forEach(k=>sel.innerHTML+=`<option value="${k}">${k}</option>`);if(chs.length>0&&(!cId||isDM))window.selChan(chs[0].id,chs[0]);});if(window.innerWidth<768){getEl('server-rail').classList.remove('hidden');getEl('sidebar-panel').classList.remove('-translate-x-full');getEl('main-panel').classList.add('translate-x-full');}
         };
-        
         window.renderHome=()=>{
             if(!cur) return;
-            isDM=true;sId=null;activeServerData=null;
-            getEl('server-settings-icon').classList.add('hidden');
-            getEl('invite-icon').classList.add('hidden');
-            getEl('channel-settings-btn').classList.add('hidden');
-            getEl('dm-actions').classList.remove('hidden');
-            getEl('sidebar-header').textContent="Direct Messages";
-            getEl('messages-container').classList.add('hidden');
-            getEl('input-area').classList.add('hidden');
-            getEl('friends-view').classList.remove('hidden');
-            getEl('member-list').classList.add('hidden');
-            loadFriends();
-            if(window.innerWidth<768){
-                getEl('server-rail').classList.remove('hidden');
-                getEl('sidebar-panel').classList.remove('-translate-x-full');
-                getEl('main-panel').classList.add('translate-x-full');
-            }
+            isDM=true;sId=null;activeServerData=null;getEl('server-settings-icon').classList.add('hidden');getEl('invite-icon').classList.add('hidden');getEl('channel-settings-btn').classList.add('hidden');getEl('dm-actions').classList.remove('hidden');getEl('sidebar-header').textContent="Direct Messages";getEl('messages-container').classList.add('hidden');getEl('input-area').classList.add('hidden');getEl('friends-view').classList.remove('hidden');getEl('member-list').classList.add('hidden');loadFriends();if(window.innerWidth<768){getEl('server-rail').classList.remove('hidden');getEl('sidebar-panel').classList.remove('-translate-x-full');getEl('main-panel').classList.add('translate-x-full');}
         };
         
         async function loadFriends(){
@@ -1393,36 +1383,122 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             getEl('channels-list').innerHTML=`<div class="px-4 py-4 text-[#72767d] text-xs font-bold uppercase">Direct Messages</div>`;
             const fl=getEl('friends-list');
             fl.innerHTML='';
+            
+            // Set active tab
+            document.querySelectorAll('#friends-view button[id^="tab-"]').forEach(b => {
+                b.classList.remove('text-white', 'border-[#5865F2]');
+                b.classList.add('text-[#b9bbbe]', 'border-transparent');
+            });
+            const activeBtn = getEl(`tab-${friendsTab}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-[#b9bbbe]', 'border-transparent');
+                activeBtn.classList.add('text-white', 'border-[#5865F2]');
+            }
+            
             if(subs.f)subs.f();
             subs.f=onSnapshot(doc(db,"users",cur.uid),async s=>{
                 if(!s.exists())return;
                 const d=s.data();
+                cur.friends = d.friends || [];
+                cur.requests = d.requests || [];
+                cur.blocked = d.blocked || [];
+                
                 fl.innerHTML='';
-                if(d.requests?.length){
-                    fl.innerHTML+=`<div class="text-[#b9bbbe] text-xs font-bold mb-2">Pending</div>`;
+                
+                if(friendsTab === 'pending' && d.requests?.length){
                     for(const uid of d.requests){
                         const u=await getU(uid);
-                        fl.innerHTML+=`<div class="flex justify-between p-2 bg-[#2f3136] rounded mb-1"><span class="text-white">${u.username}</span><button onclick="window.accReq('${uid}')" class="text-green-500 text-xs">Accept</button></div>`;
+                        fl.innerHTML+=`
+                        <div class="flex justify-between items-center p-3 bg-[#2f3136] rounded mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
+                                    <img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentElement.textContent='${u.username?.substring(0,2).toUpperCase()}'">
+                                </div>
+                                <span class="text-white font-medium">${u.username}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.accReq('${uid}')" class="bg-[#3ba55c] text-white px-3 py-1 rounded text-sm">Accept</button>
+                                <button onclick="window.declineReq('${uid}')" class="bg-[#ed4245] text-white px-3 py-1 rounded text-sm">Ignore</button>
+                            </div>
+                        </div>`;
                     }
+                    if(fl.innerHTML === '') fl.innerHTML = '<div class="text-[#72767d] text-center mt-8">No pending friend requests</div>';
+                    return;
                 }
-                fl.innerHTML+=`<div class="text-[#b9bbbe] text-xs font-bold mt-4">Friends</div>`;
-                for(const uid of(d.friends||[])){
+                
+                if(friendsTab === 'blocked') {
+                    for(const uid of (d.blocked||[])){
+                        const u=await getU(uid);
+                        fl.innerHTML+=`
+                        <div class="flex justify-between items-center p-3 bg-[#2f3136] rounded mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
+                                    <img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentElement.textContent='${u.username?.substring(0,2).toUpperCase()}'">
+                                </div>
+                                <span class="text-white font-medium">${u.username}</span>
+                            </div>
+                            <button onclick="window.unblockUser('${uid}')" class="bg-[#72767d] text-white px-3 py-1 rounded text-sm">Unblock</button>
+                        </div>`;
+                    }
+                    if(fl.innerHTML === '') fl.innerHTML = '<div class="text-[#72767d] text-center mt-8">No blocked users</div>';
+                    return;
+                }
+                
+                // Online/All tabs
+                const friendsToShow = friendsTab === 'online' ? (d.friends||[]).filter(f => uCache[f]?.status !== 'offline') : (d.friends||[]);
+                
+                if(friendsTab === 'online' && friendsToShow.length === 0 && (d.friends||[]).length > 0) {
+                    fl.innerHTML = '<div class="text-[#72767d] text-center mt-8">None of your friends are online</div>';
+                }
+                
+                for(const uid of friendsToShow){
                     const u=await getU(uid);
-                    const d=document.createElement('div');
-                    d.className="flex justify-between p-2 bg-[#2f3136] rounded mb-1 cursor-pointer hover:bg-[#36393f]";
-                    d.innerHTML=`<div class="flex items-center"><div class="w-8 h-8 rounded-full mr-3 bg-gray-600 overflow-hidden"><img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none'"></div><span class="text-white">${u.username}</span></div>`;
-                    d.onclick=()=>window.startDM(uid,u);
-                    fl.appendChild(d);
+                    if(friendsTab === 'online' && u.status === 'offline') continue;
+                    
+                    const div = document.createElement('div');
+                    div.className="flex justify-between items-center p-3 bg-[#2f3136] rounded mb-2 cursor-pointer hover:bg-[#36393f]";
+                    div.innerHTML=`
+                        <div class="flex items-center gap-3" onclick="window.startDM('${uid}', {username:'${u.username}',avatar:'${u.avatar||''}',status:'${u.status}'})">
+                            <div class="relative">
+                                <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden">
+                                    <img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentElement.textContent='${u.username?.substring(0,2).toUpperCase()}'">
+                                </div>
+                                <div class="status-dot status-${u.status==='idle'?'idle':u.status==='offline'?'offline':u.status==='dnd'?'dnd':'online'}"></div>
+                            </div>
+                            <div>
+                                <div class="text-white font-medium ${u.isNitro?'shiny-name':''}">${u.username}</div>
+                                <div class="text-[#72767d] text-xs">${u.status === 'online' ? 'Online' : u.status === 'idle' ? 'Idle' : u.status === 'dnd' ? 'Do Not Disturb' : 'Offline'}</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.startDM('${uid}', {username:'${u.username}',avatar:'${u.avatar||''}',status:'${u.status}'})" class="bg-[#2f3136] text-[#b9bbbe] hover:text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-comment"></i></button>
+                            <button onclick="window.openProfileCard(await window.getU('${uid}'), event)" class="bg-[#2f3136] text-[#b9bbbe] hover:text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-ellipsis-v"></i></button>
+                        </div>
+                    `;
+                    fl.appendChild(div);
+                    
                     const sb=document.createElement('div');
-                    sb.className="channel-item px-2 py-2 mx-2 rounded cursor-pointer text-[#96989d] mb-1 flex items-center";
-                    sb.innerHTML=`<i class="fas fa-user mr-2"></i> ${u.username}`;
+                    sb.className="channel-item px-2 py-2 mx-2 rounded cursor-pointer text-[#96989d] mb-1 flex items-center hover:bg-[#35373c]";
+                    sb.innerHTML=`<div class="relative mr-2"><div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden text-xs"><img src="${u.avatar||''}" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentElement.textContent='${u.username?.substring(0,2).toUpperCase()}'"></div><div class="status-dot status-${u.status==='idle'?'idle':u.status==='offline'?'offline':u.status==='dnd'?'dnd':'online'}"></div></div><span class="truncate">${u.username}</span>`;
                     sb.onclick=()=>window.startDM(uid,u);
                     getEl('channels-list').appendChild(sb);
+                }
+                
+                if(fl.innerHTML === '' && friendsTab !== 'pending') {
+                    fl.innerHTML = '<div class="text-[#72767d] text-center mt-8">No friends found. Add some friends to get started!</div>';
                 }
             });
         }
 
-        // --- AUTH STATE ---
+        window.unblockUser = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", cur.uid), {blocked: arrayRemove(uid)});
+                loadFriends();
+            } catch(err) {
+                window.showToast(err.message, 'error');
+            }
+        };
+
         if(auth){
             onAuthStateChanged(auth,async u=>{
                 if(u){
@@ -1433,7 +1509,7 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                         if(d.banExpires && d.banExpires.toMillis() > Date.now()){signOut(auth);return alert(`You are temporarily banned until ${new Date(d.banExpires.toMillis()).toLocaleString()}`);}
                         cur={uid:u.uid,...d};
                     } else {
-                        cur={uid:u.uid,username:u.email.split('@')[0],color:'#fff'};
+                        cur={uid:u.uid,username:u.email.split('@')[0],color:'#fff',friends:[],requests:[],blocked:[],isBoosting:[],about:''};
                         await setDoc(doc(db,"users",u.uid),cur);
                     }
                     getEl('auth-screen').classList.add('hidden');
@@ -1476,18 +1552,18 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
                     if(Date.now() - lastMsgTime < 1000) return window.showToast("Slow down!", "error");
                     lastMsgTime = Date.now();
                     
-                    const limit = cur?.isNitro ? 10000 : 1000;
+                    const limit = cur.isNitro ? 10000 : 1000;
                     if(t.length > limit) return window.showToast(`Message too long (Max ${limit})`, "error");
 
                     if(activeServerData) {
-                       const isOwner = activeServerData.ownerId === cur?.uid;
-                       const isAdmin = (activeServerData.userRoles?.[cur?.uid]||[]).some(r=>activeServerData.roles?.[r]?.admin);
-                       if(cData?.readOnly && !isOwner && !isAdmin) return window.showToast("Channel is Read-Only", "error");
+                       const isOwner = activeServerData.ownerId === cur.uid;
+                       const isAdmin = (activeServerData.userRoles?.[cur.uid]||[]).some(r=>activeServerData.roles?.[r]?.admin);
+                       if(cData.readOnly && !isOwner && !isAdmin) return window.showToast("Channel is Read-Only", "error");
                     }
 
                     if(checkAutoMod(t)){ window.showToast("Mody: Language! Message blocked.", "error"); return; }
                     e.target.value='';
-                    const m={content:t,userId:cur?.uid,channelId:cId,createdAt:serverTimestamp()};
+                    const m={content:t,userId:cur.uid,channelId:cId,createdAt:serverTimestamp()};
                     if(repId){m.replyTo=repId;window.cancelReply();}
                     await addDoc(collection(db,"messages"),m);
                 }
@@ -1495,35 +1571,308 @@ JOIN THE DISCORD SERVER FOR MORE LINKS!! -->
             });
         }
         
-        const BAD_WORDS = ["badword1", "badword2", "fail", "idiot"]; 
+        const BAD_WORDS = ["badword1", "badword2", "fail", "idiot", "stupid", "damn", "hell"]; 
         function checkAutoMod(text) {
              if (!activeServerData || !activeServerData.autoModEnabled) return false;
-             if (activeServerData.ownerId === cur?.uid) return false;
+             if (activeServerData.ownerId === cur.uid) return false;
              const lower = text.toLowerCase();
              for (const word of BAD_WORDS) { if (lower.includes(word)) return true; }
              return false;
         }
 
-        // File input handler
-        getEl('chat-file-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if(!file || !cId) return;
+        window.toggleMody = async () => {
+            if(!activeServerData) return;
+            const newState = !activeServerData.autoModEnabled;
+            await updateDoc(doc(db, "servers", activeServerData.id), {autoModEnabled: newState});
+            getEl('toggle-mody-btn').textContent = newState ? 'Uninstall' : 'Install';
+            getEl('toggle-mody-btn').className = newState ? 'bg-red-500 text-white px-3 py-1 rounded text-xs' : 'bg-green-500 text-white px-3 py-1 rounded text-xs';
+            window.showToast(newState ? 'Mody enabled' : 'Mody disabled', 'success');
+        };
+
+        window.createRole = async () => {
+            if(!activeServerData) return;
+            const name = getEl('role-name-input').value;
+            const color = getEl('role-color-input').value;
+            if(!name) return window.showToast('Role name required', 'error');
             
-            let content;
-            if(file.type.startsWith('image/')) {
-                content = await compressImg(file);
-            } else {
-                content = await toB64(file);
-            }
+            const perms = {
+                manageChannels: getEl('perm-manage').checked,
+                kickMembers: getEl('perm-kick').checked,
+                deleteMessages: getEl('perm-delete').checked,
+                admin: getEl('perm-admin').checked
+            };
             
-            await addDoc(collection(db, "messages"), {
-                content: content,
-                userId: cur?.uid,
-                channelId: cId,
-                fileName: file.name,
-                createdAt: serverTimestamp()
+            const roleId = 'role_' + Date.now();
+            await updateDoc(doc(db, "servers", activeServerData.id), {
+                [`roles.${roleId}`]: {
+                    name, color, ...perms, priority: Object.keys(activeServerData.roles||{}).length
+                }
             });
-        });
+            window.showToast('Role created!', 'success');
+            getEl('role-name-input').value = '';
+        };
+
+        window.handleCreateServer = async () => {
+            const name = getEl('new-server-name').value;
+            const icon = getEl('new-server-icon').value;
+            if(!name) return window.showToast('Server name required', 'error');
+            
+            const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            await addDoc(collection(db, "servers"), {
+                name, icon, ownerId: cur.uid, members: [cur.uid], inviteCode,
+                roles: {}, userRoles: {}, bannedUsers: [], boosts: 0, boosters: [], autoModEnabled: false
+            });
+            window.closeModal('create-server-modal');
+            window.showToast('Server created!', 'success');
+        };
+
+        window.handleJoinServer = async () => {
+            const code = getEl('join-invite-code').value.toUpperCase();
+            if(!code) return;
+            
+            const q = query(collection(db, "servers"), where("inviteCode", "==", code));
+            const snap = await getDocs(q);
+            if(snap.empty) return window.showToast('Invalid invite code', 'error');
+            
+            const server = snap.docs[0];
+            if(server.data().bannedUsers?.includes(cur.uid)) return window.showToast('You are banned from this server', 'error');
+            
+            await updateDoc(doc(db, "servers", server.id), {members: arrayUnion(cur.uid)});
+            window.closeModal('join-server-modal');
+            window.showToast('Joined server!', 'success');
+        };
+
+        window.handleCreateChannel = async () => {
+            const name = getEl('new-channel-name').value;
+            const category = getEl('new-channel-category').value;
+            const readOnly = getEl('new-channel-readonly').checked;
+            if(!name) return;
+            
+            await addDoc(collection(db, "channels"), {
+                name, serverId: sId, category, readOnly, type: 'text', position: 0
+            });
+            window.closeModal('create-channel-modal');
+            getEl('new-channel-name').value = '';
+        };
+
+        window.joinInv = async (code) => {
+            getEl('join-invite-code').value = code;
+            await window.handleJoinServer();
+        };
+
+        window.saveProfile = async () => {
+            const username = getEl('edit-username-input').value;
+            const avatar = getEl('edit-avatar-input').value;
+            const status = getEl('edit-status-input').value;
+            const bannerColor = getEl('edit-banner-color').value;
+            
+            await updateDoc(doc(db, "users", cur.uid), {username, avatar, status, bannerColor});
+            cur.username = username; cur.avatar = avatar; cur.status = status; cur.bannerColor = bannerColor;
+            updateFoot();
+            window.closeModal('user-settings-modal');
+            window.showToast('Profile saved!', 'success');
+        };
+
+        window.initReply = (mid, content, username) => {
+            repId = {mid, content, username};
+            getEl('reply-bar').classList.remove('hidden');
+            getEl('reply-username').textContent = username;
+            getEl('message-input').focus();
+        };
+
+        window.cancelReply = () => {
+            repId = null;
+            getEl('reply-bar').classList.add('hidden');
+        };
+
+        window.deleteMessage = async (mid) => {
+            await deleteDoc(doc(db, "messages", mid));
+        };
+
+        window.reportUser = async () => {
+            window.closeModal('member-action-modal');
+            window.openModal('report-modal');
+        };
+
+        window.submitReport = async () => {
+            const reason = getEl('report-reason').value;
+            if(!reason) return;
+            await addDoc(collection(db, "reports"), {
+                reporter: cur.uid, target: target.uid, reason, ts: serverTimestamp()
+            });
+            window.closeModal('report-modal');
+            getEl('report-reason').value = '';
+            window.showToast('Report submitted', 'success');
+        };
+
+        window.kickUser = async () => {
+            await updateDoc(doc(db, "servers", sId), {members: arrayRemove(target.uid)});
+            window.closeModal('member-action-modal');
+            window.showToast('User kicked', 'success');
+        };
+
+        window.banUser = async () => {
+            await updateDoc(doc(db, "servers", sId), {
+                members: arrayRemove(target.uid),
+                bannedUsers: arrayUnion(target.uid)
+            });
+            window.closeModal('member-action-modal');
+            window.showToast('User banned', 'success');
+        };
+
+        window.toggleBlockUser = async () => {
+            const isBlocked = cur.blocked?.includes(target.uid);
+            await updateDoc(doc(db, "users", cur.uid), {
+                blocked: isBlocked ? arrayRemove(target.uid) : arrayUnion(target.uid),
+                friends: arrayRemove(target.uid)
+            });
+            window.closeModal('member-action-modal');
+            window.showToast(isBlocked ? 'User unblocked' : 'User blocked', 'success');
+        };
+
+        window.removeFriend = async () => {
+            await updateDoc(doc(db, "users", cur.uid), {friends: arrayRemove(target.uid)});
+            await updateDoc(doc(db, "users", target.uid), {friends: arrayRemove(cur.uid)});
+            window.closeModal('member-action-modal');
+            window.showToast('Friend removed', 'success');
+            loadFriends();
+        };
+
+        window.handleTyping = () => {
+            // Typing indicator logic here
+        };
+
+        window.toggleRecording = () => {
+            const btn = getEl('record-btn');
+            if(!rec) {
+                navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+                    rec = new MediaRecorder(stream);
+                    recChunks = [];
+                    rec.ondataavailable = e => recChunks.push(e.data);
+                    rec.onstop = async () => {
+                        const blob = new Blob(recChunks, {type:'audio/webm'});
+                        const b64 = await toB64(blob);
+                        await addDoc(collection(db,"messages"),{
+                            content:b64, userId:cur.uid, channelId:cId, 
+                            fileName:'voice-message.webm', createdAt:serverTimestamp()
+                        });
+                    };
+                    rec.start();
+                    btn.classList.add('recording');
+                });
+            } else {
+                rec.stop();
+                rec = null;
+                btn.classList.remove('recording');
+            }
+        };
+
+        window.endVoiceCall = () => {
+            getEl('call-overlay').classList.add('hidden');
+            if(window.jitsiApi) {
+                window.jitsiApi.dispose();
+                window.jitsiApi = null;
+            }
+            if(isDM && cId) {
+                updateDoc(doc(db,"channels",cId), {activeCall: deleteField()});
+            }
+        };
+
+        window.answerVoiceCall = () => {
+            window.stopRingtone();
+            getEl('incoming-call-banner').classList.add('hidden');
+            getEl('call-overlay').classList.remove('hidden');
+            // Join existing call
+            const room = `W3Chat_${cId}`;
+            const domain = "meet.jit.si";
+            const options = {
+                roomName: room, width: "100%", height: "100%",
+                parentNode: document.querySelector('#jitsi-container'),
+                userInfo: { displayName: cur.username }
+            };
+            const s = document.createElement('script');
+            s.src = `https://${domain}/external_api.js`;
+            s.onload = () => { window.jitsiApi = new JitsiMeetExternalAPI(domain, options); };
+            document.body.appendChild(s);
+        };
+
+        window.declineVoiceCall = () => {
+            window.stopRingtone();
+            getEl('incoming-call-banner').classList.add('hidden');
+        };
+
+        window.expandCall = () => {
+            getEl('call-overlay').classList.remove('hidden');
+        };
+
+        window.postUpdate = async () => {
+            const title = getEl('upd-title').value;
+            const desc = getEl('upd-desc').value;
+            if(!title || !desc) return;
+            
+            await addDoc(collection(db, "system_updates"), {
+                title, desc, ts: serverTimestamp(), id: Date.now()
+            });
+            window.closeModal('post-update-modal');
+            getEl('upd-title').value = ''; getEl('upd-desc').value = '';
+            window.showToast('Update posted!', 'success');
+        };
+
+        window.insertTag = (open, close) => {
+            const el = getEl('upd-desc');
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            const text = el.value;
+            el.value = text.substring(0, start) + open + text.substring(start, end) + close + text.substring(end);
+        };
+
+        window.openAdminAction = (uid, username, isBanned) => {
+            getEl('adm-act-title').textContent = `Manage ${username}`;
+            const btns = getEl('adm-btns');
+            btns.innerHTML = `
+                <button onclick="window.platformBan('${uid}')" class="w-full bg-red-600 text-white py-2 rounded mb-2">${isBanned ? 'Unban' : 'Platform Ban'}</button>
+                <button onclick="window.tempBan('${uid}')" class="w-full bg-orange-600 text-white py-2 rounded mb-2">Temp Ban</button>
+                <button onclick="window.warnUser('${uid}')" class="w-full bg-yellow-600 text-white py-2 rounded mb-2">Warn</button>
+            `;
+            window.openModal('admin-user-action-modal');
+        };
+
+        window.platformBan = async (uid) => {
+            const reason = getEl('mod-reason').value;
+            if(!reason) return window.showToast('Reason required', 'error');
+            await updateDoc(doc(db, "users", uid), {isPlatformBanned: true, banReason: reason});
+            window.closeModal('admin-user-action-modal');
+            window.showToast('User platform banned', 'success');
+        };
+
+        window.tempBan = async (uid) => {
+            const duration = getEl('mod-duration').value;
+            const reason = getEl('mod-reason').value;
+            if(!duration || !reason) return window.showToast('Duration and reason required', 'error');
+            const expires = new Date(Date.now() + parseInt(duration));
+            await updateDoc(doc(db, "users", uid), {banExpires: expires, banReason: reason});
+            window.closeModal('admin-user-action-modal');
+            window.showToast('User temp banned', 'success');
+        };
+
+        window.warnUser = async (uid) => {
+            const reason = getEl('mod-reason').value;
+            if(!reason) return window.showToast('Reason required', 'error');
+            await updateDoc(doc(db, "users", uid), {
+                history: arrayUnion({type:'warn', reason, by: cur.uid, ts: Date.now()})
+            });
+            window.closeModal('admin-user-action-modal');
+            window.showToast('User warned', 'success');
+        };
+
+        window.deleteReport = async (rid) => {
+            await deleteDoc(doc(db, "reports", rid));
+            window.loadAdminView('reports');
+        };
+
+        window.sendFriendRequest = () => {
+            // Handled above
+        };
     </script>
 </body>
 </html>
