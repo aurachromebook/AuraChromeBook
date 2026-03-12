@@ -1,84 +1,207 @@
-// --- System Clock & Widgets ---
-function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    hours = hours % 12;
-    hours = hours ? hours : 12; 
-    minutes = minutes < 10 ? '0' + minutes : minutes;
+// --- SYSTEM STATE ---
+let systemState = {
+    theme: localStorage.getItem('aura_theme') || 'dark',
+    wallpaper: localStorage.getItem('aura_wallpaper') || 'https://images.unsplash.com/photo-1506744626753-1fa44df31c22?q=80&w=1920',
+    setupComplete: localStorage.getItem('aura_setup') === 'true',
+    username: localStorage.getItem('aura_user') || 'User',
+    installedApps: JSON.parse(localStorage.getItem('aura_installed')) || []
+};
+
+let highestZIndex = 100;
+
+// --- INITIALIZATION ---
+window.onload = () => {
+    // Apply saved theme & wallpaper
+    document.body.setAttribute('data-theme', systemState.theme);
+    updateThemeText();
+    document.body.style.backgroundImage = `url('${systemState.wallpaper}')`;
+
+    // Handle Boot Sequence
+    setTimeout(() => {
+        document.getElementById('boot-screen').style.display = 'none';
+        
+        if (!systemState.setupComplete) {
+            document.getElementById('welcome-modal').style.display = 'flex';
+        } else {
+            document.getElementById('lock-screen').style.display = 'flex';
+            document.getElementById('lock-username').innerText = systemState.username;
+        }
+    }, 2000);
+
+    // Initialize Clock & Lock Widget
+    setInterval(updateClock, 1000);
+    updateClock();
+    setInterval(updateLockScreenWidget, 60000);
+    updateLockScreenWidget();
+
+    // Re-render installed apps
+    renderInstalledApps();
     
-    // Taskbar Clock
-    const clockEl = document.getElementById('clock');
-    if(clockEl) clockEl.innerText = hours + ':' + minutes;
+    // Setup Custom Wallpaper Upload
+    document.getElementById('wallpaper-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                setWallpaper(event.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
-    // Lock Screen Widget (Time)
-    const lockTimeEl = document.getElementById('lock-time');
-    if(lockTimeEl) lockTimeEl.innerText = hours + ':' + minutes;
+    // Make windows draggable
+    document.querySelectorAll('.window').forEach(win => {
+        makeDraggable(win, win.querySelector('.window-header'));
+        win.addEventListener('mousedown', () => bringToFront(win));
+    });
+};
 
-    // Lock Screen Widget (Date)
-    const options = { weekday: 'long', month: 'long', day: 'numeric' };
-    const lockDateEl = document.getElementById('lock-date');
-    if(lockDateEl) lockDateEl.innerText = now.toLocaleDateString('en-US', options);
+// --- SETUP (OOBE) ---
+function closeWelcomeModal() {
+    document.getElementById('welcome-modal').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'flex';
 }
-setInterval(updateClock, 1000);
-updateClock();
 
-// --- Boot & Auth Logic ---
-setTimeout(() => {
-    document.getElementById('boot-screen').style.display = 'none';
-    
-    // Check if user has done setup
-    if (!localStorage.getItem('aura_setup_complete')) {
-        document.getElementById('setup-screen').style.display = 'flex';
-    } else {
-        document.getElementById('lock-screen').style.display = 'flex';
-        document.getElementById('lock-username').innerText = localStorage.getItem('aura_username') || 'User';
+function processSetupStep1() {
+    const name = document.getElementById('setup-name-input').value.trim();
+    if(name) {
+        systemState.username = name;
+        localStorage.setItem('aura_user', name);
     }
-}, 2500);
+    document.getElementById('setup-step-1').classList.remove('active');
+    document.getElementById('setup-step-2').classList.add('active');
+}
 
+function processSetupStep2(skip) {
+    if(!skip) {
+        const pass = document.getElementById('setup-pass-input').value;
+        if(pass) localStorage.setItem('aura_pass', pass);
+    }
+    document.getElementById('setup-step-2').classList.remove('active');
+    document.getElementById('setup-step-3').classList.add('active');
+}
+
+function finalizeSetup() {
+    localStorage.setItem('aura_setup', 'true');
+    systemState.setupComplete = true;
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('lock-username').innerText = systemState.username;
+}
+
+// --- LOCK SCREEN ---
 function unlockOS() {
-    const pass = document.getElementById('lock-password').value;
-    const savedPass = localStorage.getItem('aura_password');
-    if (!savedPass || pass === savedPass) {
+    const savedPass = localStorage.getItem('aura_pass');
+    const inputPass = document.getElementById('lock-password').value;
+    
+    if (!savedPass || inputPass === savedPass) {
         document.getElementById('lock-screen').style.display = 'none';
         document.getElementById('lock-password').value = '';
-        
-        // Show welcome modal once per session
-        if(!sessionStorage.getItem('welcomed')) {
-            document.getElementById('welcome-modal').style.display = 'flex';
-            sessionStorage.setItem('welcomed', 'true');
-        }
+        document.getElementById('lock-error').style.display = 'none';
+        showToast("System Unlocked", "Welcome back, " + systemState.username);
     } else {
         document.getElementById('lock-error').style.display = 'block';
     }
 }
 
-function closeWelcomeModal() {
-    document.getElementById('welcome-modal').style.display = 'none';
-}
-
 function lockSystem() {
+    closeMenu();
+    closeQuickSettings();
     document.getElementById('context-menu').style.display = 'none';
-    document.getElementById('quick-settings').style.display = 'none';
-    document.getElementById('launcher-menu').style.display = 'none';
     document.getElementById('lock-screen').style.display = 'flex';
     document.getElementById('lock-error').style.display = 'none';
 }
 
-// --- Menus & Folders ---
+function updateLockScreenWidget() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    
+    document.getElementById('lock-time').innerText = hours + ':' + minutes;
+    const options = { weekday: 'long', month: 'long', day: 'numeric' };
+    document.getElementById('lock-date').innerText = now.toLocaleDateString('en-US', options);
+}
+
+// Security Settings
+function showSecurityQuestion() {
+    const q = localStorage.getItem('aura_sec_q');
+    if(q) {
+        document.getElementById('security-hint').style.display = 'block';
+        document.getElementById('lock-question-text').innerText = "Hint: " + q;
+    } else {
+        alert("No security question was set during setup or in Settings.");
+    }
+}
+
+function saveSecuritySettings() {
+    const pass = document.getElementById('set-password').value;
+    const q = document.getElementById('set-question').value;
+    const a = document.getElementById('set-answer').value;
+    
+    if(pass) localStorage.setItem('aura_pass', pass);
+    if(q) localStorage.setItem('aura_sec_q', q);
+    if(a) localStorage.setItem('aura_sec_a', a);
+    
+    document.getElementById('security-save-msg').style.display = 'block';
+    setTimeout(() => { document.getElementById('security-save-msg').style.display = 'none'; }, 3000);
+}
+
+function factoryReset() {
+    if(confirm("Are you sure? This will delete all settings, wallpapers, and installed apps.")) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+// --- TASKBAR & SYSTEM UI ---
+function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let ampm = hours >= 12 ? ' PM' : ' AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    document.getElementById('clock').innerText = hours + ':' + minutes + ampm;
+}
+
 function toggleMenu() {
     const menu = document.getElementById('launcher-menu');
-    menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'flex' : 'none';
-    document.getElementById('quick-settings').style.display = 'none';
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    closeQuickSettings();
 }
+
+function closeMenu() { document.getElementById('launcher-menu').style.display = 'none'; }
 
 function toggleQuickSettings() {
     const qs = document.getElementById('quick-settings');
-    qs.style.display = qs.style.display === 'none' || qs.style.display === '' ? 'block' : 'none';
-    document.getElementById('launcher-menu').style.display = 'none';
+    qs.style.display = qs.style.display === 'none' ? 'block' : 'none';
+    closeMenu();
 }
 
-// NEW: Launcher Folder Logic
+function closeQuickSettings() { document.getElementById('quick-settings').style.display = 'none'; }
+
+function toggleTheme() {
+    systemState.theme = systemState.theme === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', systemState.theme);
+    localStorage.setItem('aura_theme', systemState.theme);
+    updateThemeText();
+}
+
+function updateThemeText() {
+    const text = document.getElementById('theme-text');
+    if(text) text.innerText = systemState.theme === 'dark' ? 'Light Theme' : 'Dark Theme';
+}
+
+function setWallpaper(url) {
+    document.body.style.backgroundImage = `url('${url}')`;
+    localStorage.setItem('aura_wallpaper', url);
+}
+
+// --- LAUNCHER LOGIC ---
 function toggleLauncherFolder(folderId, opening) {
     const mainView = document.getElementById('launcher-main-view');
     const folderView = document.getElementById(folderId);
@@ -88,207 +211,291 @@ function toggleLauncherFolder(folderId, opening) {
         folderView.style.display = 'block';
     } else {
         folderView.style.display = 'none';
-        mainView.style.display = 'grid'; 
+        mainView.style.display = 'grid';
     }
 }
 
-function toggleTheme() {
-    const body = document.body;
-    const isDark = body.getAttribute('data-theme') === 'dark';
-    body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    document.getElementById('theme-text').innerText = isDark ? 'Light Theme' : 'Dark Theme';
-}
-
-// --- Window Management ---
-let highestZIndex = 100;
-
-function openApp(appId) {
-    const win = document.getElementById(appId);
-    if (!win) return;
+function filterLauncher() {
+    const search = document.getElementById('launcher-search').value.toLowerCase();
+    const items = document.querySelectorAll('.launcher-item:not(.folder-item)');
     
-    // Load iframe source if it exists and hasn't been loaded
-    const iframe = win.querySelector('iframe');
-    if (iframe && iframe.getAttribute('src') === '') {
-        iframe.setAttribute('src', iframe.getAttribute('data-src'));
-    }
-
-    win.style.display = 'flex';
-    win.style.zIndex = ++highestZIndex;
-    
-    // Default centering if no coords set
-    if (!win.style.top || win.style.top === '0px') {
-        win.style.top = '50px';
-        win.style.left = '50px';
-    }
-    
-    document.getElementById('launcher-menu').style.display = 'none';
-    
-    // Highlight taskbar icon
-    document.querySelectorAll('.app-icon').forEach(icon => {
-        if(icon.getAttribute('onclick').includes(appId)) icon.classList.add('active');
-    });
-}
-
-function closeApp(appId) {
-    document.getElementById(appId).style.display = 'none';
-    document.querySelectorAll('.app-icon').forEach(icon => {
-        if(icon.getAttribute('onclick').includes(appId)) icon.classList.remove('active');
-    });
-}
-
-function minimizeApp(appId) {
-    document.getElementById(appId).style.display = 'none';
-}
-
-function maximizeApp(appId) {
-    const win = document.getElementById(appId);
-    if (win.style.width === '100vw') {
-        // Restore
-        win.style.width = win.getAttribute('data-prev-width') || '800px';
-        win.style.height = win.getAttribute('data-prev-height') || '600px';
-        win.style.top = win.getAttribute('data-prev-top') || '50px';
-        win.style.left = win.getAttribute('data-prev-left') || '50px';
+    // Always switch back to main view when searching to find everything
+    if(search.length > 0) {
+        document.getElementById('launcher-main-view').style.display = 'grid';
+        document.querySelectorAll('.launcher-folder-view').forEach(f => f.style.display = 'none');
+        document.querySelector('.folder-item').style.display = 'none';
     } else {
-        // Maximize
-        win.setAttribute('data-prev-width', win.style.width);
-        win.setAttribute('data-prev-height', win.style.height);
-        win.setAttribute('data-prev-top', win.style.top);
-        win.setAttribute('data-prev-left', win.style.left);
+        document.querySelector('.folder-item').style.display = 'flex';
+    }
+
+    items.forEach(item => {
+        const text = item.querySelector('.l-text').innerText.toLowerCase();
+        item.style.display = text.includes(search) ? 'flex' : 'none';
+    });
+}
+
+// --- WINDOW MANAGEMENT ---
+function openApp(id) {
+    const win = document.getElementById(id);
+    if (win) {
+        win.style.display = 'flex';
+        bringToFront(win);
         
-        win.style.width = '100vw';
-        win.style.height = 'calc(100vh - 50px)';
+        // Load iframe source if it has a data-src (lazy loading)
+        const iframe = win.querySelector('iframe');
+        if (iframe && iframe.getAttribute('data-src') && !iframe.src) {
+            iframe.src = iframe.getAttribute('data-src');
+        }
+
+        // Highlight taskbar icon if it exists
+        const tbIcons = document.querySelectorAll('.app-icon');
+        tbIcons.forEach(icon => {
+            if(icon.getAttribute('onclick').includes(id)) {
+                icon.classList.add('open');
+            }
+        });
+    }
+    closeMenu();
+}
+
+function closeApp(id) {
+    const win = document.getElementById(id);
+    if (win) win.style.display = 'none';
+    
+    const tbIcons = document.querySelectorAll('.app-icon');
+    tbIcons.forEach(icon => {
+        if(icon.getAttribute('onclick').includes(id)) {
+            icon.classList.remove('open');
+        }
+    });
+}
+
+function toggleApp(id) {
+    const win = document.getElementById(id);
+    if (win.style.display === 'none' || win.style.display === '') {
+        openApp(id);
+    } else if (win.style.zIndex < highestZIndex) {
+        bringToFront(win);
+    } else {
+        win.style.display = 'none';
+        const tbIcons = document.querySelectorAll('.app-icon');
+        tbIcons.forEach(icon => {
+            if(icon.getAttribute('onclick').includes(id)) icon.classList.remove('open');
+        });
+    }
+}
+
+function minimizeApp(id) { document.getElementById(id).style.display = 'none'; }
+
+function maximizeApp(id) {
+    const win = document.getElementById(id);
+    if (win.dataset.maximized === 'true') {
+        win.style.width = win.dataset.origWidth;
+        win.style.height = win.dataset.origHeight;
+        win.style.top = win.dataset.origTop;
+        win.style.left = win.dataset.origLeft;
+        win.dataset.maximized = 'false';
+    } else {
+        win.dataset.origWidth = win.style.width;
+        win.dataset.origHeight = win.style.height;
+        win.dataset.origTop = win.style.top;
+        win.dataset.origLeft = win.style.left;
+        win.style.width = '100%';
+        win.style.height = 'calc(100% - 50px)';
         win.style.top = '0';
         win.style.left = '0';
+        win.dataset.maximized = 'true';
     }
 }
 
-function toggleApp(appId) {
-    const win = document.getElementById(appId);
-    if (win.style.display === 'none' || win.style.display === '') {
-        openApp(appId);
-    } else {
-        if (win.style.zIndex < highestZIndex) {
-            win.style.zIndex = ++highestZIndex;
-        } else {
-            minimizeApp(appId);
-        }
-    }
+function bringToFront(element) {
+    highestZIndex++;
+    element.style.zIndex = highestZIndex;
 }
 
-// --- Make Windows Draggable ---
-document.querySelectorAll('.window').forEach(win => {
-    const header = win.querySelector('.window-header');
-    let isDragging = false, startX, startY, initialLeft, initialTop;
+// Drag & Drop / Snapping Logic
+function makeDraggable(element, handle) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    handle.onmousedown = dragMouseDown;
 
-    header.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'BUTTON') return; // Ignore window control buttons
-        isDragging = true;
-        win.style.zIndex = ++highestZIndex;
-        startX = e.clientX; startY = e.clientY;
-        initialLeft = win.offsetLeft; initialTop = win.offsetTop;
+    function dragMouseDown(e) {
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
         
-        // Disable iframe pointer events so it doesn't swallow mouse movements
-        const iframe = win.querySelector('iframe');
-        if(iframe) iframe.style.pointerEvents = 'none';
-    });
+        let newTop = element.offsetTop - pos2;
+        let newLeft = element.offsetLeft - pos1;
+        
+        element.style.top = Math.max(0, newTop) + "px";
+        element.style.left = newLeft + "px";
 
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        win.style.left = `${initialLeft + dx}px`;
-        win.style.top = `${initialTop + dy}px`;
-    });
-
-    document.addEventListener('mouseup', () => {
-        if(isDragging) {
-            isDragging = false;
-            const iframe = win.querySelector('iframe');
-            if(iframe) iframe.style.pointerEvents = 'auto';
+        // Window Snapping Preview
+        const preview = document.getElementById('snap-preview');
+        const screenWidth = window.innerWidth;
+        if (e.clientX < 20) {
+            preview.style.display = 'block';
+            preview.style.top = '0'; preview.style.left = '0';
+            preview.style.width = '50%'; preview.style.height = 'calc(100% - 50px)';
+        } else if (e.clientX > screenWidth - 20) {
+            preview.style.display = 'block';
+            preview.style.top = '0'; preview.style.left = '50%';
+            preview.style.width = '50%'; preview.style.height = 'calc(100% - 50px)';
+        } else {
+            preview.style.display = 'none';
         }
-    });
+    }
+
+    function closeDragElement(e) {
+        document.onmouseup = null;
+        document.onmousemove = null;
+        
+        // Execute Snap
+        const preview = document.getElementById('snap-preview');
+        if (preview.style.display === 'block') {
+            element.style.top = preview.style.top;
+            element.style.left = preview.style.left;
+            element.style.width = preview.style.width;
+            element.style.height = preview.style.height;
+            element.dataset.maximized = 'false';
+            preview.style.display = 'none';
+        }
+    }
+}
+
+// --- DESKTOP CONTEXT MENU ---
+const desktop = document.getElementById('desktop');
+const contextMenu = document.getElementById('context-menu');
+
+desktop.addEventListener('contextmenu', (e) => {
+    // Only show if clicking directly on desktop or icons container
+    if(e.target.id === 'desktop' || e.target.id === 'desktop-icons-container') {
+        e.preventDefault();
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+        document.getElementById('context-uninstall').style.display = 'none';
+    }
 });
 
-// --- App Store Installation Simulation ---
+// Hide menu on normal click
+document.addEventListener('click', () => {
+    contextMenu.style.display = 'none';
+});
+
+// --- APP: CALCULATOR ---
+let calcDisplay = document.getElementById('calc-display');
+function calcPress(val) { calcDisplay.value = calcDisplay.value === '0' ? val : calcDisplay.value + val; }
+function calcClear() { calcDisplay.value = '0'; }
+function calcEval() {
+    try { calcDisplay.value = eval(calcDisplay.value); }
+    catch(e) { calcDisplay.value = 'Error'; }
+}
+
+// --- APP: WORDPAD ---
+function notepadSave() { showToast("Wordpad", "File saved temporarily to memory."); }
+function notepadSaveAs() { showToast("Wordpad", "Save As feature coming soon."); }
+function notepadOpen() { showToast("Wordpad", "File Explorer integration coming soon."); }
+
+// --- APP: CHROME ---
+function navigateChrome() {
+    let url = document.getElementById('chrome-url').value;
+    if (!url.startsWith('http')) {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(url) + '&igu=1';
+    }
+    document.getElementById('chrome-frame').src = url;
+}
+function chromeBack() { showToast("Chrome", "Back navigation locked in iframe."); }
+function chromeForward() { showToast("Chrome", "Forward navigation locked in iframe."); }
+function chromeReload() { document.getElementById('chrome-frame').src = document.getElementById('chrome-frame').src; }
+
+document.getElementById('chrome-url').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') navigateChrome();
+});
+
+// --- PLAY STORE LOGIC ---
 function switchStoreTab(tab) {
     document.querySelectorAll('.play-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.store-tab-content').forEach(c => c.classList.remove('active'));
     
-    if (tab === 'games') {
-        document.querySelector('.play-tab:nth-child(1)').classList.add('active');
+    if(tab === 'games') {
+        document.querySelectorAll('.play-tab')[0].classList.add('active');
         document.getElementById('store-games-tab').classList.add('active');
     } else {
-        document.querySelector('.play-tab:nth-child(2)').classList.add('active');
+        document.querySelectorAll('.play-tab')[1].classList.add('active');
         document.getElementById('store-apps-tab').classList.add('active');
     }
 }
 
-function installApp(windowId, emoji, name, btnElement) {
-    btnElement.style.display = 'none';
+function installApp(windowId, emoji, name, buttonElement) {
+    if (systemState.installedApps.includes(windowId)) return;
+
+    buttonElement.style.display = 'none';
     const progressContainer = document.getElementById(`progress-container-${windowId}`);
     const progressBar = document.getElementById(`progress-bar-${windowId}`);
     
     progressContainer.style.display = 'block';
     
-    let progress = 0;
+    let width = 0;
     const interval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress >= 100) {
-            progress = 100;
+        width += Math.random() * 15;
+        if (width >= 100) {
             clearInterval(interval);
-            setTimeout(() => finishInstall(windowId, emoji, name, btnElement, progressContainer), 500);
+            progressBar.style.width = '100%';
+            
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+                buttonElement.style.display = 'block';
+                buttonElement.innerText = 'Installed';
+                buttonElement.disabled = true;
+                buttonElement.style.background = 'transparent';
+                buttonElement.style.color = 'var(--play-green)';
+                
+                // Save to state
+                systemState.installedApps.push(windowId);
+                localStorage.setItem('aura_installed', JSON.stringify(systemState.installedApps));
+                
+                showToast("Installation Complete", `${name} has been installed to your Launcher.`);
+                renderInstalledApps();
+            }, 500);
+        } else {
+            progressBar.style.width = width + '%';
         }
-        progressBar.style.width = `${progress}%`;
     }, 300);
 }
 
-function finishInstall(windowId, emoji, name, btnElement, progressContainer) {
-    progressContainer.style.display = 'none';
-    
-    // Change button to "Open"
-    btnElement.innerText = 'Open';
-    btnElement.style.display = 'block';
-    btnElement.style.background = 'transparent';
-    btnElement.style.color = 'var(--play-green)';
-    btnElement.onclick = () => openApp(windowId);
-    
-    // Create Desktop Shortcut
-    const desktop = document.getElementById('desktop-icons-container');
-    const iconCount = desktop.children.length;
-    const topPos = 20 + (Math.floor(iconCount / 2) * 100);
-    const leftPos = 20 + ((iconCount % 2) * 100);
-    
-    const newIcon = document.createElement('div');
-    newIcon.className = 'desktop-icon';
-    newIcon.style.top = `${topPos}px`;
-    newIcon.style.left = `${leftPos}px`;
-    newIcon.setAttribute('ondblclick', `openApp('${windowId}')`);
-    newIcon.innerHTML = `<div class="icon-emoji">${emoji}</div><div class="icon-text">${name}</div>`;
-    
-    desktop.appendChild(newIcon);
+function renderInstalledApps() {
+    // Check all store buttons and update their UI if they are in the installed list
+    systemState.installedApps.forEach(windowId => {
+        const btn = document.getElementById(`install-btn-${windowId}`);
+        if(btn) {
+            btn.innerText = 'Installed';
+            btn.disabled = true;
+            btn.style.background = 'transparent';
+            btn.style.color = 'var(--play-green)';
+        }
+    });
 }
 
-// --- Basic Settings & Customization ---
-function setWallpaper(src) {
-    document.getElementById('desktop').style.background = `url('${src}') center/cover`;
-    document.getElementById('lock-screen').style.background = `url('${src}') center/cover`;
-    localStorage.setItem('aura_wallpaper', src);
+// --- UTILS ---
+function showToast(title, message) {
+    const container = document.getElementById('notification-toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'notification-toast';
+    toast.innerHTML = `<div><strong>${title}</strong><br><span style="font-size:12px; color:var(--sys-text-muted);">${message}</span></div>`;
+    
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideInRight 0.3s ease reverse forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
-
-document.getElementById('wallpaper-upload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) { setWallpaper(e.target.result); }
-        reader.readAsDataURL(file);
-    }
-});
-
-// Load saved wallpaper on boot
-window.onload = () => {
-    const savedWall = localStorage.getItem('aura_wallpaper');
-    if(savedWall) {
-        document.getElementById('desktop').style.background = `url('${savedWall}') center/cover`;
-        document.getElementById('lock-screen').style.background = `url('${savedWall}') center/cover`;
-    }
-};
