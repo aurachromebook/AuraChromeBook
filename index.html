@@ -65,6 +65,37 @@
     </div>
 
     <div id="lock-screen" style="display: none;">
+        <div id="lock-screen" style="display: none;">
+        <div id="lock-widget">
+            <div id="lock-time">12:00</div>
+            <div id="lock-date">Monday, January 1</div>
+        </div>
+        
+        <div class="lock-box">
+            ```
+
+**Step B: Add CSS**
+Add this to your `style.css` to style the widget so it sits beautifully in the bottom-left corner of the screen:
+```css
+#lock-widget {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+}
+#lock-time {
+    font-size: 80px;
+    font-weight: 200;
+    line-height: 1;
+}
+#lock-date {
+    font-size: 24px;
+    font-weight: 400;
+    margin-top: 10px;
+}
         <div class="lock-box">
             <div class="avatar">👤</div>
             <h2 id="lock-username">User</h2>
@@ -174,7 +205,7 @@
             <h3 class="settings-title">Personalization</h3>
                 <div class="settings-card">
                     <p>Choose a wallpaper (Supports JPG, PNG, GIF):</p>
-                    <input type="file" id="wallpaper-upload" accept="image/png, image/jpeg, image/gif" class="modern-file-input" onchange="handleWallpaperUpload(event)">
+                    <input type="file" id="wallpaper-upload" accept="image/png, image/jpeg, image/gif" class="modern-file-input">
                     
                     <div style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between;">
                         <span>Auto Dark/Light Mode</span>
