@@ -9,81 +9,67 @@
 <body data-theme="dark">
     <div id="boot-screen">
         <div class="boot-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 80px; height: 80px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
         </div>
         <div class="boot-loader"></div>
     </div>
 
     <div id="welcome-modal" style="display: none;">
-        <div class="welcome-box modern-glass">
-            <h2>🎉 Welcome to AURA OS</h2>
-            <p>You're new to this OS system. This OS was created by Gemini and Eren.</p>
-            <p>Do whatever you like here. New features are added constantly. Check the updates in Settings.</p>
-            <p style="color: #8ab4f8; font-size: 12px; margin-top: 20px;">Enjoy this OS. Created on Nov 21 4:52PM</p>
-            <button class="glass-btn-primary" onclick="closeWelcomeModal()">Awesome!</button>
+        <div class="welcome-box">
+            <h2>🎉 Welcome to AURA OS!!!</h2>
+            <p>You're new to this new OS system. This OS system was created from Gemini and Eren.</p>
+            <p>Do whatever you like in this OS system. New features will be added soon, Check the updates in Settings..</p>
+            <p style="color: var(--sys-primary); font-size: 12px; margin-top: 15px;">Enjoy this OS. Created on Nov 21 4:52PM</p>
+            <button onclick="closeWelcomeModal()">Awesome!</button>
         </div>
     </div>
 
     <div id="setup-screen" style="display: none;">
-        <div class="setup-blur-bg"></div>
-        <div class="setup-card modern-glass">
+        <div class="setup-card">
             <div id="setup-step-1" class="setup-step active">
-                <div class="setup-icon">✨</div>
-                <h2 class="setup-title">Let's set up Aura OS</h2>
-                <p class="setup-text">Who is going to be using this device?</p>
-                <input type="text" id="setup-name-input" class="modern-glass-input" placeholder="Enter your name">
+                <div class="setup-icon">👋</div>
+                <h2 class="setup-title">Welcome to Aura OS</h2>
+                <p class="setup-text">Let's get your new workspace set up. Who is going to be using this device?</p>
+                <input type="text" id="setup-name-input" class="setup-input" placeholder="Enter your full name">
                 <div class="setup-buttons">
-                    <button class="glass-btn-primary" onclick="processSetupStep1()">Continue ➔</button>
+                    <button class="setup-btn-primary" onclick="processSetupStep1()">Continue</button>
                 </div>
             </div>
 
             <div id="setup-step-2" class="setup-step">
-                <div class="setup-icon">🛡️</div>
-                <h2 class="setup-title">Secure your workspace</h2>
-                <p class="setup-text">Create a password to protect your local data.</p>
-                <input type="password" id="setup-pass-input" class="modern-glass-input" placeholder="Choose a password (Optional)">
+                <div class="setup-icon">🔒</div>
+                <h2 class="setup-title">Secure your device</h2>
+                <p class="setup-text">Create a password to protect your data and prevent unauthorized access.</p>
+                <input type="password" id="setup-pass-input" class="setup-input" placeholder="Choose a password (Optional)">
                 <div class="setup-buttons">
-                    <button class="glass-btn-secondary" onclick="processSetupStep2(true)">Skip</button>
-                    <button class="glass-btn-primary" onclick="processSetupStep2(false)">Set Password</button>
+                    <button class="setup-btn-secondary" onclick="processSetupStep2(true)">Skip</button>
+                    <button class="setup-btn-primary" onclick="processSetupStep2(false)">Set Password</button>
                 </div>
             </div>
 
             <div id="setup-step-3" class="setup-step">
                 <div class="setup-icon">📜</div>
-                <h2 class="setup-title">System Guidelines</h2>
-                <p class="setup-text">Please review the terms before accessing the desktop.</p>
+                <h2 class="setup-title">Review Terms of Use</h2>
+                <p class="setup-text">Please review the system guidelines before continuing to your desktop environment.</p>
                 <div class="tou-box">
                     <strong>Terms of Use:</strong><br><br>
                     This is a Chrome Simulation Website that is only for playing, and simulation use.<br><br>
                     If used for proxy or playing use, You will be banished and banned from the website forever.
                 </div>
                 <div class="setup-buttons">
-                    <button class="glass-btn-secondary" onclick="location.reload()">Decline</button>
-                    <button class="glass-btn-primary" onclick="finalizeSetup()">Accept & Boot OS</button>
+                    <button class="setup-btn-secondary" onclick="location.reload()">Decline</button>
+                    <button class="setup-btn-primary" onclick="finalizeSetup()">Accept and Continue</button>
                 </div>
-            </div>
-            
-            <div class="setup-progress">
-                <div class="setup-dot active" id="dot-1"></div>
-                <div class="setup-dot" id="dot-2"></div>
-                <div class="setup-dot" id="dot-3"></div>
             </div>
         </div>
     </div>
 
     <div id="lock-screen" style="display: none;">
-        <div id="lock-widget">
-            <div id="lock-time">12:00</div>
-            <div id="lock-date">Monday, January 1</div>
-        </div>
-        
-        <div class="lock-box modern-glass">
+        <div class="lock-box">
             <div class="avatar">👤</div>
             <h2 id="lock-username">User</h2>
-            <div class="lock-input-wrapper">
-                <input type="password" id="lock-password" placeholder="Password" onkeypress="if(event.key === 'Enter') unlockOS()">
-                <button onclick="unlockOS()">➔</button>
-            </div>
+            <input type="password" id="lock-password" placeholder="Password">
+            <button onclick="unlockOS()">➔</button>
             <div id="lock-error">Incorrect Password</div>
             <div class="forgot-link" onclick="showSecurityQuestion()">Forgot password?</div>
             <div id="security-hint" style="display: none;"><p id="lock-question-text"></p></div>
@@ -103,7 +89,7 @@
 
         <div id="desktop-icons-container">
             <div class="desktop-icon" id="di-store" style="top: 20px; left: 20px;" ondblclick="openApp('store-window')"><div class="icon-emoji">🛍️</div><div class="icon-text">App Store</div></div>
-            <div class="desktop-icon" id="di-files" style="top: 120px; left: 20px;" ondblclick="openApp('files-window')"><div class="icon-emoji">📁</div><div class="icon-text">Files</div></div>
+            <div class="desktop-icon" id="di-games" style="top: 120px; left: 20px;" ondblclick="openApp('files-window')"><div class="icon-emoji">📁</div><div class="icon-text">Files</div></div>
         </div>
         
         <div class="window" id="files-window" style="display: none;">
@@ -117,10 +103,14 @@
         <div class="window" id="wordpad-window" style="display: none;">
             <div class="window-header" id="wordpad-window-header"><span class="window-title">📝 Wordpad</span><div><button class="win-btn" onclick="minimizeApp('wordpad-window')">−</button><button class="win-btn" onclick="maximizeApp('wordpad-window')">□</button><button class="win-btn close-btn" onclick="closeApp('wordpad-window')">✕</button></div></div>
             <div class="browser-toolbar">
+                <button onclick="notepadSave()" title="Save">💾 Save</button>
+                <button onclick="notepadSaveAs()" title="Save As">💾 Save As</button>
+                <button onclick="notepadOpen()" title="Open">📂 Open</button>
+                <div style="width: 1px; background: var(--sys-border); margin: 0 10px;"></div>
                 <button onclick="document.execCommand('undo')">↩</button><button onclick="document.execCommand('redo')">↪</button>
                 <button onclick="document.execCommand('bold')"><b>B</b></button><button onclick="document.execCommand('italic')"><i>I</i></button><button onclick="document.execCommand('underline')"><u>U</u></button>
             </div>
-            <div class="window-content"><div id="wordpad-editor" contenteditable="true" placeholder="Start typing here..." style="padding: 20px; outline: none; height: 100%; background: #fff; color: #000;"></div></div>
+            <div class="window-content"><div id="wordpad-editor" contenteditable="true" placeholder="Start typing here..." style="padding: 20px; outline: none; height: 100%;"></div></div>
         </div>
 
         <div class="window" id="calc-window" style="display: none; width: 320px; height: 480px;">
@@ -145,8 +135,8 @@
         <div class="window" id="chrome-window" style="display: none;">
             <div class="window-header" id="chrome-window-header"><span class="window-title">🌐 Google Chrome</span><div><button class="win-btn" onclick="minimizeApp('chrome-window')">−</button><button class="win-btn" onclick="maximizeApp('chrome-window')">□</button><button class="win-btn close-btn" onclick="closeApp('chrome-window')">✕</button></div></div>
             <div class="browser-toolbar">
-                <button onclick="chromeReload()">↻</button>
-                <input type="text" id="chrome-url" value="https://www.google.com/webhp?igu=1" placeholder="Search Google or type a URL">
+                <button onclick="chromeBack()">◀</button><button onclick="chromeForward()">▶</button><button onclick="chromeReload()">↻</button>
+                <input type="text" id="chrome-url" value="https://www.google.com" placeholder="Search Google or type a URL">
                 <button onclick="navigateChrome()">Go</button>
             </div>
             <div class="window-content"><iframe id="chrome-frame" src="https://www.google.com/webhp?igu=1" width="100%" height="100%" frameborder="0"></iframe></div>
@@ -155,29 +145,44 @@
         <div class="window" id="settings-window" style="display: none;">
             <div class="window-header" id="settings-window-header"><span class="window-title">⚙️ Settings</span><div><button class="win-btn" onclick="minimizeApp('settings-window')">−</button><button class="win-btn" onclick="maximizeApp('settings-window')">□</button><button class="win-btn close-btn" onclick="closeApp('settings-window')">✕</button></div></div>
             <div class="window-content" style="padding: 20px;">
-                <h3 class="settings-title">Personalization (4K)</h3>
+                <h3 class="settings-title">Personalization</h3>
                 <div class="settings-card">
                     <p>Choose a theme wallpaper:</p>
                     <div class="wallpaper-grid">
-                        <img src="https://images.unsplash.com/photo-1506744626753-1fa44df31c22?q=100&w=3840" onclick="setWallpaper(this.src)" title="Canyon">
-                        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=100&w=3840" onclick="setWallpaper(this.src)" title="Valley">
-                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=100&w=3840" onclick="setWallpaper(this.src)" title="Beach">
-                        <img src="https://images.unsplash.com/photo-1511497584788-876760111969?q=100&w=3840" onclick="setWallpaper(this.src)" title="Forest">
+                        <img src="https://images.unsplash.com/photo-1506744626753-1fa44df31c22?q=80&w=400" onclick="setWallpaper(this.src)" title="Canyon">
+                        <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=400" onclick="setWallpaper(this.src)" title="Valley">
+                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400" onclick="setWallpaper(this.src)" title="Beach">
+                        <img src="https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=400" onclick="setWallpaper(this.src)" title="Forest">
                     </div>
                     <p style="margin-top:10px;">Or upload your own:</p>
-                    <input type="file" id="wallpaper-upload" accept="image/png, image/jpeg, image/gif" class="modern-input">
+                    <input type="file" id="wallpaper-upload" accept="image/png, image/jpeg" class="modern-file-input">
                 </div>
                 
                 <h3 class="settings-title">Security and Sign-in</h3>
                 <div class="settings-card">
                     <input type="password" id="set-password" placeholder="Update Password" class="modern-input"><br>
-                    <button onclick="saveSecuritySettings()" class="glass-btn-primary" style="margin-top:10px;">Save Security Info</button>
+                    <input type="text" id="set-question" placeholder="Security Question (e.g., First pet's name?)" class="modern-input"><br>
+                    <input type="text" id="set-answer" placeholder="Answer" class="modern-input"><br>
+                    <button onclick="saveSecuritySettings()" class="modern-btn">Save Security Info</button>
                     <p id="security-save-msg" style="color: #81c995; display: none; font-size: 13px; margin-top:10px;">Security settings saved!</p>
+                </div>
+
+                <h3 class="settings-title">System Updates</h3>
+                <div class="settings-card">
+                    <strong style="display: block; margin-bottom: 5px;">Version 3.6 (Latest)</strong>
+                    <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
+                        <li>Replaced Aura Messages with Discord Integration</li>
+                        <li>Removed Firebase backend dependency</li>
+                        <li>Added Smash Carts game to App Store</li>
+                        <li>Fixed keyboard/mouse support (WASD) for 3D games</li>
+                    </ul>
+                    <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
 
                 <h3 class="settings-title" style="color: #ea4335;">System Operations</h3>
                 <div class="settings-card">
-                    <button onclick="factoryReset()" class="glass-btn-primary" style="background: rgba(234, 67, 53, 0.8);">Factory Reset</button>
+                    <p style="font-size: 13px; margin-top: 0;">Erase all data and reset the system to factory defaults.</p>
+                    <button onclick="factoryReset()" class="modern-btn" style="background: #ea4335; color: white;">Factory Reset</button>
                 </div>
             </div>
         </div>
@@ -188,6 +193,7 @@
             <div class="window-content store-bg">
                 <div class="play-header">
                     <div class="play-logo">▶<span>Google Play</span></div>
+                    <div class="play-search"><input type="text" placeholder="Search for apps & games"></div>
                 </div>
                 <div class="play-tabs">
                     <button class="play-tab active" onclick="switchStoreTab('games')">Games</button>
@@ -195,17 +201,16 @@
                 </div>
 
                 <div id="store-games-tab" class="store-tab-content active">
-                    <h2 class="play-section-title">Install to Taskbar</h2>
+                    <h2 class="play-section-title">Recommended for you</h2>
                     <div class="store-grid">
                         <div class="store-card"><div class="store-icon">🏎️</div><div class="store-info"><strong>Smash Carts</strong><span>Action • 4.8 ★</span></div><button id="install-btn-smashcarts-window" class="store-btn" onclick="installApp('smashcarts-window', '🏎️', 'Smash Carts', this)">Install</button><div class="progress-container" id="progress-container-smashcarts-window"><div class="progress-bar" id="progress-bar-smashcarts-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🔫</div><div class="store-info"><strong>1v1 LOL</strong><span>Action • 4.9 ★</span></div><button id="install-btn-1v1lol-window" class="store-btn" onclick="installApp('1v1lol-window', '🔫', '1v1 LOL', this)">Install</button><div class="progress-container" id="progress-container-1v1lol-window"><div class="progress-bar" id="progress-bar-1v1lol-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🐻</div><div class="store-info"><strong>Five Nights</strong><span>Horror • 4.5 ★</span></div><button id="install-btn-fnae-window" class="store-btn" onclick="installApp('fnae-window', '🐻', 'Five Nights', this)">Install</button><div class="progress-container" id="progress-container-fnae-window"><div class="progress-bar" id="progress-bar-fnae-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon">🐻</div><div class="store-info"><strong>Five Nights</strong><span>Action • 4.5 ★</span></div><button id="install-btn-fnae-window" class="store-btn" onclick="installApp('fnae-window', '🐻', 'Five Nights', this)">Install</button><div class="progress-container" id="progress-container-fnae-window"><div class="progress-bar" id="progress-bar-fnae-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">⛏️</div><div class="store-info"><strong>Eaglercraft</strong><span>Adventure • 4.8 ★</span></div><button id="install-btn-eaglercraft-window" class="store-btn" onclick="installApp('eaglercraft-window', '⛏️', 'Eaglercraft', this)">Install</button><div class="progress-container" id="progress-container-eaglercraft-window"><div class="progress-bar" id="progress-bar-eaglercraft-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">👵</div><div class="store-info"><strong>Granny</strong><span>Horror • 4.3 ★</span></div><button id="install-btn-granny-window" class="store-btn" onclick="installApp('granny-window', '👵', 'Granny', this)">Install</button><div class="progress-container" id="progress-container-granny-window"><div class="progress-bar" id="progress-bar-granny-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🚗</div><div class="store-info"><strong>Escape Road</strong><span>Racing • 4.6 ★</span></div><button id="install-btn-escaperoad-window" class="store-btn" onclick="installApp('escaperoad-window', '🚗', 'Escape Road', this)">Install</button><div class="progress-container" id="progress-container-escaperoad-window"><div class="progress-bar" id="progress-bar-escaperoad-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏎️</div><div class="store-info"><strong>Escape Road 2</strong><span>Racing • 4.7 ★</span></div><button id="install-btn-escaperoad2-window" class="store-btn" onclick="installApp('escaperoad2-window', '🏎️', 'Escape Road 2', this)">Install</button><div class="progress-container" id="progress-container-escaperoad2-window"><div class="progress-bar" id="progress-bar-escaperoad2-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🪐</div><div class="store-info"><strong>Solar Smash</strong><span>Simulation • 4.4 ★</span></div><button id="install-btn-solarsmash-window" class="store-btn" onclick="installApp('solarsmash-window', '🪐', 'Solar Smash', this)">Install</button><div class="progress-container" id="progress-container-solarsmash-window"><div class="progress-bar" id="progress-bar-solarsmash-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🧠</div><div class="store-info"><strong>Steal a Brainrot</strong><span>Puzzle • 4.1 ★</span></div><button id="install-btn-brainrot-window" class="store-btn" onclick="installApp('brainrot-window', '🧠', 'Steal a Brainrot', this)">Install</button><div class="progress-container" id="progress-container-brainrot-window"><div class="progress-bar" id="progress-bar-brainrot-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon">🧠</div><div class="store-info"><strong>Brainrot</strong><span>Puzzle • 4.1 ★</span></div><button id="install-btn-brainrot-window" class="store-btn" onclick="installApp('brainrot-window', '🧠', 'Brainrot', this)">Install</button><div class="progress-container" id="progress-container-brainrot-window"><div class="progress-bar" id="progress-bar-brainrot-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🥊</div><div class="store-info"><strong>Ragdoll Hit</strong><span>Action • 4.2 ★</span></div><button id="install-btn-ragdollhit-window" class="store-btn" onclick="installApp('ragdollhit-window', '🥊', 'Ragdoll Hit', this)">Install</button><div class="progress-container" id="progress-container-ragdollhit-window"><div class="progress-bar" id="progress-bar-ragdollhit-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏹</div><div class="store-info"><strong>Ragdoll Archers</strong><span>Action • 4.5 ★</span></div><button id="install-btn-ragdollarchers-window" class="store-btn" onclick="installApp('ragdollarchers-window', '🏹', 'Ragdoll Archers', this)">Install</button><div class="progress-container" id="progress-container-ragdollarchers-window"><div class="progress-bar" id="progress-bar-ragdollarchers-window"></div></div></div>
                     </div>
@@ -225,36 +230,62 @@
             </div>
         </div>
 
-        <div class="window game-window" id="discord-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title" style="color: #5865F2;">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Discord.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; microphone; camera; clipboard-read; clipboard-write;"></iframe></div></div>
-        <div class="window game-window" id="auraflix-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="auraflix-window-header"><span class="window-title">🎬 AuraFlix</span><div><button class="win-btn" onclick="minimizeApp('auraflix-window')">−</button><button class="win-btn" onclick="maximizeApp('auraflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auraflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen"></iframe></div></div>
-        <div class="window game-window" id="auramusic-window" style="display: none; width: 600px; height: 500px;"><div class="window-header" id="auramusic-window-header"><span class="window-title">🎵 Aura Music</span><div><button class="win-btn" onclick="minimizeApp('auramusic-window')">−</button><button class="win-btn" onclick="maximizeApp('auramusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auramusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen"></iframe></div></div>
+        <div class="window" id="discord-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title" style="color: #5865F2;">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Discord.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; microphone; camera; clipboard-read; clipboard-write;"></iframe></div></div>
         
-        <div class="window game-window" id="smashcarts-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="smashcarts-window-header"><span class="window-title">🏎️ Smash Carts</span><div><button class="win-btn" onclick="minimizeApp('smashcarts-window')">−</button><button class="win-btn" onclick="maximizeApp('smashcarts-window')">□</button><button class="win-btn close-btn" onclick="closeApp('smashcarts-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/smash carts.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window game-window" id="1v1lol-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="1v1lol-window-header"><span class="window-title">🔫 1v1 LOL</span><div><button class="win-btn" onclick="minimizeApp('1v1lol-window')">−</button><button class="win-btn" onclick="maximizeApp('1v1lol-window')">□</button><button class="win-btn close-btn" onclick="closeApp('1v1lol-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/1v1 LOL.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window game-window" id="eaglercraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="eaglercraft-window-header"><span class="window-title">⛏️ Eaglercraft</span><div><button class="win-btn" onclick="minimizeApp('eaglercraft-window')">−</button><button class="win-btn" onclick="maximizeApp('eaglercraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('eaglercraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Eaglercraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window game-window" id="fnae-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fnae-window-header"><span class="window-title">🐻 Five Nights</span><div><button class="win-btn" onclick="minimizeApp('fnae-window')">−</button><button class="win-btn" onclick="maximizeApp('fnae-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fnae-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Five Nights at Epstein's.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="granny-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny-window-header"><span class="window-title">👵 Granny</span><div><button class="win-btn" onclick="minimizeApp('granny-window')">−</button><button class="win-btn" onclick="maximizeApp('granny-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Granny.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="escaperoad-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad-window-header"><span class="window-title">🚗 Escape Road</span><div><button class="win-btn" onclick="minimizeApp('escaperoad-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="escaperoad2-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad2-window-header"><span class="window-title">🏎️ Escape Road 2</span><div><button class="win-btn" onclick="minimizeApp('escaperoad2-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad2-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad2-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road 2.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="solarsmash-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="solarsmash-window-header"><span class="window-title">🪐 Solar Smash</span><div><button class="win-btn" onclick="minimizeApp('solarsmash-window')">−</button><button class="win-btn" onclick="maximizeApp('solarsmash-window')">□</button><button class="win-btn close-btn" onclick="closeApp('solarsmash-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Solar Smash.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="brainrot-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="brainrot-window-header"><span class="window-title">🧠 Steal a Brainrot</span><div><button class="win-btn" onclick="minimizeApp('brainrot-window')">−</button><button class="win-btn" onclick="maximizeApp('brainrot-window')">□</button><button class="win-btn close-btn" onclick="closeApp('brainrot-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Steal a Brainrot.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="ragdollhit-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollhit-window-header"><span class="window-title">🥊 Ragdoll Hit</span><div><button class="win-btn" onclick="minimizeApp('ragdollhit-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollhit-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollhit-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Hit.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div class="window game-window" id="ragdollarchers-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollarchers-window-header"><span class="window-title">🏹 Ragdoll Archers</span><div><button class="win-btn" onclick="minimizeApp('ragdollarchers-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollarchers-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollarchers-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Archers.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="auraflix-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="auraflix-window-header"><span class="window-title">🎬 AuraFlix</span><div><button class="win-btn" onclick="minimizeApp('auraflix-window')">−</button><button class="win-btn" onclick="maximizeApp('auraflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auraflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen"></iframe></div></div>
+        <div class="window" id="auramusic-window" style="display: none; width: 600px; height: 500px;"><div class="window-header" id="auramusic-window-header"><span class="window-title">🎵 Aura Music</span><div><button class="win-btn" onclick="minimizeApp('auramusic-window')">−</button><button class="win-btn" onclick="maximizeApp('auramusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auramusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen"></iframe></div></div>
+        
+        <div class="window" id="smashcarts-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="smashcarts-window-header"><span class="window-title">🏎️ Smash Carts</span><div><button class="win-btn" onclick="minimizeApp('smashcarts-window')">−</button><button class="win-btn" onclick="maximizeApp('smashcarts-window')">□</button><button class="win-btn close-btn" onclick="closeApp('smashcarts-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/smash carts.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="eaglercraft-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="eaglercraft-window-header"><span class="window-title">⛏️ Eaglercraft</span><div><button class="win-btn" onclick="minimizeApp('eaglercraft-window')">−</button><button class="win-btn" onclick="maximizeApp('eaglercraft-window')">□</button><button class="win-btn close-btn" onclick="closeApp('eaglercraft-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Eaglercraft.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="fnae-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fnae-window-header"><span class="window-title">🐻 Five Nights</span><div><button class="win-btn" onclick="minimizeApp('fnae-window')">−</button><button class="win-btn" onclick="maximizeApp('fnae-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fnae-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Five Nights at Epstein's.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="granny-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny-window-header"><span class="window-title">👵 Granny</span><div><button class="win-btn" onclick="minimizeApp('granny-window')">−</button><button class="win-btn" onclick="maximizeApp('granny-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Granny.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="escaperoad-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad-window-header"><span class="window-title">🚗 Escape Road</span><div><button class="win-btn" onclick="minimizeApp('escaperoad-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="escaperoad2-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="escaperoad2-window-header"><span class="window-title">🏎️ Escape Road 2</span><div><button class="win-btn" onclick="minimizeApp('escaperoad2-window')">−</button><button class="win-btn" onclick="maximizeApp('escaperoad2-window')">□</button><button class="win-btn close-btn" onclick="closeApp('escaperoad2-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Escape Road 2.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="solarsmash-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="solarsmash-window-header"><span class="window-title">🪐 Solar Smash</span><div><button class="win-btn" onclick="minimizeApp('solarsmash-window')">−</button><button class="win-btn" onclick="maximizeApp('solarsmash-window')">□</button><button class="win-btn close-btn" onclick="closeApp('solarsmash-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Solar Smash.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="brainrot-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="brainrot-window-header"><span class="window-title">🧠 Steal a Brainrot</span><div><button class="win-btn" onclick="minimizeApp('brainrot-window')">−</button><button class="win-btn" onclick="maximizeApp('brainrot-window')">□</button><button class="win-btn close-btn" onclick="closeApp('brainrot-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Steal a Brainrot.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="ragdollhit-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollhit-window-header"><span class="window-title">🥊 Ragdoll Hit</span><div><button class="win-btn" onclick="minimizeApp('ragdollhit-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollhit-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollhit-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Hit.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
+        <div class="window" id="ragdollarchers-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollarchers-window-header"><span class="window-title">🏹 Ragdoll Archers</span><div><button class="win-btn" onclick="minimizeApp('ragdollarchers-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollarchers-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollarchers-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Archers.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
     </div>
 
     <div id="notification-toast-container"></div>
 
     <div id="launcher-menu" style="display: none;">
         <div class="launcher-search-box">
-            <span>🔍</span><input type="text" id="launcher-search" placeholder="Search apps..." onkeyup="filterLauncher()">
+            <span>🔍</span><input type="text" id="launcher-search" placeholder="Search your device, apps, web..." onkeyup="filterLauncher()">
         </div>
-        <div class="launcher-grid" id="launcher-main-view">
+        <div class="launcher-grid" id="launcher-list">
             <div class="launcher-item" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
             <div class="launcher-item" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Play Store</span></div>
             <div class="launcher-item" onclick="openApp('settings-window')"><div class="l-icon">⚙️</div><span class="l-text">Settings</span></div>
             <div class="launcher-item" onclick="openApp('wordpad-window')"><div class="l-icon">📝</div><span class="l-text">Wordpad</span></div>
             <div class="launcher-item" onclick="openApp('calc-window')"><div class="l-icon">🧮</div><span class="l-text">Calculator</span></div>
             <div class="launcher-item" onclick="openApp('files-window')"><div class="l-icon">📁</div><span class="l-text">Files</span></div>
+        </div>
+    </div>
+
+    <div id="quick-settings" style="display: none;">
+        <div id="qs-notifications">
+            <div class="qs-notif-header">Notifications</div>
+            <div id="qs-notif-list"><div class="qs-no-notifs">No new notifications</div></div>
+        </div>
+
+        <div class="qs-pills-grid">
+            <div class="qs-pill active"><div class="qs-icon">📶</div><span>Wi-Fi</span></div>
+            <div class="qs-pill"><div class="qs-icon">ᛒ</div><span>Bluetooth</span></div>
+            <div class="qs-pill" id="theme-toggle-btn" onclick="toggleTheme()"><div class="qs-icon">🌗</div><span id="theme-text">Dark Theme</span></div>
+            <div class="qs-pill"><div class="qs-icon">🌙</div><span>Night Light</span></div>
+        </div>
+        <div class="qs-sliders">
+            <div class="slider-row"><span>☀️</span><input type="range" id="brightness-slider" min="30" max="100" value="100"></div>
+            <div class="slider-row"><span>🔊</span><input type="range" min="0" max="100" value="70"></div>
+        </div>
+        <div class="qs-footer">
+            <div class="qs-battery-info"><span id="qs-battery-icon">🔋</span> <span id="qs-battery-text">100%</span></div>
+            <div class="qs-actions">
+                <button onclick="openApp('settings-window'); toggleQuickSettings();" title="Settings">⚙️</button>
+                <button onclick="lockSystem()" title="Lock">🔒</button>
+                <button onclick="location.reload()" title="Power off">⏻</button>
+            </div>
         </div>
     </div>
 
@@ -265,9 +296,11 @@
                 <button class="app-icon" draggable="true" onclick="toggleApp('chrome-window')" title="Chrome">🌐</button>
                 <button class="app-icon" draggable="true" onclick="toggleApp('store-window')" title="Play Store">🛍️</button>
                 <button class="app-icon" draggable="true" onclick="toggleApp('settings-window')" title="Settings">⚙️</button>
+                <button class="app-icon" draggable="true" onclick="toggleApp('wordpad-window')" title="Wordpad">📝</button>
+                <button class="app-icon" draggable="true" onclick="toggleApp('calc-window')" title="Calculator">🧮</button>
                 <button class="app-icon" draggable="true" onclick="toggleApp('files-window')" title="Files">📁</button>
-                </div>
-            <div id="status-area" onclick="toggleQuickSettings()" title="System Options">
+            </div>
+            <div id="status-area" onclick="toggleQuickSettings()">
                 <div class="status-icons"><span>📶</span><span id="taskbar-battery">🔋</span></div>
                 <div id="clock">12:00</div>
             </div>
