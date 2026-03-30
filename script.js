@@ -1,3 +1,172 @@
+// --- CORS PROXY CONFIGURATION FOR CHROME ---
+const CORS_PROXIES = {
+    allorigins: 'https://api.allorigins.win/raw?url=',
+    apiallorigins: 'https://api.allorigins.win/get?url=',
+    corsproxy: 'https://corsproxy.io/?',
+    none: ''
+};
+
+let currentProxy = localStorage.getItem('chrome_proxy') || 'allorigins';
+let chromeHistory = [], chromeIndex = -1;
+
+function getProxiedUrl(url) {
+    if (currentProxy === 'none') return url;
+    const proxy = CORS_PROXIES[currentProxy];
+    return proxy + encodeURIComponent(url);
+}
+
+function toggleProxySettings() {
+    const panel = document.getElementById('proxy-settings');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function changeProxy() {
+    const selector = document.getElementById('proxy-selector');
+    currentProxy = selector.value;
+    localStorage.setItem('chrome_proxy', currentProxy);
+    
+    const status = document.getElementById('proxy-status');
+    status.innerText = currentProxy === 'none' ? 'Disabled' : 'Active';
+    
+    // Reload current page with new proxy
+    if (chromeIndex >= 0) {
+        loadChromeUrl(chromeHistory[chromeIndex], false);
+    }
+}
+
+function navigateChrome() {
+    let url = document.getElementById('chrome-url').value.trim();
+    if (!url) return;
+    
+    // Add protocol if missing
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+    }
+    
+    // Check if it's a search query
+    if (!url.includes('.') || url.includes(' ')) {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+    }
+    
+    // Add to history
+    chromeHistory = chromeHistory.slice(0, chromeIndex + 1);
+    chromeHistory.push(url);
+    chromeIndex++;
+    
+    loadChromeUrl(url, true);
+}
+
+function loadChromeUrl(url, addToHistory) {
+    const iframe = document.getElementById('chrome-frame');
+    const errorDiv = document.getElementById('chrome-error');
+    const errorText = document.getElementById('chrome-error-text');
+    const urlInput = document.getElementById('chrome-url');
+    
+    urlInput.value = url;
+    errorDiv.style.display = 'none';
+    
+    // Try to load with proxy
+    const proxiedUrl = getProxiedUrl(url);
+    
+    // For AllOrigins API mode (returns JSON), we need special handling
+    if (currentProxy === 'apiallorigins') {
+        fetch(proxiedUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.contents) {
+                    const blob = new Blob([data.contents], { type: 'text/html' });
+                    const blobUrl = URL.createObjectURL(blob);
+                    iframe.src = blobUrl;
+                } else {
+                    throw new Error('No content received');
+                }
+            })
+            .catch(err => {
+                showChromeError(url, err.message);
+            });
+    } else {
+        // Direct iframe loading for other proxies
+        iframe.src = proxiedUrl;
+        
+        // Set up error detection
+        iframe.onload = function() {
+            try {
+                // Check if we can access the content (means it loaded successfully)
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (doc && doc.body) {
+                    // Successfully loaded
+                    errorDiv.style.display = 'none';
+                }
+            } catch (e) {
+                // Cross-origin error expected for external sites, that's OK
+                errorDiv.style.display = 'none';
+            }
+        };
+        
+        iframe.onerror = function() {
+            showChromeError(url, 'Failed to load page');
+        };
+        
+        // Timeout fallback for error detection
+        setTimeout(() => {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (!doc || !doc.body || doc.body.innerHTML === '') {
+                    // Might be empty, check if we're still on the same URL
+                    if (iframe.src !== proxiedUrl && iframe.src !== 'about:blank') {
+                        showChromeError(url, 'Page blocked or unavailable');
+                    }
+                }
+            } catch (e) {
+                // Expected for cross-origin, assume success if no error shown yet
+            }
+        }, 5000);
+    }
+}
+
+function showChromeError(url, message) {
+    const errorDiv = document.getElementById('chrome-error');
+    const errorText = document.getElementById('chrome-error-text');
+    errorText.innerText = message || `The webpage at ${url} might be temporarily down or it may have moved permanently. Try changing the proxy in settings (⚙️).`;
+    errorDiv.style.display = 'flex';
+}
+
+function retryChrome() {
+    if (chromeIndex >= 0) {
+        loadChromeUrl(chromeHistory[chromeIndex], false);
+    }
+}
+
+function chromeBack() {
+    if (chromeIndex > 0) {
+        chromeIndex--;
+        loadChromeUrl(chromeHistory[chromeIndex], false);
+    }
+}
+
+function chromeForward() {
+    if (chromeIndex < chromeHistory.length - 1) {
+        chromeIndex++;
+        loadChromeUrl(chromeHistory[chromeIndex], false);
+    }
+}
+
+function chromeReload() {
+    if (chromeIndex >= 0) {
+        loadChromeUrl(chromeHistory[chromeIndex], false);
+    }
+}
+
+// Initialize proxy selector on load
+function initChromeProxy() {
+    const selector = document.getElementById('proxy-selector');
+    if (selector) {
+        selector.value = currentProxy;
+        const status = document.getElementById('proxy-status');
+        if (status) status.innerText = currentProxy === 'none' ? 'Disabled' : 'Active';
+    }
+}
+
 // --- 1. Notification System (Integrated into QS) ---
 const notificationMgr = {
     showNotification: function({title, message, icon}) {
@@ -194,6 +363,7 @@ function closeWelcomeModal() {
 
 function initializeDesktop() {
     updateCalendarWidget();
+    initChromeProxy();
     
     const savedWallpaper = localStorage.getItem('os_wallpaper');
     if(savedWallpaper) document.getElementById('desktop').style.backgroundImage = `url('${savedWallpaper}')`;
@@ -671,35 +841,6 @@ function calcEval() {
     } 
 }
 
-let chromeHistory = ["https://www.google.com/webhp?igu=1"], chromeIndex = 0;
-function navigateChrome() {
-    let url = document.getElementById('chrome-url').value;
-    url = url.startsWith('http') ? url : 'https://' + url;
-    chromeHistory = chromeHistory.slice(0, chromeIndex + 1); 
-    chromeHistory.push(url); 
-    chromeIndex++;
-    document.getElementById('chrome-frame').src = url; 
-    document.getElementById('chrome-url').value = url;
-}
-function chromeBack() { 
-    if (chromeIndex > 0) { 
-        chromeIndex--; 
-        document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; 
-        document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; 
-    } 
-}
-function chromeForward() { 
-    if (chromeIndex < chromeHistory.length - 1) { 
-        chromeIndex++; 
-        document.getElementById('chrome-frame').src = chromeHistory[chromeIndex]; 
-        document.getElementById('chrome-url').value = chromeHistory[chromeIndex]; 
-    } 
-}
-function chromeReload() { 
-    const iframe = document.getElementById('chrome-frame'); 
-    iframe.src = iframe.src; 
-}
-
 function setWallpaper(url) {
     let highResUrl = url.replace("w=400", "w=2000");
     document.getElementById('desktop').style.backgroundImage = `url('${highResUrl}')`;
@@ -843,174 +984,5 @@ function saveAppToStorage(appId, iconSymbol, appName) {
             pinned: false
         }); 
         localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
-    }
-}
-
-// --- CORS PROXY CONFIGURATION FOR CHROME ---
-const CORS_PROXIES = {
-    allorigins: 'https://api.allorigins.win/raw?url=',
-    apiallorigins: 'https://api.allorigins.win/get?url=',
-    corsproxy: 'https://corsproxy.io/?',
-    none: ''
-};
-
-let currentProxy = localStorage.getItem('chrome_proxy') || 'allorigins';
-let chromeHistory = [], chromeIndex = -1;
-
-function getProxiedUrl(url) {
-    if (currentProxy === 'none') return url;
-    const proxy = CORS_PROXIES[currentProxy];
-    return proxy + encodeURIComponent(url);
-}
-
-function toggleProxySettings() {
-    const panel = document.getElementById('proxy-settings');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
-
-function changeProxy() {
-    const selector = document.getElementById('proxy-selector');
-    currentProxy = selector.value;
-    localStorage.setItem('chrome_proxy', currentProxy);
-    
-    const status = document.getElementById('proxy-status');
-    status.innerText = currentProxy === 'none' ? 'Disabled' : 'Active';
-    
-    // Reload current page with new proxy
-    if (chromeIndex >= 0) {
-        loadChromeUrl(chromeHistory[chromeIndex], false);
-    }
-}
-
-function navigateChrome() {
-    let url = document.getElementById('chrome-url').value.trim();
-    if (!url) return;
-    
-    // Add protocol if missing
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-    }
-    
-    // Check if it's a search query
-    if (!url.includes('.') || url.includes(' ')) {
-        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-    }
-    
-    // Add to history
-    chromeHistory = chromeHistory.slice(0, chromeIndex + 1);
-    chromeHistory.push(url);
-    chromeIndex++;
-    
-    loadChromeUrl(url, true);
-}
-
-function loadChromeUrl(url, addToHistory) {
-    const iframe = document.getElementById('chrome-frame');
-    const errorDiv = document.getElementById('chrome-error');
-    const errorText = document.getElementById('chrome-error-text');
-    const urlInput = document.getElementById('chrome-url');
-    
-    urlInput.value = url;
-    errorDiv.style.display = 'none';
-    
-    // Try to load with proxy
-    const proxiedUrl = getProxiedUrl(url);
-    
-    // For AllOrigins API mode (returns JSON), we need special handling
-    if (currentProxy === 'apiallorigins') {
-        fetch(proxiedUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.contents) {
-                    const blob = new Blob([data.contents], { type: 'text/html' });
-                    const blobUrl = URL.createObjectURL(blob);
-                    iframe.src = blobUrl;
-                } else {
-                    throw new Error('No content received');
-                }
-            })
-            .catch(err => {
-                showChromeError(url, err.message);
-            });
-    } else {
-        // Direct iframe loading for other proxies
-        iframe.src = proxiedUrl;
-        
-        // Set up error detection
-        iframe.onload = function() {
-            try {
-                // Check if we can access the content (means it loaded successfully)
-                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                if (doc && doc.body) {
-                    // Successfully loaded
-                    errorDiv.style.display = 'none';
-                }
-            } catch (e) {
-                // Cross-origin error expected for external sites, that's OK
-                errorDiv.style.display = 'none';
-            }
-        };
-        
-        iframe.onerror = function() {
-            showChromeError(url, 'Failed to load page');
-        };
-        
-        // Timeout fallback for error detection
-        setTimeout(() => {
-            try {
-                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                if (!doc || !doc.body || doc.body.innerHTML === '') {
-                    // Might be empty, check if we're still on the same URL
-                    if (iframe.src !== proxiedUrl && iframe.src !== 'about:blank') {
-                        showChromeError(url, 'Page blocked or unavailable');
-                    }
-                }
-            } catch (e) {
-                // Expected for cross-origin, assume success if no error shown yet
-            }
-        }, 5000);
-    }
-}
-
-function showChromeError(url, message) {
-    const errorDiv = document.getElementById('chrome-error');
-    const errorText = document.getElementById('chrome-error-text');
-    errorText.innerText = message || `The webpage at ${url} might be temporarily down or it may have moved permanently. Try changing the proxy in settings (⚙️).`;
-    errorDiv.style.display = 'flex';
-}
-
-function retryChrome() {
-    if (chromeIndex >= 0) {
-        loadChromeUrl(chromeHistory[chromeIndex], false);
-    }
-}
-
-function chromeBack() {
-    if (chromeIndex > 0) {
-        chromeIndex--;
-        loadChromeUrl(chromeHistory[chromeIndex], false);
-    }
-}
-
-function chromeForward() {
-    if (chromeIndex < chromeHistory.length - 1) {
-        chromeIndex++;
-        loadChromeUrl(chromeHistory[chromeIndex], false);
-    }
-}
-
-function chromeReload() {
-    if (chromeIndex >= 0) {
-        loadChromeUrl(chromeHistory[chromeIndex], false);
-    }
-}
-
-// Initialize proxy selector on load
-function initChromeProxy() {
-    const selector = document.getElementById('proxy-selector');
-    if (selector) {
-        selector.value = currentProxy;
-        const status = document.getElementById('proxy-status');
-        if (status) status.innerText = currentProxy === 'none' ? 'Disabled' : 'Active';
     }
 }
