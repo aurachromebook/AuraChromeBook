@@ -155,14 +155,37 @@
             </div>
         </div>
 
+        <!-- UPDATED CHROME WINDOW WITH CORS PROXY -->
         <div class="window" id="chrome-window" style="display: none;">
             <div class="window-header" id="chrome-window-header"><span class="window-title">🌐 Google Chrome</span><div><button class="win-btn" onclick="minimizeApp('chrome-window')">−</button><button class="win-btn" onclick="maximizeApp('chrome-window')">□</button><button class="win-btn close-btn" onclick="closeApp('chrome-window')">✕</button></div></div>
             <div class="browser-toolbar">
                 <button onclick="chromeBack()">◀</button><button onclick="chromeForward()">▶</button><button onclick="chromeReload()">↻</button>
-                <input type="text" id="chrome-url" value="https://www.google.com" placeholder="Search Google or type a URL">
+                <input type="text" id="chrome-url" value="https://www.google.com" placeholder="Search Google or type a URL" onkeydown="if(event.key==='Enter')navigateChrome()">
                 <button onclick="navigateChrome()">Go</button>
+                <button onclick="toggleProxySettings()" title="Proxy Settings">⚙️</button>
             </div>
-            <div class="window-content"><iframe id="chrome-frame" src="https://www.google.com/webhp?igu=1" width="100%" height="100%" frameborder="0"></iframe></div>
+            <!-- Proxy Settings Panel -->
+            <div id="proxy-settings" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                    <span>CORS Proxy:</span>
+                    <select id="proxy-selector" onchange="changeProxy()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
+                        <option value="allorigins">AllOrigins (Default)</option>
+                        <option value="apiallorigins">API.AllOrigins</option>
+                        <option value="corsproxy">CorsProxy.io</option>
+                        <option value="none">None (Direct - May Fail)</option>
+                    </select>
+                    <span id="proxy-status" style="color: var(--sys-primary);">Active</span>
+                </div>
+            </div>
+            <div class="window-content" style="position: relative;">
+                <iframe id="chrome-frame" src="about:blank" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+                <div id="chrome-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--sys-surface); flex-direction: column; justify-content: center; align-items: center; color: var(--sys-text);">
+                    <div style="font-size: 64px; margin-bottom: 20px;">😕</div>
+                    <h3 style="margin: 0 0 10px 0;">This site can't be reached</h3>
+                    <p id="chrome-error-text" style="color: var(--sys-text-muted); margin: 0 0 20px 0;">The webpage might be temporarily down or it may have moved permanently.</p>
+                    <button onclick="retryChrome()" style="background: var(--sys-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); cursor: pointer;">Try Again</button>
+                </div>
+            </div>
         </div>
 
         <div class="window" id="settings-window" style="display: none;">
@@ -192,12 +215,13 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 3.6 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Version 3.7 (Latest)</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
+                        <li>Fixed Chrome browser with CORS proxy support</li>
+                        <li>Added multiple proxy options for better compatibility</li>
                         <li>Replaced Aura Messages with Discord Integration</li>
                         <li>Removed Firebase backend dependency</li>
                         <li>Added Smash Carts game to App Store</li>
-                        <li>Fixed keyboard/mouse support (WASD) for 3D games</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -289,7 +313,6 @@
             <span>🔍</span><input type="text" id="launcher-search" placeholder="Search your device, apps, web..." onkeyup="filterLauncher()">
         </div>
         <div class="launcher-grid" id="launcher-list">
-            <!-- Built-in apps in launcher -->
             <div class="launcher-item" data-app-id="chrome-window" data-icon="🌐" data-name="Chrome" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
             <div class="launcher-item" data-app-id="store-window" data-icon="🛍️" data-name="Play Store" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Play Store</span></div>
             <div class="launcher-item" data-app-id="settings-window" data-icon="⚙️" data-name="Settings" onclick="openApp('settings-window')"><div class="l-icon">⚙️</div><span class="l-text">Settings</span></div>
@@ -329,7 +352,6 @@
         <div id="taskbar">
             <button id="launcher-btn" onclick="toggleMenu()"><div class="launcher-dot"></div></button>
             <div id="app-icons">
-                <!-- Only built-in apps on shelf by default -->
                 <button class="app-icon" id="taskbar-chrome-window" draggable="true" onclick="toggleApp('chrome-window')" title="Chrome">🌐</button>
                 <button class="app-icon" id="taskbar-store-window" draggable="true" onclick="toggleApp('store-window')" title="Play Store">🛍️</button>
                 <button class="app-icon" id="taskbar-settings-window" draggable="true" onclick="toggleApp('settings-window')" title="Settings">⚙️</button>
@@ -337,7 +359,6 @@
                 <button class="app-icon" id="taskbar-calc-window" draggable="true" onclick="toggleApp('calc-window')" title="Calculator">🧮</button>
                 <button class="app-icon" id="taskbar-files-window" draggable="true" onclick="toggleApp('files-window')" title="Files">📁</button>
             </div>
-            <!-- Calendar Widget -->
             <div id="calendar-widget" onclick="toggleCalendar()">
                 <div id="calendar-day">30</div>
                 <div id="calendar-date">Mar</div>
