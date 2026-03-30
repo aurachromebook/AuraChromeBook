@@ -164,19 +164,21 @@
                 <button onclick="navigateChrome()">Go</button>
                 <button onclick="toggleProxySettings()" title="Proxy Settings">⚙️</button>
             </div>
-            <!-- Proxy Settings Panel -->
-            <div id="proxy-settings" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
-                    <span>CORS Proxy:</span>
-                    <select id="proxy-selector" onchange="changeProxy()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
-                        <option value="allorigins">AllOrigins (Default)</option>
-                        <option value="apiallorigins">API.AllOrigins</option>
-                        <option value="corsproxy">CorsProxy.io</option>
-                        <option value="none">None (Direct - May Fail)</option>
-                    </select>
-                    <span id="proxy-status" style="color: var(--sys-primary);">Active</span>
-                </div>
-            </div>
+<!-- Proxy Settings Panel -->
+<div id="proxy-settings" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+        <span>CORS Proxy:</span>
+        <select id="proxy-selector" onchange="changeProxy()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
+            <option value="scramjet">Scramjet (Default)</option>
+            <option value="ultraviolet">Ultraviolet</option>
+            <option value="allorigins">AllOrigins</option>
+            <option value="apiallorigins">API.AllOrigins</option>
+            <option value="corsproxy">CorsProxy.io</option>
+            <option value="none">None (Direct - May Fail)</option>
+        </select>
+        <span id="proxy-status" style="color: var(--sys-primary);">Active</span>
+    </div>
+</div>
             <div class="window-content" style="position: relative;">
                 <iframe id="chrome-frame" src="about:blank" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
                 <div id="chrome-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--sys-surface); flex-direction: column; justify-content: center; align-items: center; color: var(--sys-text);">
