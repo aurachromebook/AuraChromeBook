@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChromeOS</title>
+    <title>Aura OS - Ultimate Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="dark">
@@ -83,6 +83,29 @@
             <div class="context-divider"></div>
             <div class="context-item" id="context-uninstall" style="display: none; color: #ea4335;">🗑️ Uninstall App</div>
             <div class="context-item" onclick="lockSystem()">🔒 Lock screen</div>
+        </div>
+
+        <!-- Launcher Context Menu -->
+        <div id="launcher-context-menu" style="display: none;">
+            <div class="context-item" onclick="launcherContextAction('open')">▶️ Open</div>
+            <div class="context-item" onclick="launcherContextAction('addToShelf')">📌 Add to Shelf</div>
+            <div class="context-divider"></div>
+            <div class="context-item" onclick="launcherContextAction('uninstall')" style="color: #ea4335;">🗑️ Uninstall</div>
+        </div>
+
+        <!-- Calendar Modal -->
+        <div id="calendar-modal" style="display: none;">
+            <div class="calendar-box">
+                <div class="calendar-header">
+                    <button onclick="changeMonth(-1)">◀</button>
+                    <h3 id="calendar-month-year">March 2026</h3>
+                    <button onclick="changeMonth(1)">▶</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+                <div class="calendar-days" id="calendar-days"></div>
+            </div>
         </div>
 
         <div id="snap-preview"></div>
@@ -215,7 +238,6 @@
                         <div class="store-card"><div class="store-icon">🏹</div><div class="store-info"><strong>Ragdoll Archers</strong><span>Action • 4.5 ★</span></div><button id="install-btn-ragdollarchers-window" class="store-btn" onclick="installApp('ragdollarchers-window', '🏹', 'Ragdoll Archers', this)">Install</button><div class="progress-container" id="progress-container-ragdollarchers-window"><div class="progress-bar" id="progress-bar-ragdollarchers-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🌲</div><div class="store-info"><strong>99 Nights in the Forest</strong><span>Survival • 4.6 ★</span></div><button id="install-btn-99nights-window" class="store-btn" onclick="installApp('99nights-window', '🌲', '99 Nights', this)">Install</button><div class="progress-container" id="progress-container-99nights-window"><div class="progress-bar" id="progress-bar-99nights-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">⚽</div><div class="store-info"><strong>Rocket League</strong><span>Sports • 4.9 ★</span></div><button id="install-btn-rocketleague-window" class="store-btn" onclick="installApp('rocketleague-window', '⚽', 'Rocket League', this)">Install</button><div class="progress-container" id="progress-container-rocketleague-window"><div class="progress-bar" id="progress-bar-rocketleague-window"></div></div></div>
-                        <!-- NEW BASKETBALL AND ROBLOX GAMES ADDED BELOW -->
                         <div class="store-card"><div class="store-icon">🏀</div><div class="store-info"><strong>Basketball Random</strong><span>Sports • 4.4 ★</span></div><button id="install-btn-bballrandom-window" class="store-btn" onclick="installApp('bballrandom-window', '🏀', 'Basketball Random', this)">Install</button><div class="progress-container" id="progress-container-bballrandom-window"><div class="progress-bar" id="progress-bar-bballrandom-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏀</div><div class="store-info"><strong>Basketball Bros</strong><span>Sports • 4.5 ★</span></div><button id="install-btn-bballbros-window" class="store-btn" onclick="installApp('bballbros-window', '🏀', 'Basketball Bros', this)">Install</button><div class="progress-container" id="progress-container-bballbros-window"><div class="progress-bar" id="progress-bar-bballbros-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏀</div><div class="store-info"><strong>Basketball Legend</strong><span>Sports • 4.6 ★</span></div><button id="install-btn-bballlegend-window" class="store-btn" onclick="installApp('bballlegend-window', '🏀', 'Basketball Legend', this)">Install</button><div class="progress-container" id="progress-container-bballlegend-window"><div class="progress-bar" id="progress-bar-bballlegend-window"></div></div></div>
@@ -254,8 +276,6 @@
         <div class="window" id="ragdollarchers-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="ragdollarchers-window-header"><span class="window-title">🏹 Ragdoll Archers</span><div><button class="win-btn" onclick="minimizeApp('ragdollarchers-window')">−</button><button class="win-btn" onclick="maximizeApp('ragdollarchers-window')">□</button><button class="win-btn close-btn" onclick="closeApp('ragdollarchers-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Ragdoll Archers.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="99nights-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="99nights-window-header"><span class="window-title">🌲 99 Nights in the Forest</span><div><button class="win-btn" onclick="minimizeApp('99nights-window')">−</button><button class="win-btn" onclick="maximizeApp('99nights-window')">□</button><button class="win-btn close-btn" onclick="closeApp('99nights-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/99 Nights.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="rocketleague-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="rocketleague-window-header"><span class="window-title">⚽ Rocket League</span><div><button class="win-btn" onclick="minimizeApp('rocketleague-window')">−</button><button class="win-btn" onclick="maximizeApp('rocketleague-window')">□</button><button class="win-btn close-btn" onclick="closeApp('rocketleague-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Rocket League.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        
-        <!-- NEW GAME WINDOWS ADDED BELOW -->
         <div class="window" id="bballrandom-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bballrandom-window-header"><span class="window-title">🏀 Basketball Random</span><div><button class="win-btn" onclick="minimizeApp('bballrandom-window')">−</button><button class="win-btn" onclick="maximizeApp('bballrandom-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bballrandom-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Basketball Random.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="bballbros-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bballbros-window-header"><span class="window-title">🏀 Basketball Bros</span><div><button class="win-btn" onclick="minimizeApp('bballbros-window')">−</button><button class="win-btn" onclick="maximizeApp('bballbros-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bballbros-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Basketball Bros.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="bballlegend-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bballlegend-window-header"><span class="window-title">🏀 Basketball Legend</span><div><button class="win-btn" onclick="minimizeApp('bballlegend-window')">−</button><button class="win-btn" onclick="maximizeApp('bballlegend-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bballlegend-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Basketball Legend.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
@@ -269,12 +289,13 @@
             <span>🔍</span><input type="text" id="launcher-search" placeholder="Search your device, apps, web..." onkeyup="filterLauncher()">
         </div>
         <div class="launcher-grid" id="launcher-list">
-            <div class="launcher-item" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
-            <div class="launcher-item" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Play Store</span></div>
-            <div class="launcher-item" onclick="openApp('settings-window')"><div class="l-icon">⚙️</div><span class="l-text">Settings</span></div>
-            <div class="launcher-item" onclick="openApp('wordpad-window')"><div class="l-icon">📝</div><span class="l-text">Wordpad</span></div>
-            <div class="launcher-item" onclick="openApp('calc-window')"><div class="l-icon">🧮</div><span class="l-text">Calculator</span></div>
-            <div class="launcher-item" onclick="openApp('files-window')"><div class="l-icon">📁</div><span class="l-text">Files</span></div>
+            <!-- Built-in apps in launcher -->
+            <div class="launcher-item" data-app-id="chrome-window" data-icon="🌐" data-name="Chrome" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
+            <div class="launcher-item" data-app-id="store-window" data-icon="🛍️" data-name="Play Store" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Play Store</span></div>
+            <div class="launcher-item" data-app-id="settings-window" data-icon="⚙️" data-name="Settings" onclick="openApp('settings-window')"><div class="l-icon">⚙️</div><span class="l-text">Settings</span></div>
+            <div class="launcher-item" data-app-id="wordpad-window" data-icon="📝" data-name="Wordpad" onclick="openApp('wordpad-window')"><div class="l-icon">📝</div><span class="l-text">Wordpad</span></div>
+            <div class="launcher-item" data-app-id="calc-window" data-icon="🧮" data-name="Calculator" onclick="openApp('calc-window')"><div class="l-icon">🧮</div><span class="l-text">Calculator</span></div>
+            <div class="launcher-item" data-app-id="files-window" data-icon="📁" data-name="Files" onclick="openApp('files-window')"><div class="l-icon">📁</div><span class="l-text">Files</span></div>
         </div>
     </div>
 
@@ -308,12 +329,18 @@
         <div id="taskbar">
             <button id="launcher-btn" onclick="toggleMenu()"><div class="launcher-dot"></div></button>
             <div id="app-icons">
-                <button class="app-icon" draggable="true" onclick="toggleApp('chrome-window')" title="Chrome">🌐</button>
-                <button class="app-icon" draggable="true" onclick="toggleApp('store-window')" title="Play Store">🛍️</button>
-                <button class="app-icon" draggable="true" onclick="toggleApp('settings-window')" title="Settings">⚙️</button>
-                <button class="app-icon" draggable="true" onclick="toggleApp('wordpad-window')" title="Wordpad">📝</button>
-                <button class="app-icon" draggable="true" onclick="toggleApp('calc-window')" title="Calculator">🧮</button>
-                <button class="app-icon" draggable="true" onclick="toggleApp('files-window')" title="Files">📁</button>
+                <!-- Only built-in apps on shelf by default -->
+                <button class="app-icon" id="taskbar-chrome-window" draggable="true" onclick="toggleApp('chrome-window')" title="Chrome">🌐</button>
+                <button class="app-icon" id="taskbar-store-window" draggable="true" onclick="toggleApp('store-window')" title="Play Store">🛍️</button>
+                <button class="app-icon" id="taskbar-settings-window" draggable="true" onclick="toggleApp('settings-window')" title="Settings">⚙️</button>
+                <button class="app-icon" id="taskbar-wordpad-window" draggable="true" onclick="toggleApp('wordpad-window')" title="Wordpad">📝</button>
+                <button class="app-icon" id="taskbar-calc-window" draggable="true" onclick="toggleApp('calc-window')" title="Calculator">🧮</button>
+                <button class="app-icon" id="taskbar-files-window" draggable="true" onclick="toggleApp('files-window')" title="Files">📁</button>
+            </div>
+            <!-- Calendar Widget -->
+            <div id="calendar-widget" onclick="toggleCalendar()">
+                <div id="calendar-day">30</div>
+                <div id="calendar-date">Mar</div>
             </div>
             <div id="status-area" onclick="toggleQuickSettings()">
                 <div class="status-icons"><span>📶</span><span id="taskbar-battery">🔋</span></div>
