@@ -1,14 +1,12 @@
 // --- CORS PROXY CONFIGURATION FOR CHROME ---
 const CORS_PROXIES = {
-    scramjet: 'https://api.mercurywork.shop/',
-    ultraviolet: 'https://uv.holyubofficial.net/',
+    corsproxy: 'https://corsproxy.io/?',
     allorigins: 'https://api.allorigins.win/raw?url=',
     apiallorigins: 'https://api.allorigins.win/get?url=',
-    corsproxy: 'https://corsproxy.io/?',
     none: ''
 };
 
-let currentProxy = localStorage.getItem('chrome_proxy') || 'scramjet';
+let currentProxy = localStorage.getItem('chrome_proxy') || 'corsproxy';
 let chromeHistory = [], chromeIndex = -1;
 
 function getProxiedUrl(url) {
@@ -30,7 +28,6 @@ function changeProxy() {
     const status = document.getElementById('proxy-status');
     status.innerText = currentProxy === 'none' ? 'Disabled' : 'Active';
     
-    // Reload current page with new proxy
     if (chromeIndex >= 0) {
         loadChromeUrl(chromeHistory[chromeIndex], false);
     }
@@ -40,17 +37,14 @@ function navigateChrome() {
     let url = document.getElementById('chrome-url').value.trim();
     if (!url) return;
     
-    // Add protocol if missing
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = 'https://' + url;
     }
     
-    // Check if it's a search query
     if (!url.includes('.') || url.includes(' ')) {
         url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
     }
     
-    // Add to history
     chromeHistory = chromeHistory.slice(0, chromeIndex + 1);
     chromeHistory.push(url);
     chromeIndex++;
@@ -61,16 +55,13 @@ function navigateChrome() {
 function loadChromeUrl(url, addToHistory) {
     const iframe = document.getElementById('chrome-frame');
     const errorDiv = document.getElementById('chrome-error');
-    const errorText = document.getElementById('chrome-error-text');
     const urlInput = document.getElementById('chrome-url');
     
     urlInput.value = url;
     errorDiv.style.display = 'none';
     
-    // Try to load with proxy
     const proxiedUrl = getProxiedUrl(url);
     
-    // For AllOrigins API mode (returns JSON), we need special handling
     if (currentProxy === 'apiallorigins') {
         fetch(proxiedUrl)
             .then(response => response.json())
@@ -87,20 +78,15 @@ function loadChromeUrl(url, addToHistory) {
                 showChromeError(url, err.message);
             });
     } else {
-        // Direct iframe loading for other proxies
         iframe.src = proxiedUrl;
         
-        // Set up error detection
         iframe.onload = function() {
             try {
-                // Check if we can access the content (means it loaded successfully)
                 const doc = iframe.contentDocument || iframe.contentWindow.document;
                 if (doc && doc.body) {
-                    // Successfully loaded
                     errorDiv.style.display = 'none';
                 }
             } catch (e) {
-                // Cross-origin error expected for external sites, that's OK
                 errorDiv.style.display = 'none';
             }
         };
@@ -109,19 +95,15 @@ function loadChromeUrl(url, addToHistory) {
             showChromeError(url, 'Failed to load page');
         };
         
-        // Timeout fallback for error detection
         setTimeout(() => {
             try {
                 const doc = iframe.contentDocument || iframe.contentWindow.document;
                 if (!doc || !doc.body || doc.body.innerHTML === '') {
-                    // Might be empty, check if we're still on the same URL
                     if (iframe.src !== proxiedUrl && iframe.src !== 'about:blank') {
                         showChromeError(url, 'Page blocked or unavailable');
                     }
                 }
-            } catch (e) {
-                // Expected for cross-origin, assume success if no error shown yet
-            }
+            } catch (e) {}
         }, 5000);
     }
 }
@@ -159,7 +141,6 @@ function chromeReload() {
     }
 }
 
-// Initialize proxy selector on load
 function initChromeProxy() {
     const selector = document.getElementById('proxy-selector');
     if (selector) {
@@ -169,12 +150,164 @@ function initChromeProxy() {
     }
 }
 
-// --- 1. Notification System (Integrated into QS) ---
+// --- TAB CLOAKING SYSTEM ---
+const CLOAK_PRESETS = {
+    aura: {
+        title: 'Aura OS - Ultimate Edition',
+        favicon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    },
+    fleckle: {
+        title: 'Fleckle - Student Portal',
+        favicon: 'https://www.google.com/favicon.ico'
+    },
+    classroom: {
+        title: 'Google Classroom',
+        favicon: 'https://ssl.gstatic.com/classroom/favicon.png'
+    },
+    flocabulary: {
+        title: 'Flocabulary - Educational Hip-Hop',
+        favicon: 'https://www.flocabulary.com/wp-content/uploads/2018/07/cropped-flobook-32x32.png'
+    }
+};
+
+function changeTabCloak() {
+    const selector = document.getElementById('cloak-selector');
+    const preset = CLOAK_PRESETS[selector.value];
+    
+    if (preset) {
+        document.getElementById('page-title').innerText = preset.title;
+        document.getElementById('page-favicon').href = preset.favicon;
+        localStorage.setItem('tab_cloak', selector.value);
+        
+        document.getElementById('cloak-status').innerText = 'Current: ' + preset.title;
+    }
+}
+
+function initTabCloak() {
+    const savedCloak = localStorage.getItem('tab_cloak') || 'aura';
+    const selector = document.getElementById('cloak-selector');
+    if (selector) {
+        selector.value = savedCloak;
+        changeTabCloak();
+    }
+}
+
+// --- ABOUT:BLANK CLOAKING SYSTEM ---
+let aboutBlankPending = false;
+
+function showAboutBlankModal() {
+    const modal = document.getElementById('aboutblank-modal');
+    modal.style.display = 'flex';
+}
+
+function handleAboutBlank(choice) {
+    const modal = document.getElementById('aboutblank-modal');
+    modal.style.display = 'none';
+    
+    switch(choice) {
+        case 'always':
+            localStorage.setItem('aboutblank_setting', 'always');
+            openInAboutBlank();
+            break;
+        case 'once':
+            aboutBlankPending = true;
+            openInAboutBlank();
+            break;
+        case 'no':
+            // Just close modal, don't do anything
+            break;
+        case 'block':
+            localStorage.setItem('aboutblank_setting', 'block');
+            showBlockMessage();
+            break;
+    }
+}
+
+function openInAboutBlank() {
+    const currentUrl = window.location.href;
+    const newWindow = window.open('about:blank', '_blank');
+    
+    if (newWindow) {
+        newWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Aura OS</title>
+                <style>
+                    body { margin: 0; overflow: hidden; }
+                    iframe { width: 100vw; height: 100vh; border: none; }
+                </style>
+            </head>
+            <body>
+                <iframe src="${currentUrl}" allowfullscreen></iframe>
+            </body>
+            </html>
+        `);
+        newWindow.document.close();
+        
+        // Close original window if opened successfully
+        if (aboutBlankPending) {
+            aboutBlankPending = false;
+        }
+    }
+}
+
+function showBlockMessage() {
+    notificationMgr.showNotification({
+        title: "About:Blank Blocked",
+        message: "You have blocked about:blank prompts. You can re-enable auto about:blank in Settings.",
+        icon: "shield-alert"
+    });
+}
+
+function checkAboutBlankSetting() {
+    const setting = localStorage.getItem('aboutblank_setting');
+    
+    if (setting === 'block') {
+        return; // Don't show anything
+    } else if (setting === 'always') {
+        // Auto open in about:blank after password entry
+        setTimeout(() => {
+            openInAboutBlank();
+        }, 1000);
+    } else {
+        // Show modal (ask mode or not set)
+        setTimeout(() => {
+            showAboutBlankModal();
+        }, 3000);
+    }
+}
+
+function saveAboutBlankSetting() {
+    const selector = document.getElementById('aboutblank-setting');
+    localStorage.setItem('aboutblank_setting', selector.value);
+    
+    const blockedMsg = document.getElementById('aboutblank-blocked-msg');
+    if (selector.value === 'block') {
+        blockedMsg.style.display = 'block';
+    } else {
+        blockedMsg.style.display = 'none';
+    }
+}
+
+function initAboutBlankSettings() {
+    const selector = document.getElementById('aboutblank-setting');
+    if (selector) {
+        const saved = localStorage.getItem('aboutblank_setting') || 'ask';
+        selector.value = saved;
+        
+        const blockedMsg = document.getElementById('aboutblank-blocked-msg');
+        if (saved === 'block') {
+            blockedMsg.style.display = 'block';
+        }
+    }
+}
+
+// --- 1. Notification System ---
 const notificationMgr = {
     showNotification: function({title, message, icon}) {
         const iconEmoji = icon === 'shield-alert' ? '🛡️' : icon === 'sparkles' ? '✨' : '🔔';
         
-        // 1. Show floating toast
         const container = document.getElementById('notification-toast-container');
         const notif = document.createElement('div');
         notif.className = 'notification';
@@ -186,7 +319,6 @@ const notificationMgr = {
             setTimeout(() => notif.remove(), 300);
         }, 7000);
 
-        // 2. Add to Quick Settings Notification Center
         const qsList = document.getElementById('qs-notif-list');
         const noNotifs = qsList.querySelector('.qs-no-notifs');
         if (noNotifs) noNotifs.remove();
@@ -217,6 +349,11 @@ function triggerInitialNotifications() {
             message: `Safety is coming to Aura OS. You will be flagged if you use swear words or nasty usernames. Coming on March 10th 2026.`,
             icon: "shield-alert"
         });
+        
+        // Show about:blank modal after safety notification
+        setTimeout(() => {
+            checkAboutBlankSetting();
+        }, 2500);
     }, 2500);
 }
 
@@ -260,7 +397,6 @@ function renderCalendar() {
     const daysContainer = document.getElementById('calendar-days');
     daysContainer.innerHTML = '';
     
-    // Previous month days
     for (let i = firstDay - 1; i >= 0; i--) {
         const day = document.createElement('div');
         day.className = 'calendar-day other-month';
@@ -268,7 +404,6 @@ function renderCalendar() {
         daysContainer.appendChild(day);
     }
     
-    // Current month days
     const today = new Date();
     for (let i = 1; i <= daysInMonth; i++) {
         const day = document.createElement('div');
@@ -280,7 +415,6 @@ function renderCalendar() {
         daysContainer.appendChild(day);
     }
     
-    // Next month days
     const remainingCells = 42 - (firstDay + daysInMonth);
     for (let i = 1; i <= remainingCells; i++) {
         const day = document.createElement('div');
@@ -295,7 +429,7 @@ function changeMonth(delta) {
     renderCalendar();
 }
 
-// --- 2. Boot Sequence & OOBE Setup ---
+// --- Boot Sequence & OOBE Setup ---
 window.onload = function() {
     if(localStorage.getItem('os_theme') === 'light') {
         document.body.setAttribute('data-theme', 'light');
@@ -366,15 +500,15 @@ function closeWelcomeModal() {
 function initializeDesktop() {
     updateCalendarWidget();
     initChromeProxy();
+    initTabCloak();
+    initAboutBlankSettings();
     
     const savedWallpaper = localStorage.getItem('os_wallpaper');
     if(savedWallpaper) document.getElementById('desktop').style.backgroundImage = `url('${savedWallpaper}')`;
 
-    // Load installed apps to launcher only (not shelf)
     const savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
     savedApps.forEach(app => {
         restoreAppToLauncher(app.id, app.icon, app.name);
-        // Also restore to shelf if it was pinned
         if (app.pinned) {
             restoreAppToTaskbar(app.id, app.icon, app.name);
         }
@@ -394,7 +528,7 @@ function factoryReset() {
     }
 }
 
-// --- 3. System UI & Dark Mode ---
+// --- System UI & Dark Mode ---
 function toggleTheme() {
     const body = document.body;
     const textSpan = document.getElementById('theme-text');
@@ -418,7 +552,7 @@ function updateClock() {
     if(clock) clock.innerText = hours + ':' + minutes;
 }
 setInterval(updateClock, 1000); updateClock();
-setInterval(updateCalendarWidget, 60000); // Update calendar every minute
+setInterval(updateCalendarWidget, 60000);
 
 function initBattery() {
     if ('getBattery' in navigator) {
@@ -443,7 +577,7 @@ document.getElementById('brightness-slider').addEventListener('input', function(
     document.getElementById('desktop').style.filter = `brightness(${e.target.value}%)`;
 });
 
-// --- 4. Context Menus & Uninstall Logic ---
+// --- Context Menus & Uninstall Logic ---
 const desktop = document.getElementById('desktop');
 const contextMenu = document.getElementById('context-menu');
 const launcherContextMenu = document.getElementById('launcher-context-menu');
@@ -454,7 +588,6 @@ const uninstallBtn = document.getElementById('context-uninstall');
 let selectedAppIdToUninstall = null;
 let selectedLauncherItem = null;
 
-// Desktop context menu
 desktop.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     const appIcon = e.target.closest('.app-icon');
@@ -494,7 +627,6 @@ uninstallBtn.addEventListener('click', () => {
     contextMenu.style.display = 'none';
 });
 
-// Launcher context menu
 function initLauncherContextMenu() {
     const launcherList = document.getElementById('launcher-list');
     
@@ -524,7 +656,6 @@ function launcherContextAction(action) {
         case 'addToShelf':
             if (!document.getElementById('taskbar-' + appId)) {
                 restoreAppToTaskbar(appId, icon, name);
-                // Update pinned status in storage
                 let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
                 const app = savedApps.find(a => a.id === appId);
                 if (app) {
@@ -539,25 +670,17 @@ function launcherContextAction(action) {
             }
             break;
         case 'uninstall':
-            // Remove from shelf if present
             const tbIcon = document.getElementById('taskbar-' + appId);
             if (tbIcon) tbIcon.remove();
-            
-            // Remove from launcher
             selectedLauncherItem.remove();
-            
-            // Update store button
             const storeBtn = document.getElementById('install-btn-' + appId);
             if(storeBtn) { 
                 storeBtn.innerText = 'Install'; 
                 storeBtn.disabled = false; 
             }
-            
-            // Remove from storage
             let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
             savedApps = savedApps.filter(app => app.id !== appId);
             localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
-            
             notificationMgr.showNotification({ 
                 title: "App Uninstalled", 
                 message: `${name} has been removed.`, 
@@ -570,7 +693,6 @@ function launcherContextAction(action) {
     selectedLauncherItem = null;
 }
 
-// Close menus on click outside
 document.addEventListener('click', (e) => {
     if(!contextMenu.contains(e.target)) contextMenu.style.display = 'none';
     if(!launcherContextMenu.contains(e.target)) launcherContextMenu.style.display = 'none';
@@ -640,7 +762,7 @@ function saveSecuritySettings() {
     msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 3000);
 }
 
-// --- 5. Window Memory Management ---
+// --- Window Memory Management ---
 let highestZ = 10;
 function openApp(appId) {
     const appWindow = document.getElementById(appId);
@@ -779,7 +901,7 @@ function dragDesktopIcon(elmnt) {
     function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
 }
 
-// --- 6. Local File Explorer & Notepad ---
+// --- Local File Explorer & Notepad ---
 let currentNotepadFile = null;
 
 function notepadSaveAs() {
@@ -829,7 +951,7 @@ window.openFileFromExplorer = function(name) {
     openApp('wordpad-window'); 
 };
 
-// --- 7. Applications Logic ---
+// --- Applications Logic ---
 let calcInput = "";
 function calcPress(val) { calcInput += val; document.getElementById('calc-display').value = calcInput; }
 function calcClear() { calcInput = ""; document.getElementById('calc-display').value = "0"; }
@@ -865,7 +987,7 @@ document.getElementById('wallpaper-upload').addEventListener('change', function(
     }
 });
 
-// --- 8. Taskbar & Play Store Logic ---
+// --- Taskbar & Play Store Logic ---
 function switchStoreTab(tabId) {
     document.querySelectorAll('.play-tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.store-tab-content').forEach(content => content.classList.remove('active'));
@@ -897,9 +1019,7 @@ function makeIconDraggable(icon) {
     });
 }
 
-// Install app - goes to launcher only (not shelf)
 function installApp(appId, iconSymbol, appName, buttonElement) {
-    // Check if already installed
     const launcherList = document.getElementById('launcher-list');
     const existingItem = launcherList.querySelector(`[data-app-id="${appId}"]`);
     if (existingItem) {
@@ -928,7 +1048,6 @@ function installApp(appId, iconSymbol, appName, buttonElement) {
             buttonElement.innerText = 'Installed'; 
             if(pCont) setTimeout(() => pCont.style.display = 'none', 500);
             
-            // Add to launcher only (not shelf)
             restoreAppToLauncher(appId, iconSymbol, appName); 
             saveAppToStorage(appId, iconSymbol, appName);
             
@@ -945,8 +1064,6 @@ function installApp(appId, iconSymbol, appName, buttonElement) {
 
 function restoreAppToLauncher(appId, iconSymbol, appName) {
     const launcherList = document.getElementById('launcher-list');
-    
-    // Check if already exists
     if (launcherList.querySelector(`[data-app-id="${appId}"]`)) return;
     
     const item = document.createElement('div');
@@ -960,7 +1077,6 @@ function restoreAppToLauncher(appId, iconSymbol, appName) {
 }
 
 function restoreAppToTaskbar(appId, iconSymbol, appName) {
-    // Check if already on shelf
     if (document.getElementById('taskbar-' + appId)) return;
     
     const btn = document.createElement('button'); 
@@ -977,7 +1093,6 @@ function restoreAppToTaskbar(appId, iconSymbol, appName) {
 
 function saveAppToStorage(appId, iconSymbol, appName) {
     let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
-    // Check if already exists
     if (!savedApps.find(app => app.id === appId)) {
         savedApps.push({ 
             id: appId, 
