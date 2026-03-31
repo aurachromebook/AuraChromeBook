@@ -1,12 +1,14 @@
 // --- CORS PROXY CONFIGURATION FOR CHROME ---
 const CORS_PROXIES = {
+    scramjet: 'https://api.mercurywork.shop/',
+    ultraviolet: 'https://uv.holyubofficial.net/',
     allorigins: 'https://api.allorigins.win/raw?url=',
     apiallorigins: 'https://api.allorigins.win/get?url=',
     corsproxy: 'https://corsproxy.io/?',
     none: ''
 };
 
-let currentProxy = localStorage.getItem('chrome_proxy') || 'allorigins';
+let currentProxy = localStorage.getItem('chrome_proxy') || 'scramjet';
 let chromeHistory = [], chromeIndex = -1;
 
 function getProxiedUrl(url) {
