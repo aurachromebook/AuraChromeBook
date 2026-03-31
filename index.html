@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura OS - Ultimate Edition</title>
+    <title id="page-title">Aura OS - Ultimate Edition</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Favicon for tab cloaking -->
+    <link id="page-favicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
 </head>
 <body data-theme="dark">
     <div id="boot-screen">
@@ -12,6 +14,21 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
         </div>
         <div class="boot-loader"></div>
+    </div>
+
+    <!-- About Blank Modal -->
+    <div id="aboutblank-modal" style="display: none;">
+        <div class="aboutblank-box">
+            <h2>🔒 About:Blank Cloaking</h2>
+            <p>Do you wish to open in about:blank?</p>
+            <p style="font-size: 12px; color: var(--sys-text-muted); margin-top: 5px;">This helps hide this site from your browser history.</p>
+            <div class="aboutblank-buttons">
+                <button class="ab-btn always" onclick="handleAboutBlank('always')">Always</button>
+                <button class="ab-btn just-once" onclick="handleAboutBlank('once')">Just Once</button>
+                <button class="ab-btn no" onclick="handleAboutBlank('no')">No</button>
+                <button class="ab-btn block" onclick="handleAboutBlank('block')">BLOCK</button>
+            </div>
+        </div>
     </div>
 
     <div id="welcome-modal" style="display: none;">
@@ -155,7 +172,7 @@
             </div>
         </div>
 
-        <!-- UPDATED CHROME WINDOW WITH CORS PROXY -->
+        <!-- UPDATED CHROME WINDOW WITH WORKING PROXIES -->
         <div class="window" id="chrome-window" style="display: none;">
             <div class="window-header" id="chrome-window-header"><span class="window-title">🌐 Google Chrome</span><div><button class="win-btn" onclick="minimizeApp('chrome-window')">−</button><button class="win-btn" onclick="maximizeApp('chrome-window')">□</button><button class="win-btn close-btn" onclick="closeApp('chrome-window')">✕</button></div></div>
             <div class="browser-toolbar">
@@ -164,21 +181,19 @@
                 <button onclick="navigateChrome()">Go</button>
                 <button onclick="toggleProxySettings()" title="Proxy Settings">⚙️</button>
             </div>
-<!-- Proxy Settings Panel -->
-<div id="proxy-settings" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
-    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
-        <span>CORS Proxy:</span>
-        <select id="proxy-selector" onchange="changeProxy()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
-            <option value="scramjet">Scramjet (Default)</option>
-            <option value="ultraviolet">Ultraviolet</option>
-            <option value="allorigins">AllOrigins</option>
-            <option value="apiallorigins">API.AllOrigins</option>
-            <option value="corsproxy">CorsProxy.io</option>
-            <option value="none">None (Direct - May Fail)</option>
-        </select>
-        <span id="proxy-status" style="color: var(--sys-primary);">Active</span>
-    </div>
-</div>
+            <!-- Proxy Settings Panel -->
+            <div id="proxy-settings" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                    <span>CORS Proxy:</span>
+                    <select id="proxy-selector" onchange="changeProxy()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
+                        <option value="corsproxy">CorsProxy.io (Default)</option>
+                        <option value="allorigins">AllOrigins</option>
+                        <option value="apiallorigins">API.AllOrigins</option>
+                        <option value="none">None (Direct - May Fail)</option>
+                    </select>
+                    <span id="proxy-status" style="color: var(--sys-primary);">Active</span>
+                </div>
+            </div>
             <div class="window-content" style="position: relative;">
                 <iframe id="chrome-frame" src="about:blank" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
                 <div id="chrome-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--sys-surface); flex-direction: column; justify-content: center; align-items: center; color: var(--sys-text);">
@@ -206,6 +221,29 @@
                     <input type="file" id="wallpaper-upload" accept="image/png, image/jpeg" class="modern-file-input">
                 </div>
 
+                <h3 class="settings-title">Tab Cloaking</h3>
+                <div class="settings-card">
+                    <p>Change how this site appears in your browser tab:</p>
+                    <select id="cloak-selector" onchange="changeTabCloak()" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--sys-border); background: transparent; color: var(--sys-text); margin-bottom: 10px;">
+                        <option value="aura">Aura OS (Default)</option>
+                        <option value="fleckle">Fleckle</option>
+                        <option value="classroom">Google Classroom</option>
+                        <option value="flocabulary">Flocabulary</option>
+                    </select>
+                    <p id="cloak-status" style="font-size: 12px; color: var(--sys-text-muted); margin: 0;">Current: Aura OS</p>
+                </div>
+
+                <h3 class="settings-title">About:Blank Cloaking</h3>
+                <div class="settings-card">
+                    <p>Auto-open in about:blank for extra privacy:</p>
+                    <select id="aboutblank-setting" onchange="saveAboutBlankSetting()" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--sys-border); background: transparent; color: var(--sys-text); margin-bottom: 10px;">
+                        <option value="ask">Ask each time</option>
+                        <option value="always">Always</option>
+                        <option value="never">Never</option>
+                    </select>
+                    <p id="aboutblank-blocked-msg" style="display: none; font-size: 12px; color: #ea4335; margin: 0;">You have blocked about:blank prompts. Select "Ask each time" or "Always" to re-enable.</p>
+                </div>
+
                 <h3 class="settings-title">Security and Sign-in</h3>
                 <div class="settings-card">
                     <input type="password" id="set-password" placeholder="Update Password" class="modern-input"><br>
@@ -217,13 +255,12 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 3.7 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Version 3.8 (Latest)</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
-                        <li>Fixed Chrome browser with CORS proxy support</li>
-                        <li>Added multiple proxy options for better compatibility</li>
-                        <li>Replaced Aura Messages with Discord Integration</li>
-                        <li>Removed Firebase backend dependency</li>
-                        <li>Added Smash Carts game to App Store</li>
+                        <li>Added about:blank cloaking system</li>
+                        <li>Added tab cloaking (Fleckle, Google Classroom, Flocabulary)</li>
+                        <li>Fixed proxy services - removed broken Scramjet/UV</li>
+                        <li>Added auto about:blank settings</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
