@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pixel Survival RPG V1.2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #2c3e50;
+            font-family: 'Press Start 2P', cursive;
+            touch-action: none;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            color: white;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #island-banner {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: white;
+            opacity: 0;
+            transition: top 1.5s ease-out, opacity 1.5s ease-out;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+        .banner-show { top: 60px !important; opacity: 1 !important; }
+
+        #health-display { position: absolute; top: 20px; right: 20px; font-size: 20px; color: #ff3333; display: none; }
+        #money-display { position: absolute; top: 50px; right: 20px; font-size: 20px; color: #f1c40f; display: none; }
+
+        /* Compass UI */
+        #compass-container {
+            position: absolute;
+            left: 20px;
+            top: 150px;
+            display: block;
+            pointer-events: auto;
+            cursor: pointer;
+            text-align: center;
+        }
+        #compass-icon {
+            width: 50px; height: 50px; background: rgba(0,0,0,0.7);
+            border: 3px solid #f1c40f; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; font-size: 24px;
+            transition: transform 0.2s;
+        }
+        #compass-icon:hover { transform: scale(1.1); }
+        #compass-arrow { margin-top: 10px; font-size: 30px; display: block; transition: transform 0.1s; }
+
+        #toolbar {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: none; gap: 10px; pointer-events: auto;
+        }
+        .slot {
+            width: 60px; height: 60px; background: rgba(0, 0, 0, 0.6);
+            border: 4px solid #555; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; font-size: 10px;
+            cursor: pointer; position: relative; transition: transform 0.1s;
+        }
+        .slot.active { border-color: #f1c40f; background: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
+        .slot-number { position: absolute; top: 5px; left: 5px; color: #f1c40f; }
+
+        #xp-container {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            width: 300px; text-align: center; display: none;
+        }
+        #xp-bar-bg { width: 100%; height: 20px; background: rgba(0, 0, 0, 0.7); border: 3px solid #fff; margin-top: 5px; }
+        #xp-bar-fill { width: 0%; height: 100%; background: #9b59b6; transition: width 0.3s; }
+
+        #mastery-container {
+            position: absolute; bottom: 90px; right: 20px; width: 250px;
+            text-align: right; display: none;
+        }
+        #mastery-text { font-size: 12px; color: #e67e22; margin-bottom: 5px; display: block; }
+        #mastery-bar-bg { width: 100%; height: 15px; background: rgba(0, 0, 0, 0.7); border: 2px solid #e67e22; }
+        #mastery-bar-fill { width: 0%; height: 100%; background: #d35400; transition: width 0.3s; }
+        #mastery-moves { margin-top: 10px; font-size: 10px; color: #ccc; text-align: right; line-height: 1.6; }
+        .locked-move { color: #e74c3c; }
+        .unlocked-move { color: #2ecc71; }
+
+        #quest-tracker {
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7); padding: 15px; border: 2px solid #f1c40f;
+            border-radius: 5px; font-size: 12px; line-height: 1.8; display: none; opacity: 0; transition: opacity 1s;
+        }
+
+        #dialogue-box {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9); padding: 30px; border: 4px solid #f1c40f;
+            border-radius: 10px; display: none; pointer-events: auto; width: 600px;
+            box-sizing: border-box; flex-direction: row; justify-content: space-between; align-items: center;
+        }
+        .dialogue-text { font-family: 'VT323', monospace; font-size: 24px; line-height: 1.4; color: #ecf0f1; width: 55%; text-align: left; text-shadow: none; }
+        .dialogue-options-container { width: 40%; display: flex; flex-direction: column; gap: 10px; }
+        .dialogue-btn {
+            width: 100%; background: #2c3e50; border: 2px solid #fff; color: white;
+            padding: 12px; font-family: 'VT323', monospace; font-size: 20px; cursor: pointer; text-align: center; transition: background 0.1s;
+        }
+        .dialogue-btn:hover { background: #34495e; }
+        .dialogue-btn:disabled { color: #555; border-color: #555; cursor: not-allowed; }
+
+        .screen {
+            background: rgba(0, 0, 0, 0.8); padding: 40px; border: 4px solid #fff;
+            border-radius: 10px; pointer-events: auto; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; display: flex; flex-direction: column; align-items: center;
+        }
+        h1 { font-size: 32px; margin-bottom: 20px; color: #f1c40f; }
+        p { font-size: 14px; line-height: 1.5; margin-bottom: 30px; }
+        button.main-btn {
+            font-family: 'Press Start 2P', cursive; background-color: #e74c3c;
+            color: white; border: 4px solid #c0392b; padding: 15px 30px;
+            font-size: 16px; cursor: pointer; transition: transform 0.1s; margin-top: 20px;
+        }
+        button.main-btn:hover { transform: scale(1.05); }
+        button.main-btn:active { transform: scale(0.95); }
+
+        #loading-screen { display: flex; }
+        #game-over-screen { display: none; }
+        .loading-bar-border { width: 300px; height: 20px; border: 4px solid #fff; background: #111; margin-top: 20px; border-radius: 4px; overflow: hidden; }
+        .loading-bar-fill { width: 0%; height: 100%; background: #f1c40f; transition: width 0.1s; }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="ui-layer">
+        <div id="island-banner">Pirate Island</div>
+        
+        <div id="health-display">HP: 100</div>
+        <div id="money-display">$0</div>
+        
+        <div id="compass-container" onclick="toggleCompass()">
+            <div id="compass-icon">🧭</div>
+            <div id="compass-arrow">⬆️</div>
+        </div>
+
+        <div id="xp-container">
+            <span id="lvl-text">LVL 1</span>
+            <div id="xp-bar-bg"><div id="xp-bar-fill"></div></div>
+        </div>
+
+        <div id="mastery-container">
+            <span id="mastery-text">Fist Mastery: Lv. 1</span>
+            <div id="mastery-bar-bg"><div id="mastery-bar-fill"></div></div>
+            <div id="mastery-moves">
+                Moves List:<br>
+                <span id="move-1" class="locked-move">Lv. 5: Raging Fist (E)<br>[LOCKED]</span><br><br>
+                <span id="move-2" class="locked-move">Lv. 20: Dash Punch (X)<br>[LOCKED]</span>
+            </div>
+        </div>
+
+        <div id="toolbar">
+            <div class="slot" id="slot-1" onclick="equipWeapon(0)">
+                <span class="slot-number">1</span>
+                <span>Fist</span>
+            </div>
+        </div>
+
+        <div id="quest-tracker"></div>
+
+        <div id="dialogue-box">
+            <div id="dialogue-content" class="dialogue-text"></div>
+            <div id="dialogue-options" class="dialogue-options-container"></div>
+        </div>
+
+        <div id="loading-screen" class="screen">
+            <h1>LOADING...</h1>
+            <div class="loading-bar-border">
+                <div id="loading-bar-inner" class="loading-bar-fill"></div>
+            </div>
+            <p id="loading-text" style="margin-top: 15px; font-size: 10px; color: #aaa;">Generating World...</p>
+        </div>
+
+        <div id="game-over-screen" class="screen">
+            <h1 style="color: #e74c3c;">GAME OVER</h1>
+            <p style="font-size: 10px; color: #aaa;">You kept your Level, XP, Money, and Mastery!</p>
+            <button id="restart-btn" class="main-btn">RESPAWN</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId = null; 
+
+        const ui = {
+            loading: document.getElementById('loading-screen'),
+            over: document.getElementById('game-over-screen'),
+            health: document.getElementById('health-display'),
+            money: document.getElementById('money-display'),
+            toolbar: document.getElementById('toolbar'),
+            xpBox: document.getElementById('xp-container'),
+            xpFill: document.getElementById('xp-bar-fill'),
+            lvlText: document.getElementById('lvl-text'),
+            masteryBox: document.getElementById('mastery-container'),
+            masteryText: document.getElementById('mastery-text'),
+            masteryFill: document.getElementById('mastery-bar-fill'),
+            questTracker: document.getElementById('quest-tracker'),
+            dialogueBox: document.getElementById('dialogue-box'),
+            dialogueContent: document.getElementById('dialogue-content'),
+            dialogueOptions: document.getElementById('dialogue-options'),
+            islandBanner: document.getElementById('island-banner'),
+            compassContainer: document.getElementById('compass-container'),
+            compassArrow: document.getElementById('compass-arrow')
+        };
+
+        let width, height;
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- AUDIO ENGINE ---
+        let audioCtx;
+        let activeTheme = null;
+        let oscs = [];
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        document.addEventListener('click', initAudio, { once: true });
+        document.addEventListener('keydown', initAudio, { once: true });
+
+        function playSound(type) {
+            if (!audioCtx || audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+
+            if (type === 'levelUp') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            } else if (type === 'dash') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'punch') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'slam') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        function playTheme(themeName) {
+            if (!audioCtx || audioCtx.state === 'suspended' || activeTheme === themeName) return;
+            
+            oscs.forEach(o => { try { o.osc.stop(); o.gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1); } catch(e){} });
+            oscs = [];
+            activeTheme = themeName;
+
+            if (themeName === 'none') return;
+
+            const makeLoop = (freqs, type, speed, vol) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; osc.connect(gain); gain.connect(audioCtx.destination);
+                gain.gain.value = vol;
+                
+                let time = audioCtx.currentTime;
+                for(let i=0; i<100; i++) { 
+                    freqs.forEach(f => {
+                        osc.frequency.setValueAtTime(f, time);
+                        time += speed;
+                    });
+                }
+                osc.start();
+                oscs.push({osc, gain});
+            };
+
+            if (themeName === 'pirate') {
+                makeLoop([392, 523, 659, 523], 'square', 0.3, 0.02);
+                makeLoop([196, 261, 196, 261], 'triangle', 0.6, 0.05);
+            } else if (themeName === 'jungle') {
+                makeLoop([100, 80, 100, 60], 'sine', 0.5, 0.05);
+                makeLoop([150, 150, 200, 150], 'triangle', 0.25, 0.03);
+            }
+        }
+
+        // --- PIXEL ART ENGINE ---
+        const PIXEL_SCALE = 5;
+        const PALETTE = {
+            '0': 'transparent', '1': '#111111', '2': '#ffccaa', '3': '#3498db',
+            '4': '#95a5a6', '5': '#2ecc71', '6': '#27ae60', '7': '#f1c40f',
+            '8': '#8e44ad', '9': '#e74c3c', 'A': '#8B4513', 'B': '#2980b9', 
+            'C': '#e67e22', 'D': '#d35400', 'E': '#bdc3c7', 'F': '#7f8c8d',
+            'G': '#1e5128', 'H': '#14361a', 'I': '#4b3621' 
+        };
+
+        const SPRITE_DEFS = {
+            player: ["011110","122221","121121","122221","013310","133331","1AA1AA"],
+            playerSwim: ["000000","011110","122221","121121","122221","013310","000000"],
+            playerHit: ["099990","999999","999999","999999","099990","999999","999999"],
+            burglar: ["011110","122221","199991","111111","011110","111111","1AA1AA"], 
+            burglarSwim: ["000000","011110","122221","199991","111111","011110","000000"],
+            gorilla: ["011110","111111","119911","111111","111111","110011","110011"],
+            gorillaKing: [
+                "000777000",
+                "001111100",
+                "011111110",
+                "011999110", // red eyes
+                "011111110",
+                "011111110",
+                "011000110",
+                "011000110"
+            ],
+            npc1: ["011110","122221","121121","122221","01EE10","1EEEE1","1AA1AA"], 
+            npc2: ["011110","122221","121121","122221","01DD10","1DDDD1","1AA1AA"], 
+            npcJungle: ["011110","122221","121121","122221","016610","166661","1AA1AA"], 
+            fist: ["1111","1221","1221","1111"],
+            water: ["33333333","33B333B3","33333333","3B333B33","33333333","333B333B","33333333","3B333B33"],
+            grass: ["66666666","65666566","66666666","66666666","66666666","66656666","66666666","66666666"],
+            jungleGrass: ["GGGGGGGG","GHGGGHGG","GGGGGGGG","GGGGGGGG","GGGGGGGG","GGGHGGGG","GGGGGGGG","GGGGGGGG"],
+            stoneDk: ["FFFFFFFF","F1F1F1F1","FFFFFFFF","1F1F1F1F","FFFFFFFF","F1F1F1F1","FFFFFFFF","FFFFFFFF"],
+            path: ["CCCCCC","CDDCCC","CCCCCC","CCCDDC","CCCCCC","CCCCCC"],
+            dock: ["AA1AA1AA","1AAAA1AA","AA1AAAA1","1AA1AA1A","AAAA1AAA","AA1AA1AA","1AAAA1AA","AA1AAAA1"],
+            stone: ["EEEEEEEE","EFEFEFEF","EEEEEEEE","FEFEFEFE","EEEEEEEE","EFEFEFEF","EEEEEEEE","EEEEEEEE"],
+            stairs: ["11111111","EFEFEFEF","11111111","FEFEFEFE","11111111","EFEFEFEF","11111111","FEFEFEFE"],
+            tree: ["00666600","06666660","66666666","66G6G666","00GIG000","00IIIG00","00III000","00III000"],
+            bush: ["00000000","00000000","00666600","06G66G60","666G6666","6G6666G6"],
+            windmillBase: ["001100","01AA10","01AA10","1AAAA1","1AAAA1","1AAAA1"],
+            shipWood: [
+                "00000A000000",
+                "0001AAA10000",
+                "001AAAAA1000",
+                "01AAAAAAA100",
+                "01A1AAA1A100",
+                "1AA1AAA1AA10",
+                "1AAAAAAAAA10",
+                "1A1AAAAA1A10",
+                "011111111100"
+            ],
+            crater: ["00111100","01AAAA10","1AA11AA1","1A1AA1A1","1AA11AA1","01AAAA10","00111100"]
+        };
+
+        const sprites = {};
+        function preRenderSprites() {
+            for (const [key, matrix] of Object.entries(SPRITE_DEFS)) {
+                const spriteCanvas = document.createElement('canvas');
+                const rows = matrix.length;
+                const cols = matrix[0].length;
+                spriteCanvas.width = cols * PIXEL_SCALE;
+                spriteCanvas.height = rows * PIXEL_SCALE;
+                const sCtx = spriteCanvas.getContext('2d');
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        if (matrix[y][x] !== '0') {
+                            sCtx.fillStyle = PALETTE[matrix[y][x]];
+                            sCtx.fillRect(x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE);
+                        }
+                    }
+                }
+                sprites[key] = { img: spriteCanvas, w: spriteCanvas.width, h: spriteCanvas.height, centerW: spriteCanvas.width/2, centerH: spriteCanvas.height/2 };
+            }
+        }
+        preRenderSprites();
+
+        // --- GAME STATE & GLOBALS ---
+        const WORLD_SIZE = 4000; 
+        const TILE_SIZE = 40;
+        let gameState = 'START'; 
+        let frameCount = 0;
+        let mapGrid = [];
+        let paths = [];
+        let windmills = [];
+        let decorations = [];
+        let craters = [];
+        let camera = { x: 0, y: 0 };
+        
+        const keys = { w: false, a: false, s: false, d: false, q: false, e: false, x: false };
+        const mouse = { x: 0, y: 0, worldX: 0, worldY: 0, down: false };
+
+        let player;
+        let npcs = [];
+        let entities = [];
+        let particles = [];
+        let activeShip = null; 
+        let quest = { active: false, name: "", target: 0, current: 0, entityName: "", reward: 0 };
+
+        // Persistent Stats across deaths
+        let globalMoney = 0;
+        let globalMastery = { level: 1, xp: 0, maxXp: 10, limit: 20 };
+        let globalLevel = 1;
+        let globalXp = 0;
+        let globalMaxXp = 50;
+        let globalSpawnX = 1000;
+        let globalSpawnY = 1000;
+
+        const PirateIslandCenter = { x: 1000, y: 1000 };
+        const JungleIslandCenter = { x: 3000, y: 3000 };
+        const GorillaIslandCenter = { x: 3800, y: 3000 };
+
+        let gorillaKingSpawnTimer = 0;
+        let showCompassArrow = true;
+
+        // Input Setup
+        window.addEventListener('keydown', e => {
+            const k = e.key.toLowerCase();
+            if (keys.hasOwnProperty(k)) keys[k] = true;
+            if (k === '1') equipWeapon(0);
+            
+            // Minigame spam handler
+            if (e.key === ' ' && player && player.isStuck) {
+                player.stuckProgress++;
+            }
+        });
+        window.addEventListener('keyup', e => {
+            const k = e.key.toLowerCase();
+            if (keys.hasOwnProperty(k)) keys[k] = false;
+        });
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX; mouse.y = e.clientY;
+            mouse.worldX = mouse.x + camera.x; mouse.worldY = mouse.y + camera.y;
+        });
+        window.addEventListener('mousedown', e => { if (e.target.id === 'gameCanvas') mouse.down = true; });
+        window.addEventListener('mouseup', () => mouse.down = false);
+
+        function toggleCompass() {
+            showCompassArrow = !showCompassArrow;
+            ui.compassArrow.style.display = showCompassArrow ? 'block' : 'none';
+        }
+
+        // --- MAP GENERATION ---
+        function generateWorld() {
+            const gridCells = WORLD_SIZE / TILE_SIZE;
+            mapGrid = [];
+            for (let y = 0; y < gridCells; y++) {
+                mapGrid[y] = [];
+                for (let x = 0; x < gridCells; x++) {
+                    mapGrid[y][x] = 'water';
+                }
+            }
+
+            // 1. Pirate Island
+            let px = PirateIslandCenter.x / TILE_SIZE;
+            let py = PirateIslandCenter.y / TILE_SIZE;
+            let pRadius = 15;
+            for (let y = py - pRadius; y <= py + pRadius; y++) {
+                for (let x = px - pRadius; x <= px + pRadius; x++) {
+                    if (Math.hypot(x - px, y - py) < pRadius) {
+                        if(mapGrid[y] && mapGrid[y][x]) mapGrid[y][x] = 'grass';
+                    }
+                }
+            }
+            for (let y = py; y < py + pRadius; y++) {
+                if (mapGrid[y] && mapGrid[y][px]) mapGrid[y][px] = 'path';
+                if (mapGrid[y] && mapGrid[y][px+1]) mapGrid[y][px+1] = 'path';
+            }
+            for(let dy=0; dy<4; dy++) {
+                for(let dx=-2; dx<=3; dx++) {
+                    let dyPos = Math.floor(py + pRadius - 1 + dy);
+                    let dxPos = Math.floor(px + dx);
+                    if (mapGrid[dyPos] && mapGrid[dyPos][dxPos]) mapGrid[dyPos][dxPos] = 'dock';
+                }
+            }
+
+            // 2. Jungle Island
+            let jx = JungleIslandCenter.x / TILE_SIZE;
+            let jy = JungleIslandCenter.y / TILE_SIZE;
+            let jRadius = 18;
+            for (let y = jy - jRadius; y <= jy + jRadius; y++) {
+                for (let x = jx - jRadius; x <= jx + jRadius; x++) {
+                    const dist = Math.hypot(x - jx, y - jy);
+                    if (dist < jRadius) {
+                        if(mapGrid[y] && mapGrid[y][x]) {
+                            if (dist < 4) mapGrid[y][x] = 'water';
+                            else mapGrid[y][x] = 'jungleGrass';
+                        }
+                    }
+                }
+            }
+            let slabStartY = jy - 10;
+            let slabStartX = jx - 3;
+            for(let y=0; y<6; y++) {
+                for(let x=0; x<6; x++) {
+                    if (mapGrid[slabStartY+y] && mapGrid[slabStartY+y][slabStartX+x]) {
+                        if (y === 5) mapGrid[slabStartY+y][slabStartX+x] = 'stairs';
+                        else mapGrid[slabStartY+y][slabStartX+x] = 'stone';
+                    }
+                }
+            }
+
+            // 3. Gorilla King Island
+            let gx = GorillaIslandCenter.x / TILE_SIZE;
+            let gy = GorillaIslandCenter.y / TILE_SIZE;
+            let gRadius = 8;
+            for (let y = gy - gRadius; y <= gy + gRadius; y++) {
+                for (let x = gx - gRadius; x <= gx + gRadius; x++) {
+                    if (Math.hypot(x - gx, y - gy) < gRadius) {
+                        if(mapGrid[y] && mapGrid[y][x]) mapGrid[y][x] = 'stoneDk';
+                    }
+                }
+            }
+
+            // Decorate
+            windmills = []; decorations = [];
+            for(let i=0; i<6; i++) {
+                let wx = PirateIslandCenter.x + (Math.random()-0.5)*1000;
+                let wy = PirateIslandCenter.y + (Math.random()-0.5)*1000;
+                if (Math.hypot(wx - PirateIslandCenter.x, wy - PirateIslandCenter.y) < pRadius * TILE_SIZE) {
+                    windmills.push({ x: wx, y: wy, angle: Math.random() * Math.PI });
+                }
+            }
+            
+            for(let i=0; i<50; i++) {
+                let tx = JungleIslandCenter.x + (Math.random()-0.5)*1200;
+                let ty = JungleIslandCenter.y + (Math.random()-0.5)*1200;
+                const dist = Math.hypot(tx - JungleIslandCenter.x, ty - JungleIslandCenter.y);
+                if (dist > 150 && dist < jRadius * TILE_SIZE) {
+                    decorations.push({ x: tx, y: ty, sprite: Math.random() > 0.3 ? sprites.tree : sprites.bush });
+                }
+            }
+        }
+
+        // --- CLASSES ---
+        class Player {
+            constructor() {
+                this.x = globalSpawnX;
+                this.y = globalSpawnY;
+                this.baseSpeed = 4;
+                this.hp = 100;
+                this.maxHp = 100;
+                
+                // Restore Globals
+                this.money = globalMoney;
+                this.mastery = globalMastery;
+                this.xp = globalXp;
+                this.level = globalLevel;
+                this.maxXp = globalMaxXp;
+                
+                this.sprite = sprites.player;
+                this.radius = this.sprite.centerW;
+                this.hitTime = 0;
+
+                this.equipped = -1; 
+                this.attackCooldown = 0;
+                
+                this.isSwimming = false;
+                this.isRidingShip = false;
+                
+                this.dashTimer = 0;
+                this.dashCooldown = 0;
+                
+                this.isDashPunching = false;
+                this.dashPunchTimer = 0;
+                this.dashPunchCooldown = 0;
+                this.dashPunchAngle = 0;
+
+                this.isRagingFist = false;
+                this.ragingFistTimer = 0;
+                this.ragingFistCooldown = 0;
+                this.ragingFistAngle = 0;
+
+                // Stuck minigame
+                this.isStuck = false;
+                this.stuckProgress = 0;
+            }
+
+            update() {
+                let gridX = Math.floor(this.x / TILE_SIZE);
+                let gridY = Math.floor(this.y / TILE_SIZE);
+                let tile = mapGrid[gridY] && mapGrid[gridY][gridX];
+                this.isSwimming = (tile === 'water');
+
+                // Ship mount/dismount logic
+                if (activeShip && !this.isRidingShip && !this.isStuck) {
+                    const distToShip = Math.hypot(this.x - activeShip.x, this.y - activeShip.y);
+                    if (distToShip < 50 && mouse.down) {
+                        this.isRidingShip = true;
+                        mouse.down = false; 
+                    }
+                }
+
+                if (this.isRidingShip && tile && tile !== 'water' && tile !== 'dock') {
+                    this.isRidingShip = false;
+                    activeShip.x = this.x - Math.cos(Math.atan2(this.y - activeShip.y, this.x - activeShip.x)) * 40;
+                    activeShip.y = this.y - Math.sin(Math.atan2(this.y - activeShip.y, this.x - activeShip.x)) * 40;
+                }
+
+                let dx = 0; let dy = 0;
+                if (!this.isStuck) {
+                    if (keys.w) dy -= 1;
+                    if (keys.s) dy += 1;
+                    if (keys.a) dx -= 1;
+                    if (keys.d) dx += 1;
+                    
+                    if (dx !== 0 && dy !== 0) {
+                        const len = Math.sqrt(dx*dx + dy*dy);
+                        dx /= len; dy /= len;
+                    }
+                } else {
+                    // Stuck logic
+                    if (this.stuckProgress >= 15) {
+                        this.isStuck = false;
+                        this.stuckProgress = 0;
+                        for(let i=0; i<10; i++) particles.push(new Particle(this.x, this.y, '#A0522D', 3, 0.05)); // dirt escape
+                    }
+                }
+
+                let currentSpeed = this.baseSpeed;
+                if (this.isRidingShip) currentSpeed *= 2.5;
+                else if (this.isSwimming) currentSpeed *= 0.6;
+                if (this.isStuck) currentSpeed = 0;
+
+                // Dash (Q)
+                if (keys.q && this.dashCooldown <= 0 && this.dashTimer <= 0 && !this.isDashPunching && !this.isRidingShip && !this.isStuck) {
+                    this.dashTimer = 12; this.dashCooldown = 90; playSound('dash');
+                }
+                if (this.dashTimer > 0) {
+                    currentSpeed *= 3; this.dashTimer--;
+                    if (frameCount % 2 === 0) particles.push(new Particle(this.x, this.y, '#E0E0E0', 1.5, 0.1));
+                }
+
+                // Dash Punch (X)
+                if (keys.x && this.mastery.level >= 20 && this.dashPunchCooldown <= 0 && this.equipped === 0 && !this.isDashPunching && !this.isRidingShip && !this.isStuck && !this.isRagingFist) {
+                    this.isDashPunching = true; this.dashPunchTimer = 15; this.dashPunchCooldown = 300;
+                    this.dashPunchAngle = Math.atan2(mouse.worldY - this.y, mouse.worldX - this.x);
+                    playSound('dash');
+                }
+                if (this.isDashPunching) {
+                    dx = Math.cos(this.dashPunchAngle); dy = Math.sin(this.dashPunchAngle);
+                    currentSpeed = this.baseSpeed * 4; this.dashPunchTimer--;
+                    particles.push(new Particle(this.x, this.y, '#f1c40f', 2.0, 0.1));
+                    if (this.dashPunchTimer <= 0) { this.executeDashPunch(); this.isDashPunching = false; }
+                }
+
+                // Raging Fist (E)
+                if (keys.e && this.mastery.level >= 5 && this.ragingFistCooldown <= 0 && this.equipped === 0 && !this.isDashPunching && !this.isRidingShip && !this.isStuck && !this.isRagingFist) {
+                    this.isRagingFist = true; this.ragingFistTimer = 30; this.ragingFistCooldown = 900; // 15 sec
+                    this.ragingFistAngle = Math.atan2(mouse.worldY - this.y, mouse.worldX - this.x);
+                }
+                if (this.isRagingFist) {
+                    currentSpeed *= 0.2; // Slow down
+                    this.ragingFistTimer--;
+                    this.ragingFistAngle = Math.atan2(mouse.worldY - this.y, mouse.worldX - this.x);
+                    
+                    if (frameCount % 4 === 0) {
+                        playSound('punch');
+                        const spread = (Math.random() - 0.5) * 0.5;
+                        const punchAngle = this.ragingFistAngle + spread;
+                        const punchX = this.x + Math.cos(punchAngle) * (this.radius + 15 + Math.random()*10);
+                        const punchY = this.y + Math.sin(punchAngle) * (this.radius + 15 + Math.random()*10);
+                        entities.push(new MeleeHitbox(punchX, punchY, punchAngle, 2, 5));
+                        particles.push(new Particle(punchX, punchY, '#ffffff', 1.0, 0.1));
+                    }
+                    if (this.ragingFistTimer <= 0) { this.isRagingFist = false; }
+                }
+
+                // Move Player
+                this.x += dx * currentSpeed;
+                this.y += dy * currentSpeed;
+
+                // Restrict to bounds
+                this.x = Math.max(50, Math.min(WORLD_SIZE - 50, this.x));
+                this.y = Math.max(50, Math.min(WORLD_SIZE - 50, this.y));
+
+                // Sync Ship
+                if (this.isRidingShip && activeShip) {
+                    activeShip.x = this.x; activeShip.y = this.y;
+                }
+
+                // Water Ripples
+                if ((this.isSwimming || this.isRidingShip) && (dx !== 0 || dy !== 0) && frameCount % 10 === 0) {
+                    particles.push(new Particle(this.x, this.y + 10, '#ffffff', this.isRidingShip ? 4.0 : 3.0, 0.05, true)); 
+                }
+
+                // Attacks
+                if (this.attackCooldown > 0) this.attackCooldown--;
+                if (mouse.down && this.attackCooldown <= 0 && gameState === 'PLAYING' && this.equipped === 0 && !this.isDashPunching && !this.isRidingShip && !this.isStuck && !this.isRagingFist) {
+                    this.attack();
+                }
+
+                if (this.dashCooldown > 0) this.dashCooldown--;
+                if (this.dashPunchCooldown > 0) this.dashPunchCooldown--;
+                if (this.ragingFistCooldown > 0) this.ragingFistCooldown--;
+                if (this.hitTime > 0) this.hitTime--;
+
+                // Health Regen 
+                if (frameCount % 60 === 0 && this.hp < this.maxHp && !this.isStuck) {
+                    this.hp = Math.min(this.maxHp, this.hp + 1);
+                    updateHUD();
+                }
+            }
+
+            getStuck() {
+                if (this.isDashPunching || this.isRidingShip || this.isStuck || this.isRagingFist) return;
+                this.isStuck = true;
+                this.stuckProgress = 0;
+                this.hitTime = 10;
+            }
+
+            attack() {
+                const angle = Math.atan2(mouse.worldY - this.y, mouse.worldX - this.x);
+                const punchX = this.x + Math.cos(angle) * (this.radius + 15);
+                const punchY = this.y + Math.sin(angle) * (this.radius + 15);
+                entities.push(new MeleeHitbox(punchX, punchY, angle, 3, 10)); 
+                this.attackCooldown = 25;
+            }
+
+            executeDashPunch() {
+                playSound('punch');
+                const punchX = this.x + Math.cos(this.dashPunchAngle) * (this.radius + 20);
+                const punchY = this.y + Math.sin(this.dashPunchAngle) * (this.radius + 20);
+                entities.push(new MeleeHitbox(punchX, punchY, this.dashPunchAngle, 15, 30, true)); 
+                craters.push({ x: punchX, y: punchY });
+                for(let i=0; i<30; i++) particles.push(new Particle(punchX, punchY, '#e67e22', 4, 0.05));
+            }
+
+            gainXp(amount) {
+                this.xp += amount;
+                if (this.xp >= this.maxXp) {
+                    this.xp -= this.maxXp; this.level++; this.maxXp = Math.floor(this.maxXp * 1.5);
+                    this.hp = this.maxHp; playSound('levelUp');
+                    for(let i=0; i<40; i++) {
+                        let p = new Particle(this.x, this.y, ['#f1c40f', '#3498db', '#e74c3c'][i%3], 3, 0.02);
+                        p.vy -= 2; particles.push(p);
+                    }
+                }
+                globalXp = this.xp; globalLevel = this.level; globalMaxXp = this.maxXp;
+                updateHUD();
+            }
+
+            gainMastery(amount) {
+                if (this.mastery.level >= this.mastery.limit) return;
+                this.mastery.xp += amount;
+                if (this.mastery.xp >= this.mastery.maxXp) {
+                    this.mastery.xp -= this.mastery.maxXp; this.mastery.level++;
+                    this.mastery.maxXp = Math.floor(this.mastery.maxXp * 1.3);
+                    playSound('levelUp');
+                }
+                globalMastery = this.mastery;
+                updateHUD();
+            }
+
+            addMoney(amount) {
+                this.money += amount;
+                globalMoney = this.money; 
+                updateHUD();
+            }
+
+            takeDamage(amount) {
+                if (this.hitTime > 0) return;
+                this.hp -= amount; this.hitTime = 20; updateHUD();
+                for(let i=0; i<10; i++) particles.push(new Particle(this.x, this.y, '#e74c3c'));
+                if (this.hp <= 0) endGame();
+            }
+
+            draw(ctx) {
+                if (this.isRidingShip) return; 
+
+                let spr = this.sprite;
+                if (this.hitTime > 0 && Math.floor(frameCount / 4) % 2 === 0) spr = sprites.playerHit;
+                else if (this.isSwimming) spr = sprites.playerSwim;
+                
+                if (this.isStuck) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(this.x - 25, this.y - 25, 50, 25); // clip upper half
+                    ctx.clip();
+                    ctx.drawImage(spr.img, this.x - spr.centerW, this.y - spr.centerH + 10);
+                    ctx.restore();
+
+                    // UI for stuck
+                    ctx.fillStyle = '#e74c3c'; ctx.font = "10px 'Press Start 2P'"; ctx.textAlign = "center";
+                    ctx.fillText("SPAM SPACE!", this.x, this.y - 25);
+                    ctx.fillStyle = '#000'; ctx.fillRect(this.x - 15, this.y - 40, 30, 5);
+                    ctx.fillStyle = '#f1c40f'; ctx.fillRect(this.x - 15, this.y - 40, (this.stuckProgress/15)*30, 5);
+                } else {
+                    ctx.drawImage(spr.img, this.x - spr.centerW, this.y - spr.centerH);
+                }
+                
+                if (this.isDashPunching || this.dashPunchCooldown > 280) {
+                    ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.dashPunchAngle);
+                    ctx.drawImage(sprites.fist.img, 10, -sprites.fist.centerH); ctx.restore();
+                }
+
+                if (this.isRagingFist) {
+                    ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.ragingFistAngle);
+                    ctx.globalAlpha = 0.6;
+                    ctx.drawImage(sprites.fist.img, 15 + Math.random()*10, -sprites.fist.centerH + (Math.random()*10-5));
+                    ctx.drawImage(sprites.fist.img, 10 + Math.random()*10, -sprites.fist.centerH + (Math.random()*10-5));
+                    ctx.globalAlpha = 1.0;
+                    ctx.restore();
+                }
+            }
+        }
+
+        class Shockwave {
+            constructor(x, y) {
+                this.x = x; this.y = y;
+                this.radius = 10;
+                this.maxRadius = 150;
+                this.speed = 4;
+                this.type = 'shockwave';
+            }
+            update() {
+                this.radius += this.speed;
+                if (this.radius >= this.maxRadius) this.remove = true;
+
+                if (!player.isStuck && !player.isRidingShip) {
+                    const dist = Math.hypot(player.x - this.x, player.y - this.y);
+                    if (Math.abs(dist - this.radius) < 15) {
+                        player.getStuck();
+                        player.takeDamage(15);
+                    }
+                }
+            }
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(230, 126, 34, ${1 - this.radius/this.maxRadius})`;
+                ctx.lineWidth = 5;
+                ctx.stroke();
+            }
+        }
+
+        class Ship {
+            constructor(x, y) {
+                this.x = x; this.y = y; this.sprite = sprites.shipWood; this.angle = 0;
+            }
+            draw(ctx) {
+                ctx.save(); ctx.translate(this.x, this.y); 
+                if (player.isRidingShip) this.angle = Math.atan2(mouse.worldY - this.y, mouse.worldX - this.x);
+                ctx.rotate(this.angle + Math.PI/2); 
+                ctx.drawImage(this.sprite.img, -this.sprite.centerW, -this.sprite.centerH);
+                ctx.restore();
+
+                if (!player.isRidingShip && Math.hypot(player.x - this.x, player.y - this.y) < 50) {
+                    ctx.fillStyle = `rgba(255, 255, 255, 0.8)`; ctx.font = "10px 'Press Start 2P'"; ctx.textAlign = "center";
+                    ctx.fillText("Click to board", this.x, this.y - 40);
+                }
+            }
+        }
+
+        class MeleeHitbox {
+            constructor(x, y, angle, damage, knockback, isGiant = false) {
+                this.x = x; this.y = y; this.angle = angle;
+                this.life = isGiant ? 15 : 10; this.radius = isGiant ? 30 : 15;
+                this.type = 'melee'; this.damage = damage; this.knockback = knockback;
+                this.isGiant = isGiant; this.hitEnemies = [];
+            }
+            update() {
+                this.life--; if (this.life <= 0) this.remove = true;
+                entities.forEach(ent => {
+                    if ((ent.type === 'burglar' || ent.type === 'gorilla' || ent.type === 'gorilla king') && !ent.remove && !this.hitEnemies.includes(ent)) {
+                        if (Math.hypot(ent.x - this.x, ent.y - this.y) < this.radius + ent.radius) {
+                            ent.takeDamage(this.damage, 'fist');
+                            this.hitEnemies.push(ent);
+                            ent.x += Math.cos(this.angle) * this.knockback;
+                            ent.y += Math.sin(this.angle) * this.knockback;
+                        }
+                    }
+                });
+            }
+            draw(ctx) {
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle);
+                const maxExt = this.isGiant ? 20 : 10;
+                const extension = Math.sin((this.life / (this.isGiant?15:10)) * Math.PI) * maxExt;
+                if (this.isGiant) ctx.scale(2, 2); 
+                ctx.drawImage(sprites.fist.img, extension - sprites.fist.centerW, -sprites.fist.centerH);
+                ctx.restore();
+            }
+        }
+
+        class Enemy {
+            constructor(type, spawnX, spawnY) {
+                this.type = type; 
+                this.x = spawnX; this.y = spawnY;
+                this.spawnX = spawnX; this.spawnY = spawnY;
+                
+                if (type === 'burglar') {
+                    this.sprite = sprites.burglar; this.speed = 2.0; this.hp = 6; this.xpReward = 15;
+                } else if (type === 'gorilla') {
+                    this.sprite = sprites.gorilla; this.speed = 2.5; this.hp = 15; this.xpReward = 30;
+                } else if (type === 'gorilla king') {
+                    this.sprite = sprites.gorillaKing; this.speed = 1.8; this.hp = 150; this.xpReward = 500;
+                    this.slamCooldown = 100;
+                }
+
+                this.isSwimming = false;
+                this.radius = this.sprite.centerW * (type==='gorilla king' ? 2 : 1);
+                this.wobble = Math.random() * Math.PI * 2;
+                this.hitTime = 0;
+            }
+
+            update() {
+                let gridX = Math.floor(this.x / TILE_SIZE);
+                let gridY = Math.floor(this.y / TILE_SIZE);
+                let currentTile = mapGrid[gridY] && mapGrid[gridY][gridX];
+                this.isSwimming = (currentTile === 'water');
+                
+                let currentSpeed = this.isSwimming ? this.speed * 0.5 : this.speed;
+
+                if (this.type === 'gorilla king' && this.slamCooldown > 0) {
+                    this.slamCooldown--;
+                }
+
+                if (this.hitTime > 0) {
+                    this.hitTime--;
+                } else {
+                    let targetX = player.x;
+                    let targetY = player.y;
+                    let isAggro = true;
+
+                    // Smart AI for Gorilla
+                    if (this.type === 'gorilla' || this.type === 'gorilla king') {
+                        let pGridX = Math.floor(player.x / TILE_SIZE);
+                        let pGridY = Math.floor(player.y / TILE_SIZE);
+                        let pTile = mapGrid[pGridY] && mapGrid[pGridY][pGridX];
+                        
+                        if ((pTile === 'stone' || pTile === 'stairs') && currentTile !== 'stone' && currentTile !== 'stairs') {
+                            let jx = Math.floor(JungleIslandCenter.x / TILE_SIZE);
+                            let jy = Math.floor(JungleIslandCenter.y / TILE_SIZE);
+                            targetX = (jx) * TILE_SIZE; 
+                            targetY = (jy - 5) * TILE_SIZE;
+                        }
+                    }
+
+                    // Boss AI & Leashing
+                    if (this.type === 'gorilla king') {
+                        const playerDistToHome = Math.hypot(player.x - this.spawnX, player.y - this.spawnY);
+                        const distToHome = Math.hypot(this.x - this.spawnX, this.y - this.spawnY);
+                        
+                        if (playerDistToHome > 450) { // Player left the island
+                            isAggro = false;
+                            currentSpeed = 0;
+                            // Teleport back to spawn point
+                            if (distToHome > 10) {
+                                this.x = this.spawnX;
+                                this.y = this.spawnY;
+                            }
+                        } else {
+                            isAggro = true;
+                            const distToPlayer = Math.hypot(player.x - this.x, player.y - this.y);
+                            // Boss Slam AI
+                            if (distToPlayer < 120 && this.slamCooldown <= 0 && !player.isStuck && !player.isRidingShip) {
+                                this.slamCooldown = 300; // 5 sec cooldown
+                                playSound('slam');
+                                entities.push(new Shockwave(this.x, this.y));
+                                for(let i=0; i<20; i++) particles.push(new Particle(this.x, this.y, '#e67e22', 3, 0.05));
+                                this.hitTime = 30; // Boss pauses to slam
+                            }
+                        }
+                    }
+
+                    if (this.hitTime <= 0 && isAggro) {
+                        const angle = Math.atan2(targetY - this.y, targetX - this.x);
+                        this.x += Math.cos(angle) * currentSpeed;
+                        this.y += Math.sin(angle) * currentSpeed;
+                    }
+                }
+                
+                this.wobble += 0.1;
+
+                if (this.isSwimming && frameCount % 15 === 0) {
+                    particles.push(new Particle(this.x, this.y + 10, '#ffffff', 2.0, 0.05, true)); 
+                }
+
+                if (Math.hypot(player.x - this.x, player.y - this.y) < this.radius + player.radius && !player.isRidingShip && !player.isStuck) {
+                    player.takeDamage(this.type === 'gorilla king' ? 25 : 10);
+                    this.x -= Math.cos(Math.atan2(player.y - this.y, player.x - this.x)) * 20; 
+                    this.y -= Math.sin(Math.atan2(player.y - this.y, player.x - this.x)) * 20;
+                }
+            }
+
+            takeDamage(amount, source) {
+                this.hp -= amount; this.hitTime = 5;
+                for(let i=0; i<3; i++) particles.push(new Particle(this.x, this.y, '#e74c3c'));
+                if (this.hp <= 0) this.die(source);
+            }
+
+            die(source) {
+                this.remove = true;
+                player.gainXp(this.xpReward);
+                if (source === 'fist') player.gainMastery(5); 
+                
+                if (this.type === 'gorilla king') {
+                    gorillaKingSpawnTimer = 60 * 60 * 5; // Respawn 5 mins
+                }
+
+                if (quest.active && quest.entityName.toLowerCase() === this.type) {
+                    quest.current++; updateQuestUI();
+                    if (quest.current >= quest.target) {
+                        quest.active = false;
+                        player.gainXp(100); player.addMoney(quest.reward);
+                        ui.questTracker.innerHTML = `<span style="color:#2ecc71">Quest Complete!</span><br>+100 XP<br>+$${quest.reward}`;
+                        setTimeout(() => ui.questTracker.style.opacity = 0, 3000);
+                    }
+                }
+                for(let i=0; i< (this.type === 'gorilla king' ? 40 : 15); i++) particles.push(new Particle(this.x, this.y, '#e74c3c'));
+            }
+
+            draw(ctx) {
+                ctx.save(); ctx.translate(this.x, this.y);
+                if (this.hitTime > 0 && this.hitTime < 20) ctx.globalAlpha = 0.5; // Flashing
+                
+                let spr = this.sprite;
+                if (this.type === 'burglar' && this.isSwimming) spr = sprites.burglarSwim;
+                
+                if (this.type === 'gorilla' || this.type === 'gorilla king') {
+                    const scaleY = 1 + Math.sin(this.wobble) * 0.1;
+                    ctx.scale(this.type === 'gorilla king' ? 2 : 1, (this.type === 'gorilla king' ? 2 : 1) * scaleY);
+                }
+
+                ctx.drawImage(spr.img, -spr.centerW, -spr.centerH);
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color, sizeMultiplier = 1, decayRate = 0) {
+                this.x = x; this.y = y;
+                this.isRipple = decayRate === 0.05 && color === '#ffffff';
+                const angle = Math.random() * Math.PI * 2;
+                const speed = this.isRipple ? 0 : Math.random() * 5;
+                this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
+                this.life = 1.0; this.decay = decayRate || (Math.random() * 0.05 + 0.02);
+                this.color = color; this.size = (Math.random() * 4 + 2) * sizeMultiplier;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.isRipple) this.size += 0.2; 
+                this.life -= this.decay; if (this.life <= 0) this.remove = true;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = Math.max(0, this.life);
+                if (this.isRipple) {
+                    ctx.strokeStyle = this.color; ctx.lineWidth = 1; ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.stroke();
+                } else {
+                    ctx.fillStyle = this.color; ctx.fillRect(this.x, this.y, this.size, this.size);
+                }
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        class NPC {
+            constructor(name, x, y, spriteType, interactCallback) {
+                this.name = name; this.x = x; this.y = y;
+                this.sprite = sprites[spriteType]; this.interactCallback = interactCallback;
+                this.pulseTime = 0;
+            }
+            update() {
+                if (Math.hypot(player.x - this.x, player.y - this.y) < 100 && gameState === 'PLAYING') {
+                    if (mouse.down) { mouse.down = false; this.interactCallback(); }
+                }
+            }
+            draw(ctx) {
+                ctx.drawImage(this.sprite.img, this.x - this.sprite.centerW, this.y - this.sprite.centerH);
+                ctx.fillStyle = '#ffffff'; ctx.font = "10px 'Press Start 2P'"; ctx.textAlign = "center";
+                ctx.fillText(this.name, this.x, this.y + this.sprite.centerH + 15);
+
+                if (Math.hypot(player.x - this.x, player.y - this.y) < 100 && gameState === 'PLAYING') {
+                    this.pulseTime += 0.05; const opacity = 0.5 + Math.sin(this.pulseTime) * 0.5;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`; ctx.fillText("Click to interact", this.x, this.y - 40);
+                }
+            }
+        }
+
+        // --- UI & LOGIC ---
+        function equipWeapon(index) {
+            if (player.equipped === index) {
+                player.equipped = -1; 
+                document.querySelectorAll('.slot').forEach(el => el.classList.remove('active'));
+                ui.masteryBox.style.display = 'none';
+            } else {
+                player.equipped = index;
+                document.querySelectorAll('.slot').forEach((el, i) => {
+                    if (i === index) el.classList.add('active'); else el.classList.remove('active');
+                });
+                if (index === 0) ui.masteryBox.style.display = 'block';
+            }
+        }
+
+        function updateHUD() {
+            ui.health.innerText = `HP: ${player.hp}`;
+            ui.money.innerText = `$${player.money}`;
+            ui.lvlText.innerText = `LVL ${player.level}`;
+            ui.xpFill.style.width = `${Math.min(100, (player.xp / player.maxXp) * 100)}%`;
+
+            ui.masteryText.innerText = `Fist Mastery: Lv. ${player.mastery.level}${player.mastery.level >= 20 ? ' (MAX)' : ''}`;
+            ui.masteryFill.style.width = `${player.mastery.level >= 20 ? 100 : Math.min(100, (player.mastery.xp / player.mastery.maxXp) * 100)}%`;
+
+            const move1 = document.getElementById('move-1');
+            if (player.mastery.level >= 5) {
+                move1.innerHTML = "Lv. 5: Raging Fist (E)<br>(UNLOCKED)"; move1.className = "unlocked-move";
+            } else {
+                move1.innerHTML = "Lv. 5: Raging Fist (E)<br>[LOCKED]"; move1.className = "locked-move";
+            }
+
+            const move2 = document.getElementById('move-2');
+            if (player.mastery.level >= 20) {
+                move2.innerHTML = "Lv. 20: Dash Punch (X)<br>(UNLOCKED)"; move2.className = "unlocked-move";
+            } else {
+                move2.innerHTML = "Lv. 20: Dash Punch (X)<br>[LOCKED]"; move2.className = "locked-move";
+            }
+        }
+
+        function updateQuestUI() {
+            if (quest.active) {
+                ui.questTracker.style.display = 'block'; ui.questTracker.style.opacity = 1;
+                ui.questTracker.innerHTML = `
+                    <span style="color:#f1c40f">${quest.name}</span><br>Kill ${quest.target} ${quest.entityName}s<br>
+                    Progress: ${quest.current}/${quest.target}<br><span style="color:#2ecc71">Reward: $${quest.reward}</span>`;
+            }
+        }
+
+        // --- DIALOGUES ---
+        function startDialogue() {
+            gameState = 'DIALOGUE';
+            keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = false; 
+            ui.dialogueBox.style.display = 'flex';
+        }
+        function closeDialogue() { ui.dialogueBox.style.display = 'none'; gameState = 'PLAYING'; }
+
+        function setDialogue(text, options) {
+            ui.dialogueContent.innerHTML = text;
+            ui.dialogueOptions.innerHTML = '';
+            options.forEach(opt => {
+                let btn = document.createElement('button'); btn.className = 'dialogue-btn'; btn.innerText = opt.text;
+                if (opt.disabled) btn.disabled = true;
+                if (opt.action) btn.onclick = opt.action;
+                ui.dialogueOptions.appendChild(btn);
+            });
+        }
+
+        function showPirateMenu() {
+            startDialogue();
+            setDialogue("Welcome! What quest do you want to choose?", [
+                { text: "1: Pirate Burglar", action: () => setDialogue("Pirate Burglar<br><br>Target: 7 Burglars<br>Reward: $20<br>Req: Lv. 1<br><br>Do you accept?", [
+                    { text: "Yes", action: () => { quest = { active: true, name: "Pirate Burglar", target: 7, current: 0, entityName: "Burglar", reward: 20 }; updateQuestUI(); closeDialogue(); } },
+                    { text: "No", action: showPirateMenu }
+                ]) },
+                { text: "2: Back", action: closeDialogue }
+            ]);
+        }
+
+        function showShipwright() {
+            startDialogue();
+            setDialogue("Ahoy there! Buy a ship to cross the seas fast!", [
+                { text: "$100 Wooden Ship", action: () => {
+                    if (player.money >= 100 && !activeShip) {
+                        player.money -= 100; globalMoney = player.money; updateHUD();
+                        activeShip = new Ship(player.x, player.y + 100); 
+                        setDialogue("She's all yours! Walk over to board her.", [{ text: "Leave", action: closeDialogue }]);
+                    } else if (activeShip) {
+                        setDialogue("Ye already own a fine vessel!", [{ text: "Leave", action: closeDialogue }]);
+                    } else {
+                        setDialogue("Yer pockets are lookin' a little light.", [{ text: "Leave", action: closeDialogue }]);
+                    }
+                }},
+                { text: "LOCKED (Medium Ship)", disabled: true },
+                { text: "Back", action: closeDialogue }
+            ]);
+        }
+
+        function showJungleMenu() {
+            startDialogue();
+            setDialogue("Ooga booga! Hunt beasts?", [
+                { text: "1: Hunt Gorillas", action: () => {
+                    let reqMet = player.level >= 10;
+                    setDialogue(`Hunt Gorillas<br><br>Target: 7 Gorillas<br>Reward: $40<br>Req: Lv. 10<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
+                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Gorilla Hunt", target: 7, current: 0, entityName: "Gorilla", reward: 40 }; updateQuestUI(); closeDialogue(); } },
+                        { text: "No", action: showJungleMenu }
+                    ]);
+                }},
+                { text: "2: Gorilla King", action: () => {
+                    let reqMet = player.level >= 15;
+                    setDialogue(`Gorilla King<br><br>Target: 1 Gorilla King<br>Reward: $100<br>Req: Lv. 15<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
+                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Gorilla King", target: 1, current: 0, entityName: "Gorilla King", reward: 100 }; updateQuestUI(); closeDialogue(); } },
+                        { text: "No", action: showJungleMenu }
+                    ]);
+                }},
+                { text: "3: Back", action: closeDialogue }
+            ]);
+        }
+
+        // --- MAIN LOOP ---
+        let loadProgress = 0;
+        function simulateLoading() {
+            if (loadProgress < 100) {
+                loadProgress += Math.random() * 2 + 0.5;
+                document.getElementById('loading-bar-inner').style.width = Math.min(loadProgress, 100) + '%';
+                requestAnimationFrame(simulateLoading);
+            } else {
+                setTimeout(startGame, 500);
+            }
+        }
+
+        function startGame() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); // FIX DOUBLE LOOP BUG
+
+            gameState = 'PLAYING'; frameCount = 0; player = new Player();
+            
+            generateWorld();
+
+            npcs = [];
+            let px = Math.floor(PirateIslandCenter.x / TILE_SIZE);
+            let py = Math.floor(PirateIslandCenter.y / TILE_SIZE);
+            npcs.push(new NPC("Guild Master", px * TILE_SIZE, (py-2) * TILE_SIZE, 'npc1', showPirateMenu));
+            npcs.push(new NPC("Shipwright", px * TILE_SIZE, (py+13) * TILE_SIZE, 'npc2', showShipwright));
+            
+            let jx = Math.floor(JungleIslandCenter.x / TILE_SIZE);
+            let jy = Math.floor(JungleIslandCenter.y / TILE_SIZE);
+            npcs.push(new NPC("Jungle Chief", jx * TILE_SIZE, (jy-8) * TILE_SIZE, 'npcJungle', showJungleMenu));
+            
+            entities = []; particles = []; craters = []; activeShip = null; quest.active = false;
+            gorillaKingSpawnTimer = 0; // Spawn King immediately
+            
+            ui.loading.style.display = 'none'; ui.over.style.display = 'none';
+            ui.health.style.display = 'block'; ui.money.style.display = 'block';
+            ui.toolbar.style.display = 'flex'; ui.xpBox.style.display = 'block';
+            ui.questTracker.style.display = 'none'; ui.compassContainer.style.display = 'block';
+            ui.compassArrow.style.display = showCompassArrow ? 'block' : 'none';
+            
+            equipWeapon(-1); updateHUD();
+
+            ui.islandBanner.innerText = "Pirate Island";
+            ui.islandBanner.classList.add('banner-show');
+            setTimeout(() => { ui.islandBanner.classList.remove('banner-show'); }, 4000);
+
+            gameLoop();
+        }
+
+        function endGame() {
+            gameState = 'GAMEOVER';
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+
+            // Find closest island for respawn
+            let distPirate = Math.hypot(player.x - PirateIslandCenter.x, player.y - PirateIslandCenter.y);
+            let distJungle = Math.hypot(player.x - JungleIslandCenter.x, player.y - JungleIslandCenter.y);
+            let distGorilla = Math.hypot(player.x - GorillaIslandCenter.x, player.y - GorillaIslandCenter.y);
+            
+            let minDist = Math.min(distPirate, distJungle, distGorilla);
+            if (minDist === distJungle) { globalSpawnX = JungleIslandCenter.x; globalSpawnY = JungleIslandCenter.y; }
+            else if (minDist === distGorilla) { globalSpawnX = GorillaIslandCenter.x; globalSpawnY = GorillaIslandCenter.y; }
+            else { globalSpawnX = PirateIslandCenter.x; globalSpawnY = PirateIslandCenter.y; }
+
+            // Ensure stats sync perfectly
+            globalXp = player.xp;
+            globalLevel = player.level;
+            globalMaxXp = player.maxXp;
+
+            ui.health.style.display = 'none'; ui.money.style.display = 'none';
+            ui.toolbar.style.display = 'none'; ui.xpBox.style.display = 'none';
+            ui.masteryBox.style.display = 'none'; ui.questTracker.style.display = 'none';
+            ui.compassContainer.style.display = 'none'; ui.over.style.display = 'flex';
+        }
+
+        function drawMap() {
+            const startCol = Math.floor(camera.x / TILE_SIZE);
+            const endCol = startCol + (width / TILE_SIZE) + 1;
+            const startRow = Math.floor(camera.y / TILE_SIZE);
+            const endRow = startRow + (height / TILE_SIZE) + 1;
+            const gridCells = WORLD_SIZE / TILE_SIZE;
+
+            for (let y = startRow; y <= endRow; y++) {
+                for (let x = startCol; x <= endCol; x++) {
+                    if (y < 0 || x < 0 || y >= gridCells || x >= gridCells) {
+                        ctx.drawImage(sprites.water.img, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); continue;
+                    }
+                    const type = mapGrid[y][x];
+                    let img = sprites[type] ? sprites[type].img : sprites.water.img;
+                    if (type === 'water' && (frameCount % 60 > 30)) img = sprites.water.img; 
+                    ctx.drawImage(img, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+            }
+        }
+
+        function spawnEnemies() {
+            // Boss Spawning Logic
+            if (gorillaKingSpawnTimer <= 0) {
+                let existingKing = entities.find(e => e.type === 'gorilla king');
+                if (!existingKing) {
+                    entities.push(new Enemy('gorilla king', GorillaIslandCenter.x, GorillaIslandCenter.y));
+                }
+            } else {
+                gorillaKingSpawnTimer--;
+            }
+
+            // Normal Quest Spawns
+            if (!quest.active) return;
+            const spawnRate = Math.max(40, 100 - Math.floor(frameCount / 300));
+            if (frameCount % spawnRate !== 0) return;
+
+            let eType = quest.entityName.toLowerCase();
+            if (eType === 'gorilla king') return; // Handled specially
+
+            let count = entities.filter(e => e.type === eType).length;
+            if (count >= 10) return;
+
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.max(width, height) / 2 + 50;
+            entities.push(new Enemy(eType, player.x + Math.cos(angle) * dist, player.y + Math.sin(angle) * dist));
+        }
+
+        function manageAudioAndThemes() {
+            let distToPirate = Math.hypot(player.x - PirateIslandCenter.x, player.y - PirateIslandCenter.y);
+            let distToJungle = Math.hypot(player.x - JungleIslandCenter.x, player.y - JungleIslandCenter.y);
+            
+            if (distToPirate < 800) playTheme('pirate');
+            else if (distToJungle < 800) playTheme('jungle');
+            else playTheme('none');
+        }
+
+        function drawCompass() {
+            if (!showCompassArrow) return;
+            let targetX = PirateIslandCenter.x;
+            let targetY = PirateIslandCenter.y;
+
+            if (player.level >= 10) {
+                targetX = JungleIslandCenter.x;
+                targetY = JungleIslandCenter.y;
+            }
+
+            const angle = Math.atan2(targetY - player.y, targetX - player.x);
+            ui.compassArrow.style.transform = `rotate(${angle + Math.PI/2}rad)`;
+        }
+
+        function gameLoop() {
+            if (gameState === 'PLAYING') {
+                frameCount++;
+                player.update();
+                npcs.forEach(n => n.update());
+                spawnEnemies();
+                entities.forEach(ent => ent.update());
+                particles.forEach(p => p.update());
+                entities = entities.filter(ent => !ent.remove);
+                particles = particles.filter(p => !p.remove);
+
+                manageAudioAndThemes();
+                drawCompass();
+            }
+
+            camera.x += (player.x - width / 2 - camera.x) * 0.1;
+            camera.y += (player.y - height / 2 - camera.y) * 0.1;
+
+            ctx.fillStyle = '#2980b9'; ctx.fillRect(0, 0, width, height);
+            ctx.save(); ctx.translate(-Math.floor(camera.x), -Math.floor(camera.y));
+
+            drawMap();
+            craters.forEach(c => ctx.drawImage(sprites.crater.img, c.x - sprites.crater.centerW*2, c.y - sprites.crater.centerH*2, sprites.crater.w*2, sprites.crater.h*2));
+
+            windmills.forEach(wm => {
+                ctx.drawImage(sprites.windmillBase.img, wm.x - 15, wm.y - 15, 30, 30);
+                if (gameState === 'PLAYING') wm.angle += 0.02;
+                ctx.save(); ctx.translate(wm.x, wm.y - 10); ctx.rotate(wm.angle);
+                ctx.fillStyle = '#ecf0f1'; ctx.fillRect(-2, -20, 4, 40); ctx.fillRect(-20, -2, 40, 4); ctx.restore();
+            });
+
+            // Y-Sorting 
+            let renderList = [player, ...npcs, ...entities, ...decorations];
+            if (activeShip) renderList.push(activeShip);
+            renderList.sort((a, b) => a.y - b.y);
+            
+            renderList.forEach(ent => {
+                if(ent.sprite && !ent.draw) { 
+                    ctx.drawImage(ent.sprite.img, ent.x - ent.sprite.centerW, ent.y - ent.sprite.centerH);
+                } else if(ent.draw) {
+                    ent.draw(ctx);
+                }
+            });
+            particles.forEach(p => p.draw(ctx));
+
+            ctx.restore();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            ui.over.style.display = 'none'; ui.loading.style.display = 'flex';
+            loadProgress = 0; simulateLoading();
+        });
+
+        simulateLoading();
+    </script>
+</body>
+</html>
