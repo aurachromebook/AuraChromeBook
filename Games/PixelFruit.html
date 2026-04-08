@@ -55,6 +55,20 @@
         #health-display { position: absolute; top: 20px; right: 20px; font-size: 20px; color: #ff3333; display: none; }
         #money-display { position: absolute; top: 50px; right: 20px; font-size: 20px; color: #f1c40f; display: none; }
 
+        #save-indicator {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(46, 204, 113, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 10px;
+            display: none;
+            z-index: 100;
+        }
+
         /* Compass UI */
         #compass-container {
             position: absolute;
@@ -155,6 +169,8 @@
     <div id="ui-layer">
         <div id="island-banner">Pirate Island</div>
         
+        <div id="save-indicator">Game Saved!</div>
+
         <div id="health-display">HP: 100</div>
         <div id="money-display">$0</div>
         
@@ -207,10 +223,113 @@
         </div>
     </div>
 
-    <script>
+    <!-- Convert main logic to a module for secure Storage integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CLOUD SAVE SYSTEM SETUP ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        let db, auth, currentUser;
+        let isDataLoaded = false;
+        window.loadedWithShip = false;
+
+        if (firebaseConfig) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (e) {
+                        console.error("Auth error", e);
+                        isDataLoaded = true;
+                    }
+                };
+                initAuth();
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await loadGameData();
+                    }
+                    isDataLoaded = true;
+                });
+            } catch (e) {
+                console.error("Firebase init error", e);
+                isDataLoaded = true;
+            }
+        } else {
+            isDataLoaded = true; // Fallback if no cloud config available
+        }
+
+        async function saveGameData() {
+            if (!currentUser || !db) return;
+            const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'player1');
+            const data = {
+                money: globalMoney,
+                mastery: globalMastery,
+                level: globalLevel,
+                xp: globalXp,
+                maxXp: globalMaxXp,
+                spawnX: globalSpawnX,
+                spawnY: globalSpawnY,
+                hasShip: !!activeShip
+            };
+            try {
+                await setDoc(saveRef, data);
+                showSaveIndicator();
+            } catch (e) {
+                console.error("Save failed", e);
+            }
+        }
+
+        async function loadGameData() {
+            if (!currentUser || !db) return;
+            const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'player1');
+            try {
+                const snap = await getDoc(saveRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.money !== undefined) globalMoney = data.money;
+                    if (data.mastery !== undefined) globalMastery = data.mastery;
+                    if (data.level !== undefined) globalLevel = data.level;
+                    if (data.xp !== undefined) globalXp = data.xp;
+                    if (data.maxXp !== undefined) globalMaxXp = data.maxXp;
+                    if (data.spawnX !== undefined) globalSpawnX = data.spawnX;
+                    if (data.spawnY !== undefined) globalSpawnY = data.spawnY;
+                    if (data.hasShip) window.loadedWithShip = true;
+                }
+            } catch (e) {
+                console.error("Load failed", e);
+            }
+        }
+
+        function showSaveIndicator() {
+            const ind = document.getElementById('save-indicator');
+            if (ind) {
+                ind.style.display = 'block';
+                setTimeout(() => ind.style.display = 'none', 2500);
+            }
+        }
+
+        // Expose global methods to window for inline onclick HTML handlers
+        window.toggleCompass = toggleCompass;
+        window.equipWeapon = equipWeapon;
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let animationFrameId = null; 
+        let animationFrameId = null;
+        let autoSaveInterval = null;
 
         const ui = {
             loading: document.getElementById('loading-screen'),
@@ -337,16 +456,7 @@
             burglar: ["011110","122221","199991","111111","011110","111111","1AA1AA"], 
             burglarSwim: ["000000","011110","122221","199991","111111","011110","000000"],
             gorilla: ["011110","111111","119911","111111","111111","110011","110011"],
-            gorillaKing: [
-                "000777000",
-                "001111100",
-                "011111110",
-                "011999110", // red eyes
-                "011111110",
-                "011111110",
-                "011000110",
-                "011000110"
-            ],
+            gorillaKing: ["000777000","001111100","011111110","011999110","011111110","011111110","011000110","011000110"],
             npc1: ["011110","122221","121121","122221","01EE10","1EEEE1","1AA1AA"], 
             npc2: ["011110","122221","121121","122221","01DD10","1DDDD1","1AA1AA"], 
             npcJungle: ["011110","122221","121121","122221","016610","166661","1AA1AA"], 
@@ -362,17 +472,7 @@
             tree: ["00666600","06666660","66666666","66G6G666","00GIG000","00IIIG00","00III000","00III000"],
             bush: ["00000000","00000000","00666600","06G66G60","666G6666","6G6666G6"],
             windmillBase: ["001100","01AA10","01AA10","1AAAA1","1AAAA1","1AAAA1"],
-            shipWood: [
-                "00000A000000",
-                "0001AAA10000",
-                "001AAAAA1000",
-                "01AAAAAAA100",
-                "01A1AAA1A100",
-                "1AA1AAA1AA10",
-                "1AAAAAAAAA10",
-                "1A1AAAAA1A10",
-                "011111111100"
-            ],
+            shipWood: ["00000A000000","0001AAA10000","001AAAAA1000","01AAAAAAA100","01A1AAA1A100","1AA1AAA1AA10","1AAAAAAAAA10","1A1AAAAA1A10","011111111100"],
             crater: ["00111100","01AAAA10","1AA11AA1","1A1AA1A1","1AA11AA1","01AAAA10","00111100"]
         };
 
@@ -440,7 +540,7 @@
         window.addEventListener('keydown', e => {
             const k = e.key.toLowerCase();
             if (keys.hasOwnProperty(k)) keys[k] = true;
-            if (k === '1') equipWeapon(0);
+            if (k === '1') window.equipWeapon(0);
             
             // Minigame spam handler
             if (e.key === ' ' && player && player.isStuck) {
@@ -760,6 +860,7 @@
                     }
                 }
                 globalXp = this.xp; globalLevel = this.level; globalMaxXp = this.maxXp;
+                saveGameData();
                 updateHUD();
             }
 
@@ -772,12 +873,14 @@
                     playSound('levelUp');
                 }
                 globalMastery = this.mastery;
+                saveGameData();
                 updateHUD();
             }
 
             addMoney(amount) {
                 this.money += amount;
                 globalMoney = this.money; 
+                saveGameData();
                 updateHUD();
             }
 
@@ -798,12 +901,11 @@
                 if (this.isStuck) {
                     ctx.save();
                     ctx.beginPath();
-                    ctx.rect(this.x - 25, this.y - 25, 50, 25); // clip upper half
+                    ctx.rect(this.x - 25, this.y - 25, 50, 25); 
                     ctx.clip();
                     ctx.drawImage(spr.img, this.x - spr.centerW, this.y - spr.centerH + 10);
                     ctx.restore();
 
-                    // UI for stuck
                     ctx.fillStyle = '#e74c3c'; ctx.font = "10px 'Press Start 2P'"; ctx.textAlign = "center";
                     ctx.fillText("SPAM SPACE!", this.x, this.y - 25);
                     ctx.fillStyle = '#000'; ctx.fillRect(this.x - 15, this.y - 40, 30, 5);
@@ -1028,6 +1130,7 @@
                         player.gainXp(100); player.addMoney(quest.reward);
                         ui.questTracker.innerHTML = `<span style="color:#2ecc71">Quest Complete!</span><br>+100 XP<br>+$${quest.reward}`;
                         setTimeout(() => ui.questTracker.style.opacity = 0, 3000);
+                        saveGameData();
                     }
                 }
                 for(let i=0; i< (this.type === 'gorilla king' ? 40 : 15); i++) particles.push(new Particle(this.x, this.y, '#e74c3c'));
@@ -1186,6 +1289,7 @@
                         player.money -= 100; globalMoney = player.money; updateHUD();
                         activeShip = new Ship(player.x, player.y + 100); 
                         setDialogue("She's all yours! Walk over to board her.", [{ text: "Leave", action: closeDialogue }]);
+                        saveGameData();
                     } else if (activeShip) {
                         setDialogue("Ye already own a fine vessel!", [{ text: "Leave", action: closeDialogue }]);
                     } else {
@@ -1224,18 +1328,25 @@
             if (loadProgress < 100) {
                 loadProgress += Math.random() * 2 + 0.5;
                 document.getElementById('loading-bar-inner').style.width = Math.min(loadProgress, 100) + '%';
-                requestAnimationFrame(simulateLoading);
+                if (!animationFrameId) requestAnimationFrame(simulateLoading);
+            } else if (!isDataLoaded && firebaseConfig) {
+                document.getElementById('loading-text').innerText = "Loading Cloud Save...";
+                if (!animationFrameId) requestAnimationFrame(simulateLoading);
             } else {
                 setTimeout(startGame, 500);
             }
         }
 
         function startGame() {
-            if (animationFrameId) cancelAnimationFrame(animationFrameId); // FIX DOUBLE LOOP BUG
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
             gameState = 'PLAYING'; frameCount = 0; player = new Player();
             
             generateWorld();
+
+            if (window.loadedWithShip && !activeShip) {
+                activeShip = new Ship(player.x, player.y + 100); 
+            }
 
             npcs = [];
             let px = Math.floor(PirateIslandCenter.x / TILE_SIZE);
@@ -1247,20 +1358,22 @@
             let jy = Math.floor(JungleIslandCenter.y / TILE_SIZE);
             npcs.push(new NPC("Jungle Chief", jx * TILE_SIZE, (jy-8) * TILE_SIZE, 'npcJungle', showJungleMenu));
             
-            entities = []; particles = []; craters = []; activeShip = null; quest.active = false;
-            gorillaKingSpawnTimer = 0; // Spawn King immediately
+            entities = []; particles = []; craters = []; quest.active = false;
+            gorillaKingSpawnTimer = 0; 
             
             ui.loading.style.display = 'none'; ui.over.style.display = 'none';
             ui.health.style.display = 'block'; ui.money.style.display = 'block';
             ui.toolbar.style.display = 'flex'; ui.xpBox.style.display = 'block';
             ui.questTracker.style.display = 'none'; ui.compassContainer.style.display = 'block';
-            ui.compassArrow.style.display = showCompassArrow ? 'block' : 'none';
             
             equipWeapon(-1); updateHUD();
 
             ui.islandBanner.innerText = "Pirate Island";
             ui.islandBanner.classList.add('banner-show');
             setTimeout(() => { ui.islandBanner.classList.remove('banner-show'); }, 4000);
+
+            if (autoSaveInterval) clearInterval(autoSaveInterval);
+            autoSaveInterval = setInterval(saveGameData, 30000); // Auto-save every 30 seconds
 
             gameLoop();
         }
@@ -1269,6 +1382,7 @@
             gameState = 'GAMEOVER';
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
+            if (autoSaveInterval) clearInterval(autoSaveInterval);
 
             // Find closest island for respawn
             let distPirate = Math.hypot(player.x - PirateIslandCenter.x, player.y - PirateIslandCenter.y);
@@ -1280,10 +1394,14 @@
             else if (minDist === distGorilla) { globalSpawnX = GorillaIslandCenter.x; globalSpawnY = GorillaIslandCenter.y; }
             else { globalSpawnX = PirateIslandCenter.x; globalSpawnY = PirateIslandCenter.y; }
 
-            // Ensure stats sync perfectly
+            // Ensure stats sync perfectly before saving
             globalXp = player.xp;
             globalLevel = player.level;
             globalMaxXp = player.maxXp;
+            globalMoney = player.money;
+            globalMastery = player.mastery;
+            
+            saveGameData(); // Save on death
 
             ui.health.style.display = 'none'; ui.money.style.display = 'none';
             ui.toolbar.style.display = 'none'; ui.xpBox.style.display = 'none';
