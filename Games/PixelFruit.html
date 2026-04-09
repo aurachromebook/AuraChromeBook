@@ -248,6 +248,9 @@
                 <div class="stat-row"><span>Sword: Lv. <span id="stat-sword-lv">1</span></span> <button class="stat-add-btn" onclick="window.addStat('sword')">+</button></div>
                 <div class="stat-row"><span>Gun: Lv. <span id="stat-gun-lv">1</span></span> <button class="stat-add-btn" onclick="window.addStat('gun')">+</button></div>
                 <div class="stat-row"><span>Fruit: Lv. <span id="stat-fruit-lv">1</span></span> <button class="stat-add-btn" onclick="window.addStat('fruit')">+</button></div>
+                <div class="stat-row" style="border:none; margin-top: 15px; display: flex; justify-content: center;">
+                    <button class="main-btn" style="width: 100%; font-size: 16px; padding: 10px;" onclick="window.manualSave()">Save Game to Cloud</button>
+                </div>
             </div>
             <div id="tab-items" class="tab-content" style="display:none;">
                 <h3 style="margin-top:0; color:#f1c40f;">Inventory</h3>
@@ -392,6 +395,12 @@
             }
         }
 
+        // Auto-save triggers when the user tries to refresh or close the page
+        window.addEventListener('beforeunload', () => { saveGameData(); });
+        window.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') saveGameData();
+        });
+
         // Export globals for HTML UI
         window.toggleCompass = () => {
             showCompassArrow = !showCompassArrow;
@@ -407,16 +416,20 @@
                 document.querySelectorAll('.slot').forEach((el, i) => {
                     if (i === index) el.classList.add('active'); else el.classList.remove('active');
                 });
-                // Only show Fist mastery if Fist (0) or Fruit is active
                 if (index === 0 || globalFruit) ui.masteryBox.style.display = 'block';
                 else ui.masteryBox.style.display = 'none';
             }
         };
         window.openMenu = () => {
+            gameState = 'MENU'; // Pause the game while the menu is open
+            keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = keys.e = false; 
             ui.menuModal.style.display = 'flex';
             window.switchTab('stats');
         };
-        window.closeMenu = () => { ui.menuModal.style.display = 'none'; };
+        window.closeMenu = () => { 
+            ui.menuModal.style.display = 'none'; 
+            gameState = 'PLAYING'; // Unpause when closing
+        };
         window.switchTab = (tabId) => {
             document.getElementById('tab-stats').style.display = 'none';
             document.getElementById('tab-items').style.display = 'none';
@@ -436,11 +449,17 @@
                 
                 updateMenuUI(); updateHUD(); saveGameData();
             }
-        }
+        };
+        window.manualSave = async () => {
+            await saveGameData();
+            document.getElementById('avail-stats').innerText = "Saved!";
+            setTimeout(() => updateMenuUI(), 1000);
+        };
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let animationFrameId = null;
+        let loadingFrameId = null;
         let autoSaveInterval = null;
 
         const ui = {
@@ -792,6 +811,7 @@
                     windmills.push({ x: wx, y: wy, angle: Math.random() * Math.PI });
                 }
             }
+            
             for(let i=0; i<50; i++) {
                 let tx = JungleIslandCenter.x + (Math.random()-0.5)*1200;
                 let ty = JungleIslandCenter.y + (Math.random()-0.5)*1200;
@@ -876,10 +896,13 @@
                 this.isSwimming = (tile === 'water');
 
                 if (activeShip && !this.isRidingShip && !this.isStuck) {
-                    if (Math.hypot(this.x - activeShip.x, this.y - activeShip.y) < 50 && mouse.down) {
-                        this.isRidingShip = true; mouse.down = false; 
+                    const distToShip = Math.hypot(this.x - activeShip.x, this.y - activeShip.y);
+                    if (distToShip < 50 && mouse.down) {
+                        this.isRidingShip = true;
+                        mouse.down = false; 
                     }
                 }
+
                 if (this.isRidingShip && tile && tile !== 'water' && tile !== 'dock') {
                     this.isRidingShip = false;
                     activeShip.x = this.x - Math.cos(Math.atan2(this.y - activeShip.y, this.x - activeShip.x)) * 40;
@@ -902,7 +925,7 @@
 
                 let currentSpeed = this.baseSpeed;
                 if (this.isRidingShip) currentSpeed *= 2.5;
-                else if (this.isSwimming) currentSpeed *= (globalFruit ? 0.2 : 0.6); // Water weakness
+                else if (this.isSwimming) currentSpeed *= (globalFruit ? 0.2 : 0.6); 
                 if (this.isStuck) currentSpeed = 0;
 
                 // --- ABILITIES ---
@@ -968,18 +991,24 @@
                     updateHUD();
                 }
                 if (this.isRagingFist) {
-                    currentSpeed *= 0.2; this.ragingFistTimer--;
+                    currentSpeed *= 0.2; 
+                    this.ragingFistTimer--;
                     this.ragingFistAngle = Math.atan2(mouse.worldY - this.y, mouse.worldX - this.x);
+                    
                     if (frameCount % 4 === 0) {
                         playSound('punch');
-                        const spread = (Math.random() - 0.5) * 0.5; const punchAngle = this.ragingFistAngle + spread;
+                        const spread = (Math.random() - 0.5) * 0.5;
+                        const punchAngle = this.ragingFistAngle + spread;
                         const punchX = this.x + Math.cos(punchAngle) * (this.radius + 15 + Math.random()*10);
                         const punchY = this.y + Math.sin(punchAngle) * (this.radius + 15 + Math.random()*10);
-                        const finalDmg = 2 + (globalStats.melee - 1) * 1.5;
+                        
+                        const baseDmg = 2;
+                        const finalDmg = baseDmg + (globalStats.melee - 1) * 1.5;
+                        
                         entities.push(new MeleeHitbox(punchX, punchY, punchAngle, finalDmg, 5));
                         particles.push(new Particle(punchX, punchY, '#ffffff', 1.0, 0.1));
                     }
-                    if (this.ragingFistTimer <= 0) this.isRagingFist = false;
+                    if (this.ragingFistTimer <= 0) { this.isRagingFist = false; }
                 }
 
                 // Move Player
@@ -994,16 +1023,14 @@
                     particles.push(new Particle(this.x, this.y + 10, '#ffffff', this.isRidingShip ? 4.0 : 3.0, 0.05, true)); 
                 }
 
-                // Water damage for Fruit Users
                 if (this.isSwimming && globalFruit && frameCount % 30 === 0) {
                     this.takeDamage(2);
-                    particles.push(new Particle(this.x, this.y, '#8e44ad', 2, 0.05)); // drown effect
+                    particles.push(new Particle(this.x, this.y, '#8e44ad', 2, 0.05)); 
                 }
 
                 // Click Attacks & Interactions
                 if (mouse.down && this.attackCooldown <= 0 && gameState === 'PLAYING') {
                     if (this.equipped > 0) { 
-                        // Using a Fruit from Inventory
                         let itemName = globalInventory[this.equipped - 1];
                         if (itemName && itemName.includes("Fruit")) {
                             mouse.down = false; 
@@ -1111,7 +1138,7 @@
                     ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(frameCount * 0.5);
                     ctx.fillStyle = '#ffccaa'; ctx.fillRect(-15, -15, 10, 10); ctx.fillRect(10, 10, 10, 10);
                     ctx.fillStyle = '#3498db'; ctx.fillRect(-10, 5, 15, 15); ctx.restore();
-                    return; // skip rest of drawing
+                    return; 
                 }
 
                 let spr = this.sprite;
@@ -1144,9 +1171,11 @@
 
                 if (this.isRagingFist) {
                     ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.ragingFistAngle);
-                    ctx.globalAlpha = 0.6; ctx.drawImage(sprites.fist.img, 15 + Math.random()*10, -sprites.fist.centerH + (Math.random()*10-5));
+                    ctx.globalAlpha = 0.6;
+                    ctx.drawImage(sprites.fist.img, 15 + Math.random()*10, -sprites.fist.centerH + (Math.random()*10-5));
                     ctx.drawImage(sprites.fist.img, 10 + Math.random()*10, -sprites.fist.centerH + (Math.random()*10-5));
-                    ctx.globalAlpha = 1.0; ctx.restore();
+                    ctx.globalAlpha = 1.0;
+                    ctx.restore();
                 }
 
                 if (this.isChargingDragon) {
@@ -1285,7 +1314,7 @@
                         quest.active = false; player.gainXp(100); player.addMoney(quest.reward);
                         let earnedStats = Math.floor(Math.random() * 3) + 1; globalStatPoints += earnedStats;
                         ui.questTracker.innerHTML = `<span style="color:#2ecc71">Quest Complete!</span><br>+100 XP<br>+$${quest.reward}<br>+${earnedStats} Stat Points!`;
-                        setTimeout(() => ui.questTracker.style.opacity = 0, 4000); saveGameData(); window.switchTab('stats'); // force refresh
+                        setTimeout(() => ui.questTracker.style.opacity = 0, 4000); saveGameData(); window.switchTab('stats'); 
                     }
                 }
                 for(let i=0; i< (this.type === 'gorilla king' ? 40 : 15); i++) particles.push(new Particle(this.x, this.y, '#e74c3c'));
@@ -1448,18 +1477,20 @@
 
         // --- MAIN LOOP ---
         let loadProgress = 0;
+
         function simulateLoading() {
             if (loadProgress < 100) {
                 loadProgress += Math.random() * 2 + 0.5; document.getElementById('loading-bar-inner').style.width = Math.min(loadProgress, 100) + '%';
-                if (!animationFrameId) requestAnimationFrame(simulateLoading);
+                requestAnimationFrame(simulateLoading);
             } else if (!isDataLoaded && firebaseConfig) {
                 document.getElementById('loading-text').innerText = "Loading Cloud Save...";
-                if (!animationFrameId) requestAnimationFrame(simulateLoading);
+                requestAnimationFrame(simulateLoading);
             } else { setTimeout(startGame, 500); }
         }
 
         function startGame() {
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
             gameState = 'PLAYING'; frameCount = 0; player = new Player();
             generateWorld();
             if (window.loadedWithShip && !activeShip) activeShip = new Ship(player.x, player.y + 100); 
@@ -1592,6 +1623,8 @@
             particles.forEach(p => p.draw(ctx));
 
             ctx.restore();
+            
+            // Keep the animation loop running even when paused in dialogue or menus!
             animationFrameId = requestAnimationFrame(gameLoop);
         }
 
