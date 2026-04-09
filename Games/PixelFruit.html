@@ -1023,6 +1023,7 @@
                     }
                 }
 
+                if (this.attackCooldown > 0) this.attackCooldown--;
                 if (this.dashCooldown > 0) this.dashCooldown--;
                 if (this.dashPunchCooldown > 0) this.dashPunchCooldown--;
                 if (this.ragingFistCooldown > 0) this.ragingFistCooldown--;
@@ -1555,6 +1556,8 @@
         }
 
         function gameLoop() {
+            if (gameState === 'GAMEOVER') return;
+
             if (gameState === 'PLAYING') {
                 frameCount++; player.update(); npcs.forEach(n => n.update()); spawnEnemies();
                 entities.forEach(ent => ent.update()); particles.forEach(p => p.update()); lasers.forEach(l => l.update());
