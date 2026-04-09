@@ -289,6 +289,92 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // --- GAME STATE & GLOBALS ---
+        const WORLD_SIZE = 4000; 
+        const TILE_SIZE = 40;
+        let gameState = 'START'; 
+        let frameCount = 0;
+        let mapGrid = [];
+        let paths = [];
+        let windmills = [];
+        let decorations = [];
+        let craters = [];
+        let lasers = [];
+        let camera = { x: 0, y: 0 };
+        
+        const keys = { w: false, a: false, s: false, d: false, q: false, e: false, x: false };
+        const mouse = { x: 0, y: 0, worldX: 0, worldY: 0, down: false };
+
+        let player;
+        let npcs = [];
+        let entities = [];
+        let particles = [];
+        let activeShip = null; 
+        let quest = { active: false, name: "", target: 0, current: 0, entityName: "", reward: 0 };
+
+        // Persistent Stats across deaths
+        let globalMoney = 0;
+        let globalMastery = { level: 1, xp: 0, maxXp: 10, limit: 20 };
+        let globalLevel = 1;
+        let globalXp = 0;
+        let globalMaxXp = 50;
+        let globalSpawnX = 1000;
+        let globalSpawnY = 1000;
+        
+        // V1.3 & V1.4 Stats
+        let globalEnergy = 100;
+        let globalMaxEnergy = 100;
+        let globalStatPoints = 0;
+        let globalStats = { fruit: 1, melee: 1, defense: 1, gun: 1, sword: 1 };
+        let globalFruit = null;
+        let globalInventory = []; // Array of strings e.g. 'Spin Fruit'
+        let tutorialShown_compass = false;
+        let showCompassArrow = true;
+
+        const PirateIslandCenter = { x: 1000, y: 1000 };
+        const JungleIslandCenter = { x: 3000, y: 3000 };
+        const GorillaIslandCenter = { x: 3800, y: 3000 };
+
+        let gorillaKingSpawnTimer = 0;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId = null;
+        let loadingFrameId = null;
+        let autoSaveInterval = null;
+
+        const ui = {
+            loading: document.getElementById('loading-screen'),
+            over: document.getElementById('game-over-screen'),
+            statsUI: document.getElementById('player-stats-ui'),
+            moneyTxt: document.getElementById('new-money-display'),
+            lvlTxt: document.getElementById('new-lvl-display'),
+            expFill: document.getElementById('exp-fill'),
+            expText: document.getElementById('exp-text'),
+            hpFill: document.getElementById('health-fill'),
+            hpText: document.getElementById('health-text'),
+            energyFill: document.getElementById('energy-fill'),
+            energyText: document.getElementById('energy-text'),
+            toolbar: document.getElementById('toolbar'),
+            masteryBox: document.getElementById('mastery-container'),
+            masteryText: document.getElementById('mastery-text'),
+            masteryFill: document.getElementById('mastery-bar-fill'),
+            masteryMoves: document.getElementById('mastery-moves'),
+            questTracker: document.getElementById('quest-tracker'),
+            dialogueBox: document.getElementById('dialogue-box'),
+            dialogueContent: document.getElementById('dialogue-content'),
+            dialogueOptions: document.getElementById('dialogue-options'),
+            islandBanner: document.getElementById('island-banner'),
+            compassContainer: document.getElementById('compass-container'),
+            compassArrow: document.getElementById('compass-arrow'),
+            compassTutorial: document.getElementById('compass-tutorial'),
+            menuModal: document.getElementById('main-menu-modal'),
+            availStats: document.getElementById('avail-stats'),
+            statBtns: document.querySelectorAll('.stat-add-btn')
+        };
+
+        let width, height;
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
 
@@ -496,45 +582,6 @@
             setTimeout(() => updateMenuUI(), 1000);
         };
 
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let animationFrameId = null;
-        let loadingFrameId = null;
-        let autoSaveInterval = null;
-
-        const ui = {
-            loading: document.getElementById('loading-screen'),
-            over: document.getElementById('game-over-screen'),
-            statsUI: document.getElementById('player-stats-ui'),
-            moneyTxt: document.getElementById('new-money-display'),
-            lvlTxt: document.getElementById('new-lvl-display'),
-            expFill: document.getElementById('exp-fill'),
-            expText: document.getElementById('exp-text'),
-            hpFill: document.getElementById('health-fill'),
-            hpText: document.getElementById('health-text'),
-            energyFill: document.getElementById('energy-fill'),
-            energyText: document.getElementById('energy-text'),
-            
-            toolbar: document.getElementById('toolbar'),
-            masteryBox: document.getElementById('mastery-container'),
-            masteryText: document.getElementById('mastery-text'),
-            masteryFill: document.getElementById('mastery-bar-fill'),
-            masteryMoves: document.getElementById('mastery-moves'),
-            questTracker: document.getElementById('quest-tracker'),
-            dialogueBox: document.getElementById('dialogue-box'),
-            dialogueContent: document.getElementById('dialogue-content'),
-            dialogueOptions: document.getElementById('dialogue-options'),
-            islandBanner: document.getElementById('island-banner'),
-            compassContainer: document.getElementById('compass-container'),
-            compassArrow: document.getElementById('compass-arrow'),
-            compassTutorial: document.getElementById('compass-tutorial'),
-            
-            menuModal: document.getElementById('main-menu-modal'),
-            availStats: document.getElementById('avail-stats'),
-            statBtns: document.querySelectorAll('.stat-add-btn')
-        };
-
-        let width, height;
         function resizeCanvas() {
             width = window.innerWidth; height = window.innerHeight;
             canvas.width = width; canvas.height = height;
@@ -675,35 +722,6 @@
             }
         }
         preRenderSprites();
-
-        // --- GAME STATE & GLOBALS ---
-        const WORLD_SIZE = 4000; 
-        const TILE_SIZE = 40;
-        let gameState = 'START'; 
-        let frameCount = 0;
-        let mapGrid = [];
-        let paths = [];
-        let windmills = [];
-        let decorations = [];
-        let craters = [];
-        let lasers = [];
-        let camera = { x: 0, y: 0 };
-        
-        const keys = { w: false, a: false, s: false, d: false, q: false, e: false, x: false };
-        const mouse = { x: 0, y: 0, worldX: 0, worldY: 0, down: false };
-
-        let player;
-        let npcs = [];
-        let entities = [];
-        let particles = [];
-        let activeShip = null; 
-        let quest = { active: false, name: "", target: 0, current: 0, entityName: "", reward: 0 };
-
-        const PirateIslandCenter = { x: 1000, y: 1000 };
-        const JungleIslandCenter = { x: 3000, y: 3000 };
-        const GorillaIslandCenter = { x: 3800, y: 3000 };
-
-        let gorillaKingSpawnTimer = 0;
 
         // Dynamic Toolbar Rendering
         window.renderToolbar = () => {
