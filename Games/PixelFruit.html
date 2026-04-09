@@ -35,9 +35,10 @@
 
         #save-indicator {
             position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-            background: rgba(46, 204, 113, 0.8); padding: 5px 10px;
-            border-radius: 5px; color: white; font-size: 10px;
-            display: none; z-index: 100;
+            background: rgba(46, 204, 113, 0.9); padding: 8px 15px;
+            border-radius: 5px; color: white; font-size: 12px;
+            display: none; z-index: 100; font-family: 'Press Start 2P', cursive;
+            border: 2px solid #27ae60;
         }
 
         /* --- RPG UI (V1.3/V1.4) --- */
@@ -185,7 +186,7 @@
 
     <div id="ui-layer">
         <div id="island-banner">Pirate Island</div>
-        <div id="save-indicator">Game Saved!</div>
+        <div id="save-indicator">Game Saved! 💾</div>
 
         <!-- NEW RPG UI -->
         <div id="player-stats-ui">
@@ -249,7 +250,7 @@
                 <div class="stat-row"><span>Gun: Lv. <span id="stat-gun-lv">1</span></span> <button class="stat-add-btn" onclick="window.addStat('gun')">+</button></div>
                 <div class="stat-row"><span>Fruit: Lv. <span id="stat-fruit-lv">1</span></span> <button class="stat-add-btn" onclick="window.addStat('fruit')">+</button></div>
                 <div class="stat-row" style="border:none; margin-top: 15px; display: flex; justify-content: center;">
-                    <button class="main-btn" style="width: 100%; font-size: 16px; padding: 10px;" onclick="window.manualSave()">Save Game to Cloud</button>
+                    <button class="main-btn" style="width: 100%; font-size: 16px; padding: 10px;" onclick="window.manualSave()">Save Game</button>
                 </div>
             </div>
             <div id="tab-items" class="tab-content" style="display:none;">
@@ -282,7 +283,7 @@
         </div>
     </div>
 
-    <!-- Script Module for Firebase and Game Logic -->
+    <!-- Script Module for Firebase, IndexedDB, and Game Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -295,6 +296,69 @@
         let isDataLoaded = false;
         window.loadedWithShip = false;
 
+        // --- LOCAL INDEXEDDB FALLBACK (For GitHub Pages Export) ---
+        const dbName = "PixelSurvivalDB";
+        const storeName = "saveData";
+
+        function initLocalDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(dbName, 1);
+                request.onupgradeneeded = (e) => {
+                    const localDb = e.target.result;
+                    if (!localDb.objectStoreNames.contains(storeName)) {
+                        localDb.createObjectStore(storeName);
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function saveLocalData(data) {
+            try {
+                const localDb = await initLocalDB();
+                return new Promise((resolve, reject) => {
+                    const tx = localDb.transaction(storeName, 'readwrite');
+                    const req = tx.objectStore(storeName).put(data, 'player1');
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            } catch(e) { console.error("Local save error", e); }
+        }
+
+        async function loadLocalData() {
+            try {
+                const localDb = await initLocalDB();
+                return new Promise((resolve) => {
+                    const tx = localDb.transaction(storeName, 'readonly');
+                    const req = tx.objectStore(storeName).get('player1');
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(null);
+                });
+            } catch(e) { console.error("Local load error", e); return null; }
+        }
+
+        // Apply loaded data to global variables
+        function applyLoadedData(data) {
+            if (data.money !== undefined) globalMoney = data.money;
+            if (data.mastery !== undefined) globalMastery = data.mastery;
+            if (data.level !== undefined) globalLevel = data.level;
+            if (data.xp !== undefined) globalXp = data.xp;
+            if (data.maxXp !== undefined) globalMaxXp = data.maxXp;
+            if (data.spawnX !== undefined) globalSpawnX = data.spawnX;
+            if (data.spawnY !== undefined) globalSpawnY = data.spawnY;
+            if (data.hasShip) window.loadedWithShip = true;
+            
+            if (data.energy !== undefined) globalEnergy = data.energy;
+            if (data.maxEnergy !== undefined) globalMaxEnergy = data.maxEnergy;
+            if (data.statPoints !== undefined) globalStatPoints = data.statPoints;
+            if (data.stats !== undefined) globalStats = data.stats;
+            if (data.tutorialCompass !== undefined) tutorialShown_compass = data.tutorialCompass;
+            if (data.fruit !== undefined) globalFruit = data.fruit;
+            if (data.inventory !== undefined) globalInventory = data.inventory;
+        }
+
+        // Initialize Firebase OR Local DB
         if (firebaseConfig) {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -308,17 +372,17 @@
                         } else {
                             await signInAnonymously(auth);
                         }
-                    } catch (e) {
-                        console.error("Auth error", e);
-                        isDataLoaded = true;
-                    }
+                    } catch (e) { console.error("Auth error", e); isDataLoaded = true; }
                 };
                 initAuth();
 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         currentUser = user;
-                        await loadGameData();
+                        try {
+                            const snap = await getDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'player1'));
+                            if (snap.exists()) applyLoadedData(snap.data());
+                        } catch(e) { console.error(e); }
                     }
                     isDataLoaded = true;
                 });
@@ -327,12 +391,14 @@
                 isDataLoaded = true;
             }
         } else {
-            isDataLoaded = true;
+            // Fallback for GitHub Pages!
+            loadLocalData().then(data => {
+                if (data) applyLoadedData(data);
+                isDataLoaded = true;
+            });
         }
 
         async function saveGameData() {
-            if (!currentUser || !db) return;
-            const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'player1');
             const data = {
                 money: globalMoney,
                 mastery: globalMastery,
@@ -351,39 +417,15 @@
                 inventory: globalInventory
             };
             try {
-                await setDoc(saveRef, data);
+                if (firebaseConfig && currentUser && db) {
+                    const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'player1');
+                    await setDoc(saveRef, data);
+                } else {
+                    await saveLocalData(data);
+                }
                 showSaveIndicator();
             } catch (e) {
                 console.error("Save failed", e);
-            }
-        }
-
-        async function loadGameData() {
-            if (!currentUser || !db) return;
-            const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'player1');
-            try {
-                const snap = await getDoc(saveRef);
-                if (snap.exists()) {
-                    const data = snap.data();
-                    if (data.money !== undefined) globalMoney = data.money;
-                    if (data.mastery !== undefined) globalMastery = data.mastery;
-                    if (data.level !== undefined) globalLevel = data.level;
-                    if (data.xp !== undefined) globalXp = data.xp;
-                    if (data.maxXp !== undefined) globalMaxXp = data.maxXp;
-                    if (data.spawnX !== undefined) globalSpawnX = data.spawnX;
-                    if (data.spawnY !== undefined) globalSpawnY = data.spawnY;
-                    if (data.hasShip) window.loadedWithShip = true;
-                    
-                    if (data.energy !== undefined) globalEnergy = data.energy;
-                    if (data.maxEnergy !== undefined) globalMaxEnergy = data.maxEnergy;
-                    if (data.statPoints !== undefined) globalStatPoints = data.statPoints;
-                    if (data.stats !== undefined) globalStats = data.stats;
-                    if (data.tutorialCompass !== undefined) tutorialShown_compass = data.tutorialCompass;
-                    if (data.fruit !== undefined) globalFruit = data.fruit;
-                    if (data.inventory !== undefined) globalInventory = data.inventory;
-                }
-            } catch (e) {
-                console.error("Load failed", e);
             }
         }
 
@@ -420,16 +462,15 @@
                 else ui.masteryBox.style.display = 'none';
             }
         };
+        
+        // Pause Feature removed! Menus open without changing gameState
         window.openMenu = () => {
-            gameState = 'MENU'; // Pause the game while the menu is open
-            keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = keys.e = false; 
+            keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = keys.e = false; mouse.down = false;
             ui.menuModal.style.display = 'flex';
             window.switchTab('stats');
         };
-        window.closeMenu = () => { 
-            ui.menuModal.style.display = 'none'; 
-            gameState = 'PLAYING'; // Unpause when closing
-        };
+        window.closeMenu = () => { ui.menuModal.style.display = 'none'; };
+        
         window.switchTab = (tabId) => {
             document.getElementById('tab-stats').style.display = 'none';
             document.getElementById('tab-items').style.display = 'none';
@@ -452,7 +493,6 @@
         };
         window.manualSave = async () => {
             await saveGameData();
-            document.getElementById('avail-stats').innerText = "Saved!";
             setTimeout(() => updateMenuUI(), 1000);
         };
 
@@ -659,25 +699,6 @@
         let activeShip = null; 
         let quest = { active: false, name: "", target: 0, current: 0, entityName: "", reward: 0 };
 
-        // Persistent Stats across deaths
-        let globalMoney = 0;
-        let globalMastery = { level: 1, xp: 0, maxXp: 10, limit: 20 };
-        let globalLevel = 1;
-        let globalXp = 0;
-        let globalMaxXp = 50;
-        let globalSpawnX = 1000;
-        let globalSpawnY = 1000;
-        
-        // V1.3 & V1.4 Stats
-        let globalEnergy = 100;
-        let globalMaxEnergy = 100;
-        let globalStatPoints = 0;
-        let globalStats = { fruit: 1, melee: 1, defense: 1, gun: 1, sword: 1 };
-        let globalFruit = null;
-        let globalInventory = []; // Array of strings e.g. 'Spin Fruit'
-        let tutorialShown_compass = false;
-        let showCompassArrow = true;
-
         const PirateIslandCenter = { x: 1000, y: 1000 };
         const JungleIslandCenter = { x: 3000, y: 3000 };
         const GorillaIslandCenter = { x: 3800, y: 3000 };
@@ -704,8 +725,9 @@
             ui.toolbar.innerHTML = html;
         };
 
-        // Input Setup
+        // Input Setup - Block input when interacting with UI!
         window.addEventListener('keydown', e => {
+            if (ui.menuModal.style.display === 'flex' || ui.dialogueBox.style.display === 'flex') return;
             const k = e.key.toLowerCase();
             if (keys.hasOwnProperty(k)) keys[k] = true;
             
@@ -728,7 +750,10 @@
             mouse.x = e.clientX; mouse.y = e.clientY;
             mouse.worldX = mouse.x + camera.x; mouse.worldY = mouse.y + camera.y;
         });
-        window.addEventListener('mousedown', e => { if (e.target.id === 'gameCanvas') mouse.down = true; });
+        window.addEventListener('mousedown', e => { 
+            if (ui.menuModal.style.display === 'flex' || ui.dialogueBox.style.display === 'flex') return;
+            if (e.target.id === 'gameCanvas') mouse.down = true; 
+        });
         window.addEventListener('mouseup', () => mouse.down = false);
 
         // --- MAP GENERATION ---
@@ -1050,6 +1075,7 @@
                     }
                 }
 
+                // Tick cooldowns
                 if (this.attackCooldown > 0) this.attackCooldown--;
                 if (this.dashCooldown > 0) this.dashCooldown--;
                 if (this.dashPunchCooldown > 0) this.dashPunchCooldown--;
@@ -1351,11 +1377,14 @@
                 this.name = name; this.x = x; this.y = y;
                 this.sprite = sprites[spriteType]; this.interactCallback = interactCallback; this.pulseTime = 0;
             }
-            update() { if (Math.hypot(player.x - this.x, player.y - this.y) < 100 && gameState === 'PLAYING' && mouse.down) { mouse.down = false; this.interactCallback(); } }
+            update() { 
+                if (ui.dialogueBox.style.display === 'flex' || ui.menuModal.style.display === 'flex') return;
+                if (Math.hypot(player.x - this.x, player.y - this.y) < 100 && mouse.down) { mouse.down = false; this.interactCallback(); } 
+            }
             draw(ctx) {
                 ctx.drawImage(this.sprite.img, this.x - this.sprite.centerW, this.y - this.sprite.centerH);
                 ctx.fillStyle = '#ffffff'; ctx.font = "10px 'Press Start 2P'"; ctx.textAlign = "center"; ctx.fillText(this.name, this.x, this.y + this.sprite.centerH + 15);
-                if (Math.hypot(player.x - this.x, player.y - this.y) < 100 && gameState === 'PLAYING') {
+                if (Math.hypot(player.x - this.x, player.y - this.y) < 100 && ui.dialogueBox.style.display !== 'flex') {
                     this.pulseTime += 0.05; ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.sin(this.pulseTime) * 0.5})`; ctx.fillText("Click to interact", this.x, this.y - 40);
                 }
             }
@@ -1405,8 +1434,8 @@
             }
         }
 
-        function startDialogue() { gameState = 'DIALOGUE'; keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = keys.e = false; ui.dialogueBox.style.display = 'flex'; }
-        function closeDialogue() { ui.dialogueBox.style.display = 'none'; gameState = 'PLAYING'; }
+        function startDialogue() { keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = keys.e = false; mouse.down = false; ui.dialogueBox.style.display = 'flex'; }
+        function closeDialogue() { ui.dialogueBox.style.display = 'none'; }
         function setDialogue(text, options) {
             ui.dialogueContent.innerHTML = text; ui.dialogueOptions.innerHTML = '';
             options.forEach(opt => {
@@ -1481,14 +1510,15 @@
         function simulateLoading() {
             if (loadProgress < 100) {
                 loadProgress += Math.random() * 2 + 0.5; document.getElementById('loading-bar-inner').style.width = Math.min(loadProgress, 100) + '%';
-                requestAnimationFrame(simulateLoading);
-            } else if (!isDataLoaded && firebaseConfig) {
-                document.getElementById('loading-text').innerText = "Loading Cloud Save...";
-                requestAnimationFrame(simulateLoading);
+                loadingFrameId = requestAnimationFrame(simulateLoading);
+            } else if (!isDataLoaded) {
+                // Wait for Local DB or Cloud to finish loading
+                loadingFrameId = requestAnimationFrame(simulateLoading);
             } else { setTimeout(startGame, 500); }
         }
 
         function startGame() {
+            if (loadingFrameId) cancelAnimationFrame(loadingFrameId);
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
             gameState = 'PLAYING'; frameCount = 0; player = new Player();
@@ -1624,7 +1654,6 @@
 
             ctx.restore();
             
-            // Keep the animation loop running even when paused in dialogue or menus!
             animationFrameId = requestAnimationFrame(gameLoop);
         }
 
