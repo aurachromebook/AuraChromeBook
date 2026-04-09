@@ -19,6 +19,8 @@
       --text-muted: #b3b3b3;
       --border: #2a2a2a;
       --hover-bg: #2a2a2a;
+      --success: #00d084;
+      --warning: #ffa500;
     }
 
     * { 
@@ -347,12 +349,26 @@
       width: 100%;
       height: 100%;
       background: #000;
+      position: relative;
     }
 
     .modal-video iframe {
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    .video-controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.9));
+      padding: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .modal-close {
@@ -431,6 +447,122 @@
     .modal-select:hover {
       background: rgba(255,255,255,0.15);
       border-color: var(--primary);
+    }
+
+    .source-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .source-tab {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .source-tab:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--primary);
+    }
+
+    .source-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .proxy-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,128,255,0.1);
+      border: 1px solid var(--primary);
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      transition: all 0.2s;
+    }
+
+    .proxy-toggle:hover {
+      background: rgba(0,128,255,0.2);
+    }
+
+    .proxy-toggle.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .proxy-status {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      margin-left: 4px;
+    }
+
+    .proxy-status.offline {
+      background: #ff4444;
+    }
+
+    .server-list {
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    .server-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 4px;
+    }
+
+    .server-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .server-item.active {
+      background: rgba(0,128,255,0.2);
+      border-left: 3px solid var(--primary);
+    }
+
+    .server-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .server-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(0,208,132,0.2);
+      color: var(--success);
+    }
+
+    .server-status.slow {
+      background: rgba(255,165,0,0.2);
+      color: var(--warning);
     }
 
     /* Disclaimer Overlay */
@@ -519,6 +651,53 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Advanced Options Panel */
+    .advanced-panel {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .advanced-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .proxy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+    }
+
+    .proxy-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .proxy-btn:hover {
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .proxy-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
       .hero-title { font-size: 5vw; }
@@ -539,6 +718,7 @@
       .modal-info { padding: 20px 24px 32px; }
       .modal-title { font-size: 1.5rem; }
       .disclaimer-box { padding: 32px 24px; }
+      .proxy-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -636,7 +816,26 @@
       
       <div class="modal-hero">
         <div class="modal-video" id="videoContainer">
-          <iframe id="modalIframe" allowfullscreen></iframe>
+          <iframe id="modalIframe" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+          
+          <div class="video-controls">
+            <button class="proxy-toggle" id="proxyToggle">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+              Proxy Mode
+              <span class="proxy-status" id="proxyStatus"></span>
+            </button>
+            
+            <select class="modal-select" id="qualitySelect" style="min-width: 100px; display: none;">
+              <option value="auto">Auto Quality</option>
+              <option value="1080">1080p</option>
+              <option value="720">720p</option>
+              <option value="480">480p</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -652,6 +851,27 @@
           <select class="modal-select" id="seasonSelect" style="display: none;"></select>
           <select class="modal-select" id="episodeSelect" style="display: none;"></select>
           <select class="modal-select" id="sourceSelect"></select>
+        </div>
+
+        <div class="source-tabs" id="sourceTabs">
+          <div class="source-tab active" data-category="all">All Sources</div>
+          <div class="source-tab" data-category="fast">Fast Servers</div>
+          <div class="source-tab" data-category="hd">HD Quality</div>
+          <div class="source-tab" data-category="backup">Backups</div>
+        </div>
+
+        <div class="server-list" id="serverList"></div>
+
+        <div class="advanced-panel">
+          <div class="advanced-title">Proxy & Region Options</div>
+          <div class="proxy-grid" id="proxyGrid">
+            <button class="proxy-btn active" data-proxy="direct">Direct</button>
+            <button class="proxy-btn" data-proxy="us">US Proxy</button>
+            <button class="proxy-btn" data-proxy="eu">EU Proxy</button>
+            <button class="proxy-btn" data-proxy="asia">Asia Proxy</button>
+            <button class="proxy-btn" data-proxy="cdn1">CDN-1</button>
+            <button class="proxy-btn" data-proxy="cdn2">CDN-2</button>
+          </div>
         </div>
       </div>
     </div>
@@ -697,6 +917,11 @@
     const seasonSelect = document.getElementById('seasonSelect');
     const episodeSelect = document.getElementById('episodeSelect');
     const loadingIndicator = document.getElementById('loadingIndicator');
+    const serverList = document.getElementById('serverList');
+    const proxyToggle = document.getElementById('proxyToggle');
+    const proxyStatus = document.getElementById('proxyStatus');
+    const proxyGrid = document.getElementById('proxyGrid');
+    const sourceTabs = document.getElementById('sourceTabs');
 
     const FALLBACK_POSTER = 'https://via.placeholder.com/500x750/181818/0080ff?text=No+Image';
 
@@ -704,35 +929,202 @@
     let loading = false;
     let inSearch = false;
     let annotatedCache = [];
+    let currentProxy = 'direct';
+    let proxyEnabled = false;
+    let currentCategory = 'all';
 
-    // Sources
-    const tvSources = [
-      'https://player.vidify.top/embed/tv/${id}/${season}/${episode}?autoplay=false&poster=true&chromecast=true&servericon=false&setting=true&pip=true&download=true&font=Roboto&fontcolor=0080ff&fontsize=20&opacity=0.5&primarycolor=0080ff&secondarycolor=0066cc&iconcolor=ffffff',
-      'https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}',
-      'https://player.vidsrc.co/embed/tv/${id}/${season}/${episode}?server=2',
-      'https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}',
-      'https://vidsrc.icu/embed/tv/${id}/${season}/${episode}',
-      'https://moviekex.online/embed/tv/${id}/${season}/${episode}',
-      'https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}',
-      'https://moviesapi.club/tv/${id}-${season}-${episode}',
-      'https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=false&poster=true&primaryColor=0080ff',
-      'https://embed.su/embed/tv/${id}/${season}/${episode}',
-      'https://vidora.su/tv/${id}/${season}/${episode}?colour=0080ff&autoplay=true'
-    ];
+    // EXTENSIVE VIDEO SOURCES - 20+ Options with Metadata
+    const videoSources = {
+      // Primary High-Quality Sources
+      primary: [
+        {
+          name: 'Vidify',
+          url: 'https://player.vidify.top/embed/${type}/${id}${seasonEpisode}?autoplay=false&poster=true&chromecast=true&servericon=false&setting=true&pip=true&download=true&font=Roboto&fontcolor=0080ff&fontsize=20&opacity=0.5&primarycolor=0080ff&secondarycolor=0066cc&iconcolor=ffffff',
+          type: 'both',
+          quality: 'hd',
+          speed: 'fast',
+          category: 'primary'
+        },
+        {
+          name: 'VidLink Pro',
+          url: 'https://vidlink.pro/${type}/${id}${seasonEpisode}?autoplay=false&poster=true&primaryColor=0080ff',
+          type: 'both',
+          quality: 'hd',
+          speed: 'fast',
+          category: 'primary'
+        },
+        {
+          name: 'Embed.su',
+          url: 'https://embed.su/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'hd',
+          speed: 'fast',
+          category: 'primary'
+        },
+        {
+          name: 'Vidora',
+          url: 'https://vidora.su/${type}/${id}${seasonEpisode}?colour=0080ff&autoplay=true',
+          type: 'both',
+          quality: 'hd',
+          speed: 'medium',
+          category: 'primary'
+        }
+      ],
+      
+      // Fast/Reliable Sources
+      fast: [
+        {
+          name: 'VidSrc XYZ',
+          url: 'https://vidsrc.xyz/embed/${type}?tmdb=${id}${seasonEpisodeAmp}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'fast',
+          category: 'fast'
+        },
+        {
+          name: 'VidSrc Co',
+          url: 'https://player.vidsrc.co/embed/${type}/${id}${seasonEpisode}?server=2',
+          type: 'both',
+          quality: 'auto',
+          speed: 'fast',
+          category: 'fast'
+        },
+        {
+          name: 'VidSrc CC',
+          url: 'https://vidsrc.cc/v2/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'fast',
+          category: 'fast'
+        },
+        {
+          name: 'AutoEmbed',
+          url: 'https://player.autoembed.cc/embed/${type}/${id}${seasonEpisode}?server=1',
+          type: 'both',
+          quality: 'auto',
+          speed: 'fast',
+          category: 'fast'
+        },
+        {
+          name: 'MoviesAPI',
+          url: 'https://moviesapi.club/${type}/${id}${seasonEpisodeDash}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'fast',
+          category: 'fast'
+        }
+      ],
+      
+      // Backup/Alternative Sources
+      backup: [
+        {
+          name: 'VidSrc ICU',
+          url: 'https://vidsrc.icu/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'medium',
+          category: 'backup'
+        },
+        {
+          name: 'MovieKex',
+          url: 'https://moviekex.online/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'medium',
+          category: 'backup'
+        },
+        {
+          name: '2Embed',
+          url: 'https://www.2embed.cc/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'medium',
+          category: 'backup'
+        },
+        {
+          name: 'SuperEmbed',
+          url: 'https://multiembed.mov/?video_id=${id}&tmdb=1${seasonEpisodeSuper}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'medium',
+          category: 'backup'
+        },
+        {
+          name: 'GoMovies',
+          url: 'https://gomo.to/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'auto',
+          speed: 'slow',
+          category: 'backup'
+        }
+      ],
+      
+      // HD Quality Specialized
+      hd: [
+        {
+          name: 'Flicky',
+          url: 'https://flicky.host/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'hd',
+          speed: 'medium',
+          category: 'hd'
+        },
+        {
+          name: 'Smashy',
+          url: 'https://player.smashy.stream/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'hd',
+          speed: 'medium',
+          category: 'hd'
+        },
+        {
+          name: 'Vidsrc Me',
+          url: 'https://vidsrc.me/embed/${type}?tmdb=${id}${seasonEpisodeAmp}',
+          type: 'both',
+          quality: 'hd',
+          speed: 'medium',
+          category: 'hd'
+        },
+        {
+          name: 'Embed CF',
+          url: 'https://embed.cf/embed/${type}/${id}${seasonEpisode}',
+          type: 'both',
+          quality: 'hd',
+          speed: 'medium',
+          category: 'hd'
+        }
+      ],
+      
+      // Regional/Proxy Optimized
+      regional: [
+        {
+          name: 'Stream Tape',
+          url: 'https://streamtape.com/e/${id}',
+          type: 'movie',
+          quality: 'auto',
+          speed: 'medium',
+          category: 'regional'
+        },
+        {
+          name: 'Dood Stream',
+          url: 'https://dood.ws/e/${id}',
+          type: 'movie',
+          quality: 'auto',
+          speed: 'medium',
+          category: 'regional'
+        }
+      ]
+    };
 
-    const movieSources = [
-      'https://player.vidify.top/embed/movie/${id}?autoplay=false&poster=true&chromecast=true&servericon=false&setting=true&pip=true&download=true&font=Roboto&fontcolor=0080ff&fontsize=20&opacity=0.5&primarycolor=0080ff&secondarycolor=0066cc&iconcolor=ffffff',
-      'https://vidsrc.xyz/embed/movie?tmdb=${id}',
-      'https://player.vidsrc.co/embed/movie/${id}?server=2',
-      'https://player.autoembed.cc/embed/movie/${id}?server=1',
-      'https://vidsrc.icu/embed/movie/${id}',
-      'https://moviekex.online/embed/movie/${id}',
-      'https://vidsrc.cc/v2/embed/movie/${id}',
-      'https://moviesapi.club/movie/${id}',
-      'https://vidlink.pro/movie/${id}?autoplay=true&poster=true&primaryColor=0080ff',
-      'https://embed.su/embed/movie/${id}',
-      'https://vidora.su/movie/${id}?colour=0080ff&autoplay=true'
-    ];
+    // Proxy Configuration
+    const proxyConfig = {
+      direct: { url: '', enabled: false },
+      us: { url: 'https://api.allorigins.win/raw?url=', enabled: true },
+      eu: { url: 'https://cors.eu.org/', enabled: true },
+      asia: { url: 'https://api.codetabs.com/v1/proxy?quest=', enabled: true },
+      cdn1: { url: 'https://corsproxy.io/?', enabled: true },
+      cdn2: { url: 'https://thingproxy.freeboard.io/fetch/', enabled: true }
+    };
 
     // Helpers
     function showLoading(show) {
@@ -894,7 +1286,7 @@
       if(inSearch) doSearch(searchInput.value);
     });
 
-    // Modal
+    // Modal Functions
     function openModal(item) {
       modal.style.display = 'flex';
       setTimeout(() => modal.classList.add('show'), 10);
@@ -905,6 +1297,7 @@
       seasonSelect.style.display = 'none';
       episodeSelect.style.display = 'none';
       sourceSelect.innerHTML = '';
+      serverList.innerHTML = '';
       modalIframe.src = '';
 
       if (item.media_type === 'tv') {
@@ -914,16 +1307,82 @@
       }
     }
 
-    function setupMovie(id) {
-      movieSources.forEach(src => {
-        const url = src.replace('${id}', id);
-        addSourceOption(url);
-      });
-      if(sourceSelect.options.length) {
-        sourceSelect.selectedIndex = 0;
-        modalIframe.src = sourceSelect.value;
+    function getAllSources() {
+      return [...videoSources.primary, ...videoSources.fast, ...videoSources.backup, ...videoSources.hd, ...videoSources.regional];
+    }
+
+    function filterSourcesByCategory(category) {
+      if (category === 'all') return getAllSources();
+      return getAllSources().filter(s => s.category === category || (category === 'fast' && s.speed === 'fast') || (category === 'hd' && s.quality === 'hd'));
+    }
+
+    function buildUrl(source, id, mediaType, season = null, episode = null) {
+      let url = source.url;
+      const isTv = mediaType === 'tv';
+      
+      // Replace type
+      url = url.replace('${type}', isTv ? 'tv' : 'movie');
+      
+      // Replace ID
+      url = url.replace('${id}', id);
+      
+      // Handle season/episode replacements
+      if (isTv && season && episode) {
+        url = url.replace('${seasonEpisode}', `/${season}/${episode}`);
+        url = url.replace('${seasonEpisodeAmp}', `&season=${season}&episode=${episode}`);
+        url = url.replace('${seasonEpisodeDash}', `-${season}-${episode}`);
+        url = url.replace('${seasonEpisodeSuper}', `&s=${season}&e=${episode}`);
+      } else {
+        url = url.replace('${seasonEpisode}', '');
+        url = url.replace('${seasonEpisodeAmp}', '');
+        url = url.replace('${seasonEpisodeDash}', '');
+        url = url.replace('${seasonEpisodeSuper}', '');
       }
-      sourceSelect.onchange = () => modalIframe.src = sourceSelect.value;
+      
+      // Apply proxy if enabled
+      if (proxyEnabled && currentProxy !== 'direct' && proxyConfig[currentProxy]) {
+        const proxy = proxyConfig[currentProxy];
+        if (proxy.enabled) {
+          url = proxy.url + encodeURIComponent(url);
+        }
+      }
+      
+      return url;
+    }
+
+    function renderServerList(sources, id, mediaType, season = null, episode = null) {
+      serverList.innerHTML = '';
+      
+      sources.forEach((source, index) => {
+        const item = document.createElement('div');
+        item.className = 'server-item' + (index === 0 ? ' active' : '');
+        
+        const speedClass = source.speed === 'fast' ? '' : (source.speed === 'slow' ? 'slow' : '');
+        
+        item.innerHTML = `
+          <span class="server-name">${source.name}</span>
+          <span class="server-status ${speedClass}">${source.quality.toUpperCase()} • ${source.speed}</span>
+        `;
+        
+        item.onclick = () => {
+          document.querySelectorAll('.server-item').forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+          const url = buildUrl(source, id, mediaType, season, episode);
+          modalIframe.src = url;
+        };
+        
+        serverList.appendChild(item);
+      });
+    }
+
+    function setupMovie(id) {
+      const sources = filterSourcesByCategory(currentCategory).filter(s => s.type === 'both' || s.type === 'movie');
+      renderServerList(sources, id, 'movie');
+      
+      if (sources.length > 0) {
+        const url = buildUrl(sources[0], id, 'movie');
+        modalIframe.src = url;
+      }
     }
 
     function setupTv(id) {
@@ -968,27 +1427,68 @@
         });
     }
 
-    function updateTvSource(id, s, e) {
-      sourceSelect.innerHTML = '';
-      tvSources.forEach(src => {
-        const url = src.replace('${id}', id).replace('${season}', s).replace('${episode}', e);
-        addSourceOption(url);
-      });
-      if(sourceSelect.options.length) {
-        sourceSelect.selectedIndex = 0;
-        modalIframe.src = sourceSelect.value;
+    function updateTvSource(id, season, episode) {
+      const sources = filterSourcesByCategory(currentCategory).filter(s => s.type === 'both' || s.type === 'tv');
+      renderServerList(sources, id, 'tv', season, episode);
+      
+      if (sources.length > 0) {
+        const url = buildUrl(sources[0], id, 'tv', season, episode);
+        modalIframe.src = url;
       }
-      sourceSelect.onchange = () => modalIframe.src = sourceSelect.value;
     }
 
-    function addSourceOption(url) {
-      const opt = document.createElement('option');
-      opt.value = url;
-      try {
-        opt.text = new URL(url).hostname.replace('www.','');
-      } catch { opt.text = 'Server'; }
-      sourceSelect.appendChild(opt);
-    }
+    // Proxy Controls
+    proxyToggle.addEventListener('click', () => {
+      proxyEnabled = !proxyEnabled;
+      proxyToggle.classList.toggle('active', proxyEnabled);
+      proxyStatus.classList.toggle('offline', !proxyEnabled);
+      
+      // Refresh current video if playing
+      if (modalIframe.src && currentItem) {
+        const activeServer = document.querySelector('.server-item.active');
+        if (activeServer) {
+          activeServer.click();
+        }
+      }
+    });
+
+    proxyGrid.addEventListener('click', (e) => {
+      if (e.target.classList.contains('proxy-btn')) {
+        document.querySelectorAll('.proxy-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentProxy = e.target.dataset.proxy;
+        
+        if (currentProxy !== 'direct') {
+          proxyEnabled = true;
+          proxyToggle.classList.add('active');
+          proxyStatus.classList.remove('offline');
+        } else {
+          proxyEnabled = false;
+          proxyToggle.classList.remove('active');
+          proxyStatus.classList.add('offline');
+        }
+      }
+    });
+
+    // Source Category Tabs
+    sourceTabs.addEventListener('click', (e) => {
+      if (e.target.classList.contains('source-tab')) {
+        document.querySelectorAll('.source-tab').forEach(tab => tab.classList.remove('active'));
+        e.target.classList.add('active');
+        currentCategory = e.target.dataset.category;
+        
+        // Refresh server list
+        const currentId = modalTitle.dataset.id;
+        const mediaType = modalTitle.dataset.type;
+        if (currentId) {
+          if (mediaType === 'tv' && seasonSelect.value && episodeSelect.value) {
+            updateTvSource(currentId, seasonSelect.value, episodeSelect.value);
+          } else if (mediaType === 'movie') {
+            setupMovie(currentId);
+          }
+        }
+      }
+    });
 
     function closeModal() {
       modal.classList.remove('show');
@@ -1012,6 +1512,16 @@
       await loadMore();
       await loadMore();
     }
+
+    // Store current item for reference
+    let currentItem = null;
+    const originalOpenModal = openModal;
+    openModal = function(item) {
+      currentItem = item;
+      modalTitle.dataset.id = item.id;
+      modalTitle.dataset.type = item.media_type;
+      originalOpenModal(item);
+    };
   </script>
 </body>
 </html>
