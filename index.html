@@ -202,8 +202,8 @@
                     <span id="proxy-method-status" style="color: var(--sys-primary);">IFrame Embed Active</span>
                 </div>
             </div>
-            <div class="window-content" id="chrome-content-area" style="position: relative; background: var(--sys-surface);">
-                <div id="chrome-iframe-container" style="width: 100%; height: 100%;"></div>
+            <div class="window-content" id="chrome-content-area" style="position: relative; background: var(--sys-surface); flex-grow: 1; min-height: 400px;">
+                <div id="chrome-iframe-container" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
                 <div id="chrome-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--sys-surface); flex-direction: column; justify-content: center; align-items: center; color: var(--sys-text);">
                     <div style="font-size: 64px; margin-bottom: 20px;">😕</div>
                     <h3 style="margin: 0 0 10px 0;">This site can't be reached</h3>
@@ -737,9 +737,13 @@ function loadUrlWithMethod(url, method) {
     document.getElementById('chrome-url').value = url;
     errorDiv.style.display = 'none';
 
+    // Clear previous content
+    container.innerHTML = '';
+
     try {
         if (method === 'iframe') {
             // Method 1: IFrame Embed (Your School Method)
+            // Create the embed HTML with the target URL
             const embedHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -747,29 +751,67 @@ function loadUrlWithMethod(url, method) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Browser</title>
     <style>
-        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+        iframe { width: 100%; height: 100%; border: none; display: block; }
     </style>
 </head>
 <body>
-    <iframe src="${url}" title="Secure Browser" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>
+    <iframe src="${url}" title="Secure Browser" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-modals"></iframe>
 </body>
 </html>`;
 
+            // Create blob and object URL
             const blob = new Blob([embedHtml], { type: 'text/html' });
             const blobUrl = URL.createObjectURL(blob);
 
-            container.innerHTML = `<iframe src="${blobUrl}" style="width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>`;
+            // Create iframe element properly (not using innerHTML)
+            const iframe = document.createElement('iframe');
+            iframe.src = blobUrl;
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-modals';
+            iframe.allowFullscreen = true;
+
+            // Add load and error handlers
+            iframe.onload = function() {
+                console.log('Iframe loaded successfully');
+            };
+
+            iframe.onerror = function() {
+                console.error('Iframe failed to load');
+                if (fallbackAttempts < 2) {
+                    fallbackAttempts++;
+                    loadUrlWithMethod(url, 'blob');
+                } else {
+                    showChromeError(url, 'Iframe method failed');
+                }
+            };
+
+            // Append to container
+            container.appendChild(iframe);
 
         } else if (method === 'blob') {
             // Method 2: Safety V2 - Direct Blob
             fetch(url, { mode: 'no-cors' })
-                .then(response => response.blob())
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.blob();
+                })
                 .then(blob => {
                     const blobUrl = URL.createObjectURL(blob);
-                    container.innerHTML = `<iframe src="${blobUrl}" style="width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`;
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = blobUrl;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups';
+
+                    container.appendChild(iframe);
                 })
-                .catch(() => {
+                .catch(err => {
+                    console.error('Blob method failed:', err);
                     if (fallbackAttempts < 2) {
                         fallbackAttempts++;
                         loadUrlWithMethod(url, 'dataurl');
@@ -783,8 +825,20 @@ function loadUrlWithMethod(url, method) {
             fetch(url, { mode: 'no-cors' })
                 .then(response => response.text())
                 .then(text => {
-                    const dataUrl = 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(text)));
-                    container.innerHTML = `<iframe src="${dataUrl}" style="width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`;
+                    try {
+                        const dataUrl = 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(text)));
+
+                        const iframe = document.createElement('iframe');
+                        iframe.src = dataUrl;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups';
+
+                        container.appendChild(iframe);
+                    } catch (e) {
+                        showChromeError(url, 'Data URL encoding failed');
+                    }
                 })
                 .catch(() => {
                     showChromeError(url, 'All proxy methods failed. Site may be blocked.');
