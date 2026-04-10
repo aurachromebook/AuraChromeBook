@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pixel Survival RPG V1.4</title>
+    <title>Pixel Survival RPG V1.5</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
@@ -41,7 +41,7 @@
             border: 2px solid #27ae60;
         }
 
-        /* --- RPG UI (V1.3/V1.4) --- */
+        /* --- RPG UI --- */
         #player-stats-ui {
             position: absolute; bottom: 15px; left: 15px;
             font-family: 'VT323', monospace; text-shadow: 1px 1px 0 #000;
@@ -211,7 +211,7 @@
             <div id="compass-icon">🧭</div>
             <div id="compass-arrow">⬆️</div>
         </div>
-        <div id="compass-tutorial">⬅ Click the compass to track the Jungle!</div>
+        <div id="compass-tutorial">⬅ Click the compass to track your next Island!</div>
 
         <div id="mastery-container">
             <span id="mastery-text">Fist Mastery: Lv. 1</span>
@@ -261,6 +261,7 @@
             </div>
             <div id="tab-log" class="tab-content" style="display:none;">
                 <h3 style="margin-top:0; color:#f1c40f;">Update Log</h3>
+                <p><b>V1.5:</b> Desert Island, Docks everywhere!</p>
                 <p><b>V1.4:</b> Devil Fruits! Spin & Dragon Powers.</p>
                 <p><b>V1.3:</b> Energy, Stats, UI Overhaul.</p>
                 <p><b>V1.2:</b> Gorilla King Boss, Cloud Saves.</p>
@@ -290,7 +291,7 @@
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- GAME STATE & GLOBALS ---
-        const WORLD_SIZE = 4000; 
+        const WORLD_SIZE = 6000; 
         const TILE_SIZE = 40;
         let gameState = 'START'; 
         let frameCount = 0;
@@ -310,7 +311,7 @@
         let entities = [];
         let particles = [];
         let activeShip = null; 
-        let quest = { active: false, name: "", target: 0, current: 0, entityName: "", reward: 0 };
+        let quest = { active: false, name: "", target: 0, current: 0, entityName: "", reward: 0, xpReward: 0 };
 
         // Persistent Stats across deaths
         let globalMoney = 0;
@@ -327,13 +328,14 @@
         let globalStatPoints = 0;
         let globalStats = { fruit: 1, melee: 1, defense: 1, gun: 1, sword: 1 };
         let globalFruit = null;
-        let globalInventory = []; // Array of strings e.g. 'Spin Fruit'
+        let globalInventory = []; 
         let tutorialShown_compass = false;
         let showCompassArrow = true;
 
         const PirateIslandCenter = { x: 1000, y: 1000 };
         const JungleIslandCenter = { x: 3000, y: 3000 };
         const GorillaIslandCenter = { x: 3800, y: 3000 };
+        const DesertIslandCenter = { x: 1000, y: 3000 }; // NEW: Desert Island
 
         let gorillaKingSpawnTimer = 0;
 
@@ -549,7 +551,6 @@
             }
         };
         
-        // Pause Feature removed! Menus open without changing gameState
         window.openMenu = () => {
             keys.w = keys.a = keys.s = keys.d = keys.q = keys.x = keys.e = false; mouse.down = false;
             ui.menuModal.style.display = 'flex';
@@ -680,6 +681,7 @@
             burglarSwim: ["000000","011110","122221","199991","111111","011110","000000"],
             gorilla: ["011110","111111","119911","111111","111111","110011","110011"],
             gorillaKing: ["000777000","001111100","011111110","011999110","011111110","011111110","011000110","011000110"],
+            desertBandit: ["011110","122221","177771","111111","011110","111111","1AA1AA"],
             npc1: ["011110","122221","121121","122221","01EE10","1EEEE1","1AA1AA"], 
             npc2: ["011110","122221","121121","122221","01DD10","1DDDD1","1AA1AA"], 
             npcJungle: ["011110","122221","121121","122221","016610","166661","1AA1AA"], 
@@ -689,6 +691,7 @@
             water: ["33333333","33B333B3","33333333","3B333B33","33333333","333B333B","33333333","3B333B33"],
             grass: ["66666666","65666566","66666666","66666666","66666666","66656666","66666666","66666666"],
             jungleGrass: ["GGGGGGGG","GHGGGHGG","GGGGGGGG","GGGGGGGG","GGGGGGGG","GGGHGGGG","GGGGGGGG","GGGGGGGG"],
+            sand: ["77777777","72777277","77777777","77777777","77777777","77727777","77777777","77777777"],
             stoneDk: ["FFFFFFFF","F1F1F1F1","FFFFFFFF","1F1F1F1F","FFFFFFFF","F1F1F1F1","FFFFFFFF","FFFFFFFF"],
             path: ["CCCCCC","CDDCCC","CCCCCC","CCCDDC","CCCCCC","CCCCCC"],
             dock: ["AA1AA1AA","1AAAA1AA","AA1AAAA1","1AA1AA1A","AAAA1AAA","AA1AA1AA","1AAAA1AA","AA1AAAA1"],
@@ -696,6 +699,7 @@
             stairs: ["11111111","EFEFEFEF","11111111","FEFEFEFE","11111111","EFEFEFEF","11111111","FEFEFEFE"],
             tree: ["00666600","06666660","66666666","66G6G666","00GIG000","00IIIG00","00III000","00III000"],
             bush: ["00000000","00000000","00666600","06G66G60","666G6666","6G6666G6"],
+            building: ["00111111111100","01888888888810","18888888888881","14444444444441","14114444441141","14114444441141","14444411444441","14444412144441","11111111111111"],
             windmillBase: ["001100","01AA10","01AA10","1AAAA1","1AAAA1","1AAAA1"],
             shipWood: ["00000A000000","0001AAA10000","001AAAAA1000","01AAAAAAA100","01A1AAA1A100","1AA1AAA1AA10","1AAAAAAAAA10","1A1AAAAA1A10","011111111100"],
             crater: ["00111100","01AAAA10","1AA11AA1","1A1AA1A1","1AA11AA1","01AAAA10","00111100"]
@@ -743,7 +747,7 @@
             ui.toolbar.innerHTML = html;
         };
 
-        // Input Setup - Block input when interacting with UI!
+        // Input Setup
         window.addEventListener('keydown', e => {
             if (ui.menuModal.style.display === 'flex' || ui.dialogueBox.style.display === 'flex') return;
             const k = e.key.toLowerCase();
@@ -833,6 +837,13 @@
                     }
                 }
             }
+            // Jungle Dock
+            let jDockY = jy + jRadius - 2;
+            for(let dy=0; dy<4; dy++) {
+                for(let dx=-2; dx<=3; dx++) {
+                    if (mapGrid[jDockY+dy] && mapGrid[jDockY+dy][jx+dx]) mapGrid[jDockY+dy][jx+dx] = 'dock';
+                }
+            }
 
             // 3. Gorilla King Island
             let gx = GorillaIslandCenter.x / TILE_SIZE;
@@ -843,6 +854,28 @@
                     if (Math.hypot(x - gx, y - gy) < gRadius) {
                         if(mapGrid[y] && mapGrid[y][x]) mapGrid[y][x] = 'stoneDk';
                     }
+                }
+            }
+
+            // 4. Desert Island (V1.5)
+            let dx_c = DesertIslandCenter.x / TILE_SIZE;
+            let dy_c = DesertIslandCenter.y / TILE_SIZE;
+            let dRadius = 16;
+            for (let y = dy_c - dRadius; y <= dy_c + dRadius; y++) {
+                for (let x = dx_c - dRadius; x <= dx_c + dRadius; x++) {
+                    if (Math.hypot(x - dx_c, y - dy_c) < dRadius) {
+                        if(mapGrid[y] && mapGrid[y][x]) mapGrid[y][x] = 'sand';
+                    }
+                }
+            }
+            for (let y = dy_c; y < dy_c + dRadius; y++) {
+                if (mapGrid[y] && mapGrid[y][dx_c]) mapGrid[y][dx_c] = 'path';
+                if (mapGrid[y] && mapGrid[y][dx_c+1]) mapGrid[y][dx_c+1] = 'path';
+            }
+            let dDockY = dy_c + dRadius - 1;
+            for(let dy=0; dy<4; dy++) {
+                for(let dx=-2; dx<=3; dx++) {
+                    if (mapGrid[dDockY+dy] && mapGrid[dDockY+dy][dx_c+dx]) mapGrid[dDockY+dy][dx_c+dx] = 'dock';
                 }
             }
 
@@ -861,6 +894,15 @@
                 const dist = Math.hypot(tx - JungleIslandCenter.x, ty - JungleIslandCenter.y);
                 if (dist > 150 && dist < jRadius * TILE_SIZE) {
                     decorations.push({ x: tx, y: ty, sprite: Math.random() > 0.3 ? sprites.tree : sprites.bush });
+                }
+            }
+
+            // Desert Houses
+            for(let i=0; i<8; i++) {
+                let bx = DesertIslandCenter.x + (Math.random()-0.5)*900;
+                let by = DesertIslandCenter.y + (Math.random()-0.5)*900;
+                if (Math.hypot(bx - DesertIslandCenter.x, by - DesertIslandCenter.y) < dRadius * TILE_SIZE && Math.hypot(bx - DesertIslandCenter.x, by - DesertIslandCenter.y) > 150) {
+                    decorations.push({ x: bx, y: by, sprite: sprites.building });
                 }
             }
         }
@@ -1269,7 +1311,7 @@
             update() {
                 this.life--; if (this.life <= 0) this.remove = true;
                 entities.forEach(ent => {
-                    if ((ent.type === 'burglar' || ent.type === 'gorilla' || ent.type === 'gorilla king') && !ent.remove && !this.hitEnemies.includes(ent)) {
+                    if ((ent.type === 'burglar' || ent.type === 'gorilla' || ent.type === 'gorilla king' || ent.type === 'desert bandit') && !ent.remove && !this.hitEnemies.includes(ent)) {
                         if (Math.hypot(ent.x - this.x, ent.y - this.y) < this.radius + ent.radius) {
                             ent.takeDamage(this.damage, 'fist'); this.hitEnemies.push(ent);
                             ent.x += Math.cos(this.angle) * this.knockback; ent.y += Math.sin(this.angle) * this.knockback;
@@ -1288,9 +1330,11 @@
         class Enemy {
             constructor(type, spawnX, spawnY) {
                 this.type = type; this.x = spawnX; this.y = spawnY; this.spawnX = spawnX; this.spawnY = spawnY;
-                if (type === 'burglar') { this.sprite = sprites.burglar; this.speed = 2.0; this.hp = 6; this.xpReward = 15; }
-                else if (type === 'gorilla') { this.sprite = sprites.gorilla; this.speed = 2.5; this.hp = 15; this.xpReward = 30; } 
-                else if (type === 'gorilla king') { this.sprite = sprites.gorillaKing; this.speed = 1.8; this.hp = 150; this.xpReward = 500; this.slamCooldown = 100; }
+                if (type === 'burglar') { this.sprite = sprites.burglar; this.speed = 2.0; this.hp = 6; }
+                else if (type === 'desert bandit') { this.sprite = sprites.desertBandit; this.speed = 2.2; this.hp = 30; }
+                else if (type === 'gorilla') { this.sprite = sprites.gorilla; this.speed = 2.5; this.hp = 15; } 
+                else if (type === 'gorilla king') { this.sprite = sprites.gorillaKing; this.speed = 1.8; this.hp = 150; this.slamCooldown = 100; }
+                
                 this.isSwimming = false; this.radius = this.sprite.centerW * (type==='gorilla king' ? 2 : 1);
                 this.wobble = Math.random() * Math.PI * 2; this.hitTime = 0;
             }
@@ -1349,15 +1393,26 @@
             }
 
             die(source) {
-                this.remove = true; player.gainXp(this.xpReward);
+                this.remove = true;
                 if (source === 'fist') player.gainMastery(5); 
                 if (this.type === 'gorilla king') gorillaKingSpawnTimer = 60 * 60 * 5; 
+                
+                // Normal monster XP
+                if (!quest.active || quest.entityName.toLowerCase() !== this.type) {
+                    if (this.type === 'burglar') player.gainXp(15);
+                    else if (this.type === 'desert bandit') player.gainXp(50);
+                    else if (this.type === 'gorilla') player.gainXp(30);
+                    else if (this.type === 'gorilla king') player.gainXp(500);
+                }
+
                 if (quest.active && quest.entityName.toLowerCase() === this.type) {
                     quest.current++; updateQuestUI();
                     if (quest.current >= quest.target) {
-                        quest.active = false; player.gainXp(100); player.addMoney(quest.reward);
+                        quest.active = false; 
+                        player.gainXp(quest.xpReward || 100); 
+                        player.addMoney(quest.reward);
                         let earnedStats = Math.floor(Math.random() * 3) + 1; globalStatPoints += earnedStats;
-                        ui.questTracker.innerHTML = `<span style="color:#2ecc71">Quest Complete!</span><br>+100 XP<br>+$${quest.reward}<br>+${earnedStats} Stat Points!`;
+                        ui.questTracker.innerHTML = `<span style="color:#2ecc71">Quest Complete!</span><br>+${quest.xpReward || 100} XP<br>+$${quest.reward}<br>+${earnedStats} Stat Points!`;
                         setTimeout(() => ui.questTracker.style.opacity = 0, 4000); saveGameData(); window.switchTab('stats'); 
                     }
                 }
@@ -1448,7 +1503,7 @@
         function updateQuestUI() {
             if (quest.active) {
                 ui.questTracker.style.display = 'block'; ui.questTracker.style.opacity = 1;
-                ui.questTracker.innerHTML = `<span style="color:#f1c40f">${quest.name}</span><br>Kill ${quest.target} ${quest.entityName}s<br>Progress: ${quest.current}/${quest.target}<br><span style="color:#2ecc71">Reward: $${quest.reward}</span>`;
+                ui.questTracker.innerHTML = `<span style="color:#f1c40f">${quest.name}</span><br>Kill ${quest.target} ${quest.entityName}s<br>Progress: ${quest.current}/${quest.target}<br><span style="color:#2ecc71">Reward: $${quest.reward} | ${quest.xpReward} XP</span>`;
             }
         }
 
@@ -1465,8 +1520,8 @@
         function showPirateMenu() {
             startDialogue();
             setDialogue("Welcome! What quest do you want to choose?", [
-                { text: "1: Pirate Burglar", action: () => setDialogue("Pirate Burglar<br><br>Target: 7 Burglars<br>Reward: $20<br>Req: Lv. 1<br><br>Do you accept?", [
-                    { text: "Yes", action: () => { quest = { active: true, name: "Pirate Burglar", target: 7, current: 0, entityName: "Burglar", reward: 20 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showPirateMenu }
+                { text: "1: Pirate Burglar", action: () => setDialogue("Pirate Burglar<br><br>Target: 7 Burglars<br>Reward: $20 | 100 XP<br>Req: Lv. 1<br><br>Do you accept?", [
+                    { text: "Yes", action: () => { quest = { active: true, name: "Pirate Burglar", target: 7, current: 0, entityName: "Burglar", reward: 20, xpReward: 100 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showPirateMenu }
                 ]) }, { text: "2: Back", action: closeDialogue }
             ]);
         }
@@ -1476,7 +1531,8 @@
             setDialogue("Ahoy there! Buy a ship to cross the seas fast!", [
                 { text: "$100 Wooden Ship", action: () => {
                     if (player.money >= 100 && !activeShip) {
-                        player.money -= 100; globalMoney = player.money; updateHUD(); activeShip = new Ship(player.x, player.y + 100); 
+                        player.money -= 100; globalMoney = player.money; updateHUD(); 
+                        activeShip = new Ship(player.x, player.y + 100); 
                         setDialogue("She's all yours! Walk over to board her.", [{ text: "Leave", action: closeDialogue }]); saveGameData(); window.switchTab('items');
                     } else if (activeShip) setDialogue("Ye already own a fine vessel!", [{ text: "Leave", action: closeDialogue }]);
                     else setDialogue("Yer pockets are lookin' a little light.", [{ text: "Leave", action: closeDialogue }]);
@@ -1489,16 +1545,28 @@
             setDialogue("Ooga booga! Hunt beasts?", [
                 { text: "1: Hunt Gorillas", action: () => {
                     let reqMet = player.level >= 10;
-                    setDialogue(`Hunt Gorillas<br><br>Target: 7 Gorillas<br>Reward: $40<br>Req: Lv. 10<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
-                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Gorilla Hunt", target: 7, current: 0, entityName: "Gorilla", reward: 40 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showJungleMenu }
+                    setDialogue(`Hunt Gorillas<br><br>Target: 7 Gorillas<br>Reward: $40 | 500 XP<br>Req: Lv. 10<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
+                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Gorilla Hunt", target: 7, current: 0, entityName: "Gorilla", reward: 40, xpReward: 500 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showJungleMenu }
                     ]);
                 }},
                 { text: "2: Gorilla King", action: () => {
                     let reqMet = player.level >= 15;
-                    setDialogue(`Gorilla King<br><br>Target: 1 Gorilla King<br>Reward: $100<br>Req: Lv. 15<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
-                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Gorilla King", target: 1, current: 0, entityName: "Gorilla King", reward: 100 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showJungleMenu }
+                    setDialogue(`Gorilla King<br><br>Target: 1 Gorilla King<br>Reward: $100 | 1020 XP<br>Req: Lv. 15<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
+                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Gorilla King", target: 1, current: 0, entityName: "Gorilla King", reward: 100, xpReward: 1020 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showJungleMenu }
                     ]);
                 }}, { text: "3: Back", action: closeDialogue }
+            ]);
+        }
+
+        function showDesertMenu() {
+            startDialogue();
+            setDialogue("Howdy partner. Ready to clean up this town?", [
+                { text: "1: Desert Bandits", action: () => {
+                    let reqMet = player.level >= 25;
+                    setDialogue(`Desert Bandits<br><br>Target: 10 Desert Bandits<br>Reward: $60 | 1500 XP<br>Req: Lv. 25<br><br>${reqMet ? "Accept?" : "<span style='color:red'>Level too low!</span>"}`, [
+                        { text: "Yes", disabled: !reqMet, action: () => { quest = { active: true, name: "Desert Bandit", target: 10, current: 0, entityName: "Desert Bandit", reward: 60, xpReward: 1500 }; updateQuestUI(); closeDialogue(); } }, { text: "No", action: showDesertMenu }
+                    ]);
+                }}, { text: "2: Back", action: closeDialogue }
             ]);
         }
 
@@ -1530,7 +1598,6 @@
                 loadProgress += Math.random() * 2 + 0.5; document.getElementById('loading-bar-inner').style.width = Math.min(loadProgress, 100) + '%';
                 loadingFrameId = requestAnimationFrame(simulateLoading);
             } else if (!isDataLoaded) {
-                // Wait for Local DB or Cloud to finish loading
                 loadingFrameId = requestAnimationFrame(simulateLoading);
             } else { setTimeout(startGame, 500); }
         }
@@ -1544,14 +1611,22 @@
             if (window.loadedWithShip && !activeShip) activeShip = new Ship(player.x, player.y + 100); 
 
             npcs = [];
+            // Pirate NPCs
             let px = Math.floor(PirateIslandCenter.x / TILE_SIZE); let py = Math.floor(PirateIslandCenter.y / TILE_SIZE);
             npcs.push(new NPC("Guild Master", px * TILE_SIZE, (py-2) * TILE_SIZE, 'npc1', showPirateMenu));
             npcs.push(new NPC("Shipwright", px * TILE_SIZE, (py+13) * TILE_SIZE, 'npc2', showShipwright));
             
+            // Jungle NPCs
             let jx = Math.floor(JungleIslandCenter.x / TILE_SIZE); let jy = Math.floor(JungleIslandCenter.y / TILE_SIZE);
             npcs.push(new NPC("Jungle Chief", jx * TILE_SIZE, (jy-8) * TILE_SIZE, 'npcJungle', showJungleMenu));
+            npcs.push(new NPC("Shipwright", jx * TILE_SIZE, (jy+14) * TILE_SIZE, 'npc2', showShipwright));
             npcs.push(new NPC("Fruit Dealer", (jx+10) * TILE_SIZE, (jy+10) * TILE_SIZE, 'npc2', showFruitDealer));
             
+            // Desert NPCs
+            let dx_c = Math.floor(DesertIslandCenter.x / TILE_SIZE); let dy_c = Math.floor(DesertIslandCenter.y / TILE_SIZE);
+            npcs.push(new NPC("Desert Mayor", dx_c * TILE_SIZE, (dy_c-2) * TILE_SIZE, 'npc1', showDesertMenu));
+            npcs.push(new NPC("Shipwright", dx_c * TILE_SIZE, (dy_c+14) * TILE_SIZE, 'npc2', showShipwright));
+
             entities = []; particles = []; craters = []; lasers = []; quest.active = false; gorillaKingSpawnTimer = 0; 
             
             ui.loading.style.display = 'none'; ui.over.style.display = 'none';
@@ -1577,10 +1652,12 @@
             let distPirate = Math.hypot(player.x - PirateIslandCenter.x, player.y - PirateIslandCenter.y);
             let distJungle = Math.hypot(player.x - JungleIslandCenter.x, player.y - JungleIslandCenter.y);
             let distGorilla = Math.hypot(player.x - GorillaIslandCenter.x, player.y - GorillaIslandCenter.y);
+            let distDesert = Math.hypot(player.x - DesertIslandCenter.x, player.y - DesertIslandCenter.y);
             
-            let minDist = Math.min(distPirate, distJungle, distGorilla);
+            let minDist = Math.min(distPirate, distJungle, distGorilla, distDesert);
             if (minDist === distJungle) { globalSpawnX = JungleIslandCenter.x; globalSpawnY = JungleIslandCenter.y; }
             else if (minDist === distGorilla) { globalSpawnX = GorillaIslandCenter.x; globalSpawnY = GorillaIslandCenter.y; }
+            else if (minDist === distDesert) { globalSpawnX = DesertIslandCenter.x; globalSpawnY = DesertIslandCenter.y; }
             else { globalSpawnX = PirateIslandCenter.x; globalSpawnY = PirateIslandCenter.y; }
 
             globalXp = player.xp; globalLevel = player.level; globalMaxXp = player.maxXp;
@@ -1624,13 +1701,21 @@
         function manageAudioAndThemes() {
             let distToPirate = Math.hypot(player.x - PirateIslandCenter.x, player.y - PirateIslandCenter.y);
             let distToJungle = Math.hypot(player.x - JungleIslandCenter.x, player.y - JungleIslandCenter.y);
-            if (distToPirate < 800) playTheme('pirate'); else if (distToJungle < 800) playTheme('jungle'); else playTheme('none');
+            let distToDesert = Math.hypot(player.x - DesertIslandCenter.x, player.y - DesertIslandCenter.y);
+            
+            if (distToPirate < 800) playTheme('pirate'); 
+            else if (distToJungle < 800) playTheme('jungle'); 
+            else if (distToDesert < 800) playTheme('jungle'); // Reuse theme
+            else playTheme('none');
         }
 
         function drawCompass() {
             if (!showCompassArrow) return;
             let targetX = PirateIslandCenter.x; let targetY = PirateIslandCenter.y;
-            if (player.level >= 10) { targetX = JungleIslandCenter.x; targetY = JungleIslandCenter.y; }
+            
+            if (player.level >= 25) { targetX = DesertIslandCenter.x; targetY = DesertIslandCenter.y; }
+            else if (player.level >= 10) { targetX = JungleIslandCenter.x; targetY = JungleIslandCenter.y; }
+            
             ui.compassArrow.style.transform = `rotate(${Math.atan2(targetY - player.y, targetX - player.x) + Math.PI/2}rad)`;
         }
 
@@ -1671,8 +1756,9 @@
             particles.forEach(p => p.draw(ctx));
 
             ctx.restore();
-            
-            animationFrameId = requestAnimationFrame(gameLoop);
+            if (gameState === 'PLAYING') {
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
         }
 
         document.getElementById('restart-btn').addEventListener('click', () => {
