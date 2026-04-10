@@ -175,38 +175,46 @@
 
         <!-- UPDATED CHROME WINDOW WITH WORKING PROXIES -->
         <div class="window" id="chrome-window" style="display: none;">
-            <div class="window-header" id="chrome-window-header"><span class="window-title">🌐 Google Chrome</span><div><button class="win-btn" onclick="minimizeApp('chrome-window')">−</button><button class="win-btn" onclick="maximizeApp('chrome-window')">□</button><button class="win-btn close-btn" onclick="closeApp('chrome-window')">✕</button></div></div>
+            <div class="window-header" id="chrome-window-header">
+                <span class="window-title">🌐 Google Chrome</span>
+                <div>
+                    <button class="win-btn" onclick="minimizeApp('chrome-window')">−</button>
+                    <button class="win-btn" onclick="maximizeApp('chrome-window')">□</button>
+                    <button class="win-btn close-btn" onclick="closeApp('chrome-window')">✕</button>
+                </div>
+            </div>
             <div class="browser-toolbar">
-                <button onclick="chromeBack()">◀</button><button onclick="chromeForward()">▶</button><button onclick="chromeReload()">↻</button>
+                <button onclick="chromeBack()">◀</button>
+                <button onclick="chromeForward()">▶</button>
+                <button onclick="chromeReload()">↻</button>
                 <input type="text" id="chrome-url" value="https://www.google.com" placeholder="Search Google or type a URL" onkeydown="if(event.key==='Enter')navigateChrome()">
                 <button onclick="navigateChrome()">Go</button>
                 <button onclick="toggleProxySettings()" title="Proxy Settings">⚙️</button>
             </div>
-            <!-- Proxy Settings Panel -->
-            <div id="proxy-settings" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
-                    <span>CORS Proxy:</span>
-                    <select id="proxy-selector" onchange="changeProxy()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
-                        <option value="corsproxy">CorsProxy.io (Default)</option>
-                        <option value="allorigins">AllOrigins</option>
-                        <option value="apiallorigins">API.AllOrigins</option>
-                        <option value="none">None (Direct - May Fail)</option>
+            <div id="proxy-settings-panel" style="display: none; background: var(--sys-surface); border-bottom: 1px solid var(--sys-border); padding: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap;">
+                    <span>Proxy Method:</span>
+                    <select id="proxy-method-selector" onchange="changeProxyMethod()" style="background: transparent; color: var(--sys-text); border: 1px solid var(--sys-border); padding: 5px; border-radius: 4px;">
+                        <option value="iframe">IFrame Embed (Default)</option>
+                        <option value="blob">Safety V2 (Blob)</option>
+                        <option value="dataurl">Safety V3 (Data URL)</option>
                     </select>
-                    <span id="proxy-status" style="color: var(--sys-primary);">Active</span>
+                    <span id="proxy-method-status" style="color: var(--sys-primary);">IFrame Embed Active</span>
                 </div>
             </div>
-            <div class="window-content" style="position: relative;">
-                <iframe id="chrome-frame" src="about:blank" width="100%" height="100%" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+            <div class="window-content" id="chrome-content-area" style="position: relative; background: var(--sys-surface);">
+                <div id="chrome-iframe-container" style="width: 100%; height: 100%;"></div>
                 <div id="chrome-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--sys-surface); flex-direction: column; justify-content: center; align-items: center; color: var(--sys-text);">
                     <div style="font-size: 64px; margin-bottom: 20px;">😕</div>
                     <h3 style="margin: 0 0 10px 0;">This site can't be reached</h3>
                     <p id="chrome-error-text" style="color: var(--sys-text-muted); margin: 0 0 20px 0;">The webpage might be temporarily down or it may have moved permanently.</p>
-                    <button onclick="retryChrome()" style="background: var(--sys-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); cursor: pointer;">Try Again</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="retryChrome()" style="background: var(--sys-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); cursor: pointer;">Try Again</button>
+                        <button onclick="fallbackProxy()" style="background: #ea4335; color: white; border: none; padding: 10px 20px; border-radius: var(--radius-full); cursor: pointer;">Try Fallback</button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="window" id="settings-window" style="display: none;">
+        </div><div class="window" id="settings-window" style="display: none;">
             <div class="window-header" id="settings-window-header"><span class="window-title">⚙️ Settings</span><div><button class="win-btn" onclick="minimizeApp('settings-window')">−</button><button class="win-btn" onclick="maximizeApp('settings-window')">□</button><button class="win-btn close-btn" onclick="closeApp('settings-window')">✕</button></div></div>
             <div class="window-content" style="padding: 20px;">
                 <h3 class="settings-title">Personalization</h3>
@@ -511,6 +519,8 @@ function autoDownloadRobloxAnimator() {
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(autoDownloadRobloxAnimator, 2000);
 });
+    // Initialize tab cloaking
+    initTabCloak();
 
 
 
@@ -671,6 +681,181 @@ function initTabCloak() {
         changeTabCloak();
     }
 }
+
+
+
+// --- CHROME PROXY SYSTEM V2 (IFRAME EMBED METHOD) ---
+let currentProxyMethod = localStorage.getItem('chrome_proxy_method') || 'iframe';
+let currentUrl = 'https://www.google.com';
+let fallbackAttempts = 0;
+
+function changeProxyMethod() {
+    const selector = document.getElementById('proxy-method-selector');
+    currentProxyMethod = selector.value;
+    localStorage.setItem('chrome_proxy_method', currentProxyMethod);
+
+    const status = document.getElementById('proxy-method-status');
+    const methods = {
+        'iframe': 'IFrame Embed Active',
+        'blob': 'Safety V2 (Blob) Active',
+        'dataurl': 'Safety V3 (Data URL) Active'
+    };
+    status.innerText = methods[currentProxyMethod] || 'Unknown Method';
+
+    // Reload current page with new method
+    if (currentUrl && currentUrl !== 'about:blank') {
+        loadUrlWithMethod(currentUrl, currentProxyMethod);
+    }
+}
+
+function toggleProxySettings() {
+    const panel = document.getElementById('proxy-settings-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function navigateChrome() {
+    let url = document.getElementById('chrome-url').value.trim();
+    if (!url) return;
+
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+    }
+
+    if (!url.includes('.') || url.includes(' ')) {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+    }
+
+    currentUrl = url;
+    fallbackAttempts = 0;
+    loadUrlWithMethod(url, currentProxyMethod);
+}
+
+function loadUrlWithMethod(url, method) {
+    const container = document.getElementById('chrome-iframe-container');
+    const errorDiv = document.getElementById('chrome-error');
+
+    document.getElementById('chrome-url').value = url;
+    errorDiv.style.display = 'none';
+
+    try {
+        if (method === 'iframe') {
+            // Method 1: IFrame Embed (Your School Method)
+            const embedHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Browser</title>
+    <style>
+        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+    <iframe src="${url}" title="Secure Browser" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>
+</body>
+</html>`;
+
+            const blob = new Blob([embedHtml], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            container.innerHTML = `<iframe src="${blobUrl}" style="width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>`;
+
+        } else if (method === 'blob') {
+            // Method 2: Safety V2 - Direct Blob
+            fetch(url, { mode: 'no-cors' })
+                .then(response => response.blob())
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    container.innerHTML = `<iframe src="${blobUrl}" style="width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`;
+                })
+                .catch(() => {
+                    if (fallbackAttempts < 2) {
+                        fallbackAttempts++;
+                        loadUrlWithMethod(url, 'dataurl');
+                    } else {
+                        showChromeError(url, 'All methods failed');
+                    }
+                });
+
+        } else if (method === 'dataurl') {
+            // Method 3: Safety V3 - Data URL
+            fetch(url, { mode: 'no-cors' })
+                .then(response => response.text())
+                .then(text => {
+                    const dataUrl = 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(text)));
+                    container.innerHTML = `<iframe src="${dataUrl}" style="width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`;
+                })
+                .catch(() => {
+                    showChromeError(url, 'All proxy methods failed. Site may be blocked.');
+                });
+        }
+    } catch (err) {
+        console.error('Proxy error:', err);
+        if (fallbackAttempts < 2) {
+            fallbackAttempts++;
+            const nextMethod = method === 'iframe' ? 'blob' : 'dataurl';
+            loadUrlWithMethod(url, nextMethod);
+        } else {
+            showChromeError(url, err.message);
+        }
+    }
+}
+
+function fallbackProxy() {
+    if (fallbackAttempts >= 2) {
+        fallbackAttempts = 0;
+    }
+    const methods = ['iframe', 'blob', 'dataurl'];
+    const currentIndex = methods.indexOf(currentProxyMethod);
+    const nextMethod = methods[(currentIndex + 1) % methods.length];
+
+    document.getElementById('proxy-method-selector').value = nextMethod;
+    changeProxyMethod();
+}
+
+function showChromeError(url, message) {
+    const errorDiv = document.getElementById('chrome-error');
+    const errorText = document.getElementById('chrome-error-text');
+    errorText.innerText = message || `The webpage at ${url} might be temporarily down or it may have moved permanently.`;
+    errorDiv.style.display = 'flex';
+}
+
+function retryChrome() {
+    if (currentUrl) {
+        fallbackAttempts = 0;
+        loadUrlWithMethod(currentUrl, currentProxyMethod);
+    }
+}
+
+function chromeBack() {
+    // Implementation for back button
+    console.log('Back button clicked');
+}
+
+function chromeForward() {
+    // Implementation for forward button
+    console.log('Forward button clicked');
+}
+
+function chromeReload() {
+    if (currentUrl) {
+        loadUrlWithMethod(currentUrl, currentProxyMethod);
+    }
+}
+
+function initChromeProxy() {
+    const selector = document.getElementById('proxy-method-selector');
+    if (selector) {
+        selector.value = currentProxyMethod;
+        changeProxyMethod();
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initChromeProxy();
+});
 
 </script>
 </body>
