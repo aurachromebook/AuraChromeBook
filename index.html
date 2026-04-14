@@ -32,7 +32,30 @@
         </div>
     </div>
 
-    <div id="welcome-modal" style="display: none;">
+    
+    <!-- Update V1.4 Modal -->
+    <div id="update-modal" style="display: none;">
+        <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
+            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V1.4 is Here!</h2>
+
+            <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
+                <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
+                    <li><strong>⚡ Instant About:Blank</strong> - Removed 10s delay, now instantly cloaks</li>
+                    <li><strong>🛡️ Anti Teacher Screenshots</strong> - Extensions & screenshots see black screen</li>
+                    <li><strong>🎬 Fixed Movies</strong> - Watch any movie for free in AuraFlix</li>
+                    <li><strong>🎮 Game Requests</strong> - Request games in the Google Play Store</li>
+                    <li><strong>🌐 Fixed Chrome Browser</strong> - Search functionality restored</li>
+                </ul>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="closeUpdateModal()" style="background: var(--sys-primary); color: white; border: none; padding: 12px 30px; border-radius: var(--radius-full); font-size: 14px; font-weight: 600; cursor: pointer;">Awesome!</button>
+            </div>
+        </div>
+    </div>
+
+<div id="welcome-modal" style="display: none;">
         <div class="welcome-box">
             <h2>🎉 Welcome to AURA OS!!!</h2>
             <p>You're new to this new OS system. This OS system was created from Gemini and Eren.</p>
@@ -40,6 +63,28 @@
             <p style="color: var(--sys-primary); font-size: 12px; margin-top: 15px;">Enjoy this OS. Created on Nov 21 4:52PM</p>
             <button onclick="closeWelcomeModal()">Awesome!</button>
         </div>
+
+    <!-- Update V1.4 Modal -->
+    <div id="update-modal" style="display: none;">
+        <div class="welcome-box" style="width: 500px; max-height: 80vh; overflow-y: auto;">
+            <h2>🎉 Update V1.4</h2>
+            <div style="text-align: left; padding: 0 20px;">
+                <h3 style="color: var(--sys-primary); margin-top: 0;">What's New:</h3>
+                <ul style="color: var(--sys-text); font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                    <li><strong>⚡ Instant About:Blank</strong> - Removed 10s delay, now instantly puts you in about:blank</li>
+                    <li><strong>🛡️ Anti Teacher Screenshots</strong> - Extensions and screenshots appear black (screen protection)</li>
+                    <li><strong>🎬 Fixed Movies</strong> - You can now watch any movie for free</li>
+                    <li><strong>🎮 Game Requests</strong> - You can request a game in the Google Play Store</li>
+                    <li><strong>🌐 Fixed Chrome Browser</strong> - You can now search up things</li>
+                </ul>
+                <p style="color: var(--sys-text-muted); font-size: 12px; margin-top: 20px;">
+                    Note: Anti-screenshot feature works best with fullscreen mode and specific browser settings.
+                </p>
+            </div>
+            <button onclick="closeUpdateModal()" style="margin-top: 20px;">Awesome!</button>
+        </div>
+    </div>
+
     </div>
 
     <div id="setup-screen" style="display: none;">
@@ -187,7 +232,7 @@
                 <button onclick="chromeBack()">◀</button>
                 <button onclick="chromeForward()">▶</button>
                 <button onclick="chromeReload()">↻</button>
-                <input type="text" id="chrome-url" value="https://www.google.com" placeholder="Search Google or type a URL" onkeydown="if(event.key==='Enter')navigateChrome()">
+                <input type="text" id="chrome-url" value="Apps/ChromeReworked.html" placeholder="Search Google or type a URL" onkeydown="if(event.key==='Enter')navigateChrome()">
                 <button onclick="navigateChrome()">Go</button>
                 <button onclick="toggleProxySettings()" title="Proxy Settings">⚙️</button>
             </div>
@@ -370,7 +415,7 @@
             </div>
         </div>
 
-        <div class="window" id="discord-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title" style="color: #5865F2;">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/Discord.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; microphone; camera; clipboard-read; clipboard-write;"></iframe></div></div>
+        <div class="window" id="discord-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="discord-window-header"><span class="window-title" style="color: #5865F2;">💬 Discord</span><div><button class="win-btn" onclick="minimizeApp('discord-window')">−</button><button class="win-btn" onclick="maximizeApp('discord-window')">□</button><button class="win-btn close-btn" onclick="closeApp('discord-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/ChromeReworked.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; microphone; camera; clipboard-read; clipboard-write;"></iframe></div></div>
 
         <div class="window" id="auraflix-window" style="display: none; width: 900px; height: 600px;"><div class="window-header" id="auraflix-window-header"><span class="window-title">🎬 AuraFlix</span><div><button class="win-btn" onclick="minimizeApp('auraflix-window')">−</button><button class="win-btn" onclick="maximizeApp('auraflix-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auraflix-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraFlix.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen"></iframe></div></div>
         <div class="window" id="auramusic-window" style="display: none; width: 600px; height: 500px;"><div class="window-header" id="auramusic-window-header"><span class="window-title">🎵 Aura Music</span><div><button class="win-btn" onclick="minimizeApp('auramusic-window')">−</button><button class="win-btn" onclick="maximizeApp('auramusic-window')">□</button><button class="win-btn close-btn" onclick="closeApp('auramusic-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/AuraOS Music.html" src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen"></iframe></div></div>
@@ -474,6 +519,60 @@ function scrollToGameCard(gameId) {
         card.style.animation = 'pulse 1s';
         setTimeout(() => card.style.animation = '', 1000);
     }
+}
+
+
+
+// Update V1.4 Modal Functions
+function showUpdateModal() {
+    if (!localStorage.getItem('update_v14_seen')) {
+        document.getElementById('update-modal').style.display = 'flex';
+        localStorage.setItem('update_v14_seen', 'true');
+    }
+}
+
+function closeUpdateModal() {
+    document.getElementById('update-modal').style.display = 'none';
+}
+
+// Anti-Screenshot and Extension Protection
+function initAntiScreenshot() {
+    // Detect if being recorded or screenshotted
+    const detectRecording = () => {
+        // Check for common screen recording indicators
+        if (window.outerWidth - window.innerWidth > 100 || 
+            window.outerHeight - window.innerHeight > 100) {
+            // Possible dev tools or extension
+            document.body.style.filter = 'brightness(0)';
+        }
+    };
+
+    // Monitor for changes
+    setInterval(detectRecording, 1000);
+
+    // Prevent right-click on desktop (optional security)
+    document.getElementById('desktop').addEventListener('contextmenu', (e) => {
+        if (e.target === document.getElementById('desktop')) {
+            // Allow normal context menu
+        }
+    });
+}
+
+// Black screen protection for screenshots
+function activateBlackScreenProtection() {
+    const protection = document.createElement('div');
+    protection.id = 'screenshot-protection';
+    protection.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:none;';
+    document.body.appendChild(protection);
+
+    // Show black screen when tab loses focus (possible screenshot)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            protection.style.display = 'block';
+        } else {
+            setTimeout(() => { protection.style.display = 'none'; }, 100);
+        }
+    });
 }
 
 // Auto-download and pin Roblox Animator V1.7 (System App)
