@@ -525,9 +525,10 @@ function scrollToGameCard(gameId) {
 
 // Update V1.4 Modal Functions
 function showUpdateModal() {
-    if (!localStorage.getItem('update_v14_seen')) {
+    // Show for everyone (new and returning users), but only once
+    if (!localStorage.getItem('update_v14_shown')) {
         document.getElementById('update-modal').style.display = 'flex';
-        localStorage.setItem('update_v14_seen', 'true');
+        localStorage.setItem('update_v14_shown', 'true');
     }
 }
 
@@ -824,6 +825,16 @@ function toggleProxySettings() {
 
 function navigateChrome() {
     let url = document.getElementById('chrome-url').value.trim();
+
+    // Special case: ChromeReworked.html loads directly without proxy
+    if (url === 'Apps/ChromeReworked.html' || url.includes('ChromeReworked')) {
+        const container = document.getElementById('chrome-iframe-container');
+        if (container) {
+            container.innerHTML = '<iframe src="Apps/ChromeReworked.html" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe>';
+        }
+        return;
+    }
+
     if (!url) url = 'https://www.google.com';
 
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
