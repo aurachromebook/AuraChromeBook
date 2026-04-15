@@ -208,6 +208,18 @@ function initTabCloak() {
 (function checkInstantAboutBlank() {
     const setting = localStorage.getItem('aboutblank_setting');
     if (setting === 'always') {
+        // Prevent multiple about:blank tabs - check if we're already in an iframe
+        if (window.self !== window.top) {
+            // Already inside an iframe (about:blank), do nothing
+            return;
+        }
+
+        // Check if we've already opened about:blank in this session
+        if (sessionStorage.getItem('aboutblank_opened')) {
+            return;
+        }
+        sessionStorage.setItem('aboutblank_opened', 'true');
+
         const currentUrl = window.location.href;
         const newWindow = window.open('about:blank', '_blank');
 
@@ -228,6 +240,9 @@ function initTabCloak() {
                 </html>
             `);
             newWindow.document.close();
+
+            // Close the original tab
+            window.close();
         }
     }
 })();
@@ -264,6 +279,16 @@ function handleAboutBlank(choice) {
 }
 
 function openInAboutBlank() {
+    // Prevent multiple about:blank tabs
+    if (window.self !== window.top) {
+        return;
+    }
+
+    if (sessionStorage.getItem('aboutblank_opened')) {
+        return;
+    }
+    sessionStorage.setItem('aboutblank_opened', 'true');
+
     const currentUrl = window.location.href;
     const newWindow = window.open('about:blank', '_blank');
 
@@ -285,10 +310,8 @@ function openInAboutBlank() {
         `);
         newWindow.document.close();
 
-        // Close original window if opened successfully
-        if (aboutBlankPending) {
-            aboutBlankPending = false;
-        }
+        // Close the original tab
+        window.close();
     }
 }
 
