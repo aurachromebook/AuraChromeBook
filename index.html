@@ -512,9 +512,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-<script>
-// Scroll to game card when featured banner is clicked
+    <script src="script.js">// Scroll to game card when featured banner is clicked
 function scrollToGameCard(gameId) {
     const card = document.getElementById(gameId.replace('-window', '-card'));
     if (card) {
@@ -524,15 +522,40 @@ function scrollToGameCard(gameId) {
     }
 }
 
+
+
+// Update V1.4 Modal Functions
+function showUpdateModal() {
+    // Show for everyone (new and returning users), but only once
+    if (!localStorage.getItem('update_v14_shown')) {
+        document.getElementById('update-modal').style.display = 'flex';
+        localStorage.setItem('update_v14_shown', 'true');
+    }
+}
+
+
+
 // Anti-Screenshot and Extension Protection
 function initAntiScreenshot() {
+    // Detect if being recorded or screenshotted
     const detectRecording = () => {
+        // Check for common screen recording indicators
         if (window.outerWidth - window.innerWidth > 100 || 
             window.outerHeight - window.innerHeight > 100) {
+            // Possible dev tools or extension
             document.body.style.filter = 'brightness(0)';
         }
     };
+
+    // Monitor for changes
     setInterval(detectRecording, 1000);
+
+    // Prevent right-click on desktop (optional security)
+    document.getElementById('desktop').addEventListener('contextmenu', (e) => {
+        if (e.target === document.getElementById('desktop')) {
+            // Allow normal context menu
+        }
+    });
 }
 
 // Black screen protection for screenshots
@@ -541,6 +564,8 @@ function activateBlackScreenProtection() {
     protection.id = 'screenshot-protection';
     protection.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:none;';
     document.body.appendChild(protection);
+
+    // Show black screen when tab loses focus (possible screenshot)
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             protection.style.display = 'block';
@@ -555,11 +580,14 @@ function autoDownloadRobloxAnimator() {
     const appId = 'robloxanimator-window';
     const icon = '🎬';
     const name = 'Roblox Animator V1.7';
+
     let savedApps = JSON.parse(localStorage.getItem('os_installed_apps') || '[]');
     const alreadyInstalled = savedApps.find(app => app.id === appId);
+
     if (!alreadyInstalled) {
         savedApps.push({ id: appId, icon: icon, name: name, pinned: true, system: true });
         localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+
         const launcherList = document.getElementById('launcher-list');
         if (launcherList && !launcherList.querySelector(`[data-app-id="${appId}"]`)) {
             const item = document.createElement('div');
@@ -571,6 +599,7 @@ function autoDownloadRobloxAnimator() {
             item.innerHTML = `<div class="l-icon">${icon}</div><span class="l-text">${name}</span>`;
             launcherList.appendChild(item);
         }
+
         if (!document.getElementById('taskbar-' + appId)) {
             const taskbarIconsContainer = document.getElementById('app-icons');
             const btn = document.createElement('button');
@@ -583,6 +612,7 @@ function autoDownloadRobloxAnimator() {
             taskbarIconsContainer.appendChild(btn);
             if (typeof makeIconDraggable === 'function') makeIconDraggable(btn);
         }
+
         setTimeout(() => {
             if (typeof notificationMgr !== 'undefined') {
                 notificationMgr.showNotification({
@@ -596,10 +626,440 @@ function autoDownloadRobloxAnimator() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+        // Show update modal immediately
+        showUpdateModal();
+
+    // INSTANT about:blank cloaking (if set to always)
+    // Moved to window.onload
+
+    // Show update modal immediately
+    // Moved to window.onload
+
+    // Initialize other functions
     setTimeout(autoDownloadRobloxAnimator, 2000);
+    initTabCloak();
     initAntiScreenshot();
     activateBlackScreenProtection();
 });
+    // Initialize tab cloaking
+    initTabCloak();
+
+
+
+// --- TAB CLOAKING CONFIGURATION ---
+const CLOAK_PRESETS = {
+    aura: {
+        title: 'Aura OS - Ultimate Edition',
+        favicon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    },
+    fleckle: {
+        title: 'Fleckle - Student Portal',
+        favicon: 'https://www.google.com/favicon.ico'
+    },
+    classroom: {
+        title: 'Google Classroom',
+        favicon: 'https://ssl.gstatic.com/classroom/favicon.png'
+    },
+    flocabulary: {
+        title: 'Flocabulary - Educational Hip-Hop',
+        favicon: 'https://www.flocabulary.com/wp-content/uploads/2018/07/cropped-flobook-32x32.png'
+    },
+    docs: {
+        title: 'Google Docs',
+        favicon: 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico'
+    },
+    slides: {
+        title: 'Google Slides',
+        favicon: 'https://ssl.gstatic.com/docs/presentations/images/favicon5.ico'
+    },
+    drive: {
+        title: 'Google Drive',
+        favicon: 'https://ssl.gstatic.com/drive/favicon.ico'
+    },
+    canvas: {
+        title: 'Canvas',
+        favicon: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico'
+    },
+    clever: {
+        title: 'Clever | Portal',
+        favicon: 'https://assets.clever.com/favicon/favicon.ico'
+    },
+    khan: {
+        title: 'Khan Academy',
+        favicon: 'https://cdn.kastatic.org/images/favicon.ico'
+    },
+    ixl: {
+        title: 'IXL | Math, Language Arts, Science, Social Studies',
+        favicon: 'https://www.ixl.com/favicon.ico'
+    },
+    quizlet: {
+        title: 'Quizlet',
+        favicon: 'https://quizlet.com/favicon.ico'
+    },
+    desmos: {
+        title: 'Desmos | Graphing Calculator',
+        favicon: 'https://www.desmos.com/favicon.ico'
+    },
+    wikipedia: {
+        title: 'Wikipedia',
+        favicon: 'https://en.wikipedia.org/static/favicon/wikipedia.ico'
+    },
+    britannica: {
+        title: 'Encyclopaedia Britannica',
+        favicon: 'https://cdn.britannica.com/favicon.png'
+    },
+    codewars: {
+        title: 'Codewars - Achieve mastery through coding practice',
+        favicon: 'https://www.codewars.com/favicon.ico'
+    },
+    github: {
+        title: 'GitHub',
+        favicon: 'https://github.com/favicon.ico'
+    },
+    stackoverflow: {
+        title: 'Stack Overflow - Where Developers Learn, Share, & Build',
+        favicon: 'https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico'
+    },
+    chess: {
+        title: 'Chess.com - Play Chess Online',
+        favicon: 'https://www.chess.com/favicon.ico'
+    },
+    coolmath: {
+        title: 'Cool Math Games - Free Online Games',
+        favicon: 'https://www.coolmathgames.com/favicon.ico'
+    },
+    poki: {
+        title: 'Poki - Free Online Games',
+        favicon: 'https://poki.com/favicon.ico'
+    },
+    scratch: {
+        title: 'Scratch - Imagine, Program, Share',
+        favicon: 'https://scratch.mit.edu/favicon.ico'
+    },
+    codeorg: {
+        title: 'Code.org',
+        favicon: 'https://code.org/favicon.ico'
+    },
+    typing: {
+        title: 'Typing.com - Learn to Type',
+        favicon: 'https://www.typing.com/favicon.ico'
+    },
+    nitrotype: {
+        title: 'Nitro Type | Competitive Typing Game',
+        favicon: 'https://www.nitrotype.com/favicon.ico'
+    },
+    prodigy: {
+        title: 'Prodigy Math Game',
+        favicon: 'https://www.prodigygame.com/favicon.ico'
+    },
+    readworks: {
+        title: 'ReadWorks',
+        favicon: 'https://www.readworks.org/favicon.ico'
+    },
+    newsela: {
+        title: 'Newsela | Instructional Content Platform',
+        favicon: 'https://newsela.com/favicon.ico'
+    },
+    nearpod: {
+        title: 'Nearpod',
+        favicon: 'https://nearpod.com/favicon.ico'
+    },
+    edpuzzle: {
+        title: 'Edpuzzle',
+        favicon: 'https://edpuzzle.com/favicon.ico'
+    },
+    blooket: {
+        title: 'Blooket',
+        favicon: 'https://www.blooket.com/favicon.ico'
+    },
+    gimkit: {
+        title: 'Gimkit',
+        favicon: 'https://www.gimkit.com/favicon.ico'
+    },
+    kahoot: {
+        title: 'Kahoot!',
+        favicon: 'https://kahoot.com/favicon.ico'
+    }
+};
+
+function changeTabCloak() {
+    const selector = document.getElementById('cloak-selector');
+    const preset = CLOAK_PRESETS[selector.value];
+
+    if (preset) {
+        document.getElementById('page-title').innerText = preset.title;
+        document.getElementById('page-favicon').href = preset.favicon;
+        localStorage.setItem('tab_cloak', selector.value);
+
+        document.getElementById('cloak-status').innerText = 'Current: ' + preset.title;
+    }
+}
+
+function initTabCloak() {
+    const savedCloak = localStorage.getItem('tab_cloak') || 'aura';
+    const selector = document.getElementById('cloak-selector');
+    if (selector) {
+        selector.value = savedCloak;
+        changeTabCloak();
+    }
+}
+
+
+
+// --- CHROME PROXY SYSTEM V2 (IFRAME EMBED METHOD) ---
+let currentProxyMethod = localStorage.getItem('chrome_proxy_method') || 'iframe';
+let currentUrl = 'https://www.google.com';
+let fallbackAttempts = 0;
+
+function changeProxyMethod() {
+    const selector = document.getElementById('proxy-method-selector');
+    currentProxyMethod = selector.value;
+    localStorage.setItem('chrome_proxy_method', currentProxyMethod);
+
+    const status = document.getElementById('proxy-method-status');
+    const methods = {
+        'iframe': 'IFrame Embed Active',
+        'blob': 'Safety V2 (Blob) Active',
+        'dataurl': 'Safety V3 (Data URL) Active'
+    };
+    status.innerText = methods[currentProxyMethod] || 'Unknown Method';
+
+    // Reload current page with new method
+    if (currentUrl && currentUrl !== 'about:blank') {
+        loadUrlWithMethod(currentUrl, currentProxyMethod);
+    }
+}
+
+function toggleProxySettings() {
+    const panel = document.getElementById('proxy-settings-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+
+// Load ChromeReworked.html directly without proxy
+function loadChromeReworked() {
+    const container = document.getElementById('chrome-iframe-container');
+    if (container) {
+        container.innerHTML = '<iframe src="Apps/ChromeReworked.html" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe>';
+    }
+    document.getElementById('chrome-url').value = 'Aura Browser';
+}
+
+function navigateChrome() {
+    let url = document.getElementById('chrome-url').value.trim();
+
+    // Special case: ChromeReworked.html loads directly without proxy
+    if (url === 'Apps/ChromeReworked.html' || url.includes('ChromeReworked')) {
+        const container = document.getElementById('chrome-iframe-container');
+        if (container) {
+            container.innerHTML = '<iframe src="Apps/ChromeReworked.html" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe>';
+        }
+        return;
+    }
+
+    if (!url) url = 'https://www.google.com';
+
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+    }
+
+    if (!url.includes('.') || url.includes(' ')) {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+    }
+
+    currentUrl = url;
+    fallbackAttempts = 0;
+
+    // Ensure window is visible before loading
+    const chromeWindow = document.getElementById('chrome-window');
+    if (chromeWindow.style.display === 'none') {
+        chromeWindow.style.display = 'flex';
+    }
+
+    loadUrlWithMethod(url, currentProxyMethod);
+}
+
+function loadUrlWithMethod(url, method) {
+    const container = document.getElementById('chrome-iframe-container');
+    const errorDiv = document.getElementById('chrome-error');
+
+    document.getElementById('chrome-url').value = url;
+    errorDiv.style.display = 'none';
+
+    // Clear previous content
+    container.innerHTML = '';
+
+    try {
+        if (method === 'iframe') {
+            // Method 1: IFrame Embed (Your School Method)
+            // Create the embed HTML with the target URL
+            const embedHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Browser</title>
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+    </style>
+</head>
+<body>
+    <iframe src="${url}" title="Secure Browser" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-modals"></iframe>
+</body>
+</html>`;
+
+            // Create blob and object URL
+            const blob = new Blob([embedHtml], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            // Create iframe element properly (not using innerHTML)
+            const iframe = document.createElement('iframe');
+            iframe.src = blobUrl;
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-modals';
+            iframe.allowFullscreen = true;
+
+            // Add load and error handlers
+            iframe.onload = function() {
+                console.log('Iframe loaded successfully');
+            };
+
+            iframe.onerror = function() {
+                console.error('Iframe failed to load');
+                if (fallbackAttempts < 2) {
+                    fallbackAttempts++;
+                    loadUrlWithMethod(url, 'blob');
+                } else {
+                    showChromeError(url, 'Iframe method failed');
+                }
+            };
+
+            // Append to container
+            container.appendChild(iframe);
+
+        } else if (method === 'blob') {
+            // Method 2: Safety V2 - Direct Blob
+            fetch(url, { mode: 'no-cors' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = blobUrl;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups';
+
+                    container.appendChild(iframe);
+                })
+                .catch(err => {
+                    console.error('Blob method failed:', err);
+                    if (fallbackAttempts < 2) {
+                        fallbackAttempts++;
+                        loadUrlWithMethod(url, 'dataurl');
+                    } else {
+                        showChromeError(url, 'All methods failed');
+                    }
+                });
+
+        } else if (method === 'dataurl') {
+            // Method 3: Safety V3 - Data URL
+            fetch(url, { mode: 'no-cors' })
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const dataUrl = 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(text)));
+
+                        const iframe = document.createElement('iframe');
+                        iframe.src = dataUrl;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '100%';
+                        iframe.style.border = 'none';
+                        iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups';
+
+                        container.appendChild(iframe);
+                    } catch (e) {
+                        showChromeError(url, 'Data URL encoding failed');
+                    }
+                })
+                .catch(() => {
+                    showChromeError(url, 'All proxy methods failed. Site may be blocked.');
+                });
+        }
+    } catch (err) {
+        console.error('Proxy error:', err);
+        if (fallbackAttempts < 2) {
+            fallbackAttempts++;
+            const nextMethod = method === 'iframe' ? 'blob' : 'dataurl';
+            loadUrlWithMethod(url, nextMethod);
+        } else {
+            showChromeError(url, err.message);
+        }
+    }
+}
+
+function fallbackProxy() {
+    if (fallbackAttempts >= 2) {
+        fallbackAttempts = 0;
+    }
+    const methods = ['iframe', 'blob', 'dataurl'];
+    const currentIndex = methods.indexOf(currentProxyMethod);
+    const nextMethod = methods[(currentIndex + 1) % methods.length];
+
+    document.getElementById('proxy-method-selector').value = nextMethod;
+    changeProxyMethod();
+}
+
+function showChromeError(url, message) {
+    const errorDiv = document.getElementById('chrome-error');
+    const errorText = document.getElementById('chrome-error-text');
+    errorText.innerText = message || `The webpage at ${url} might be temporarily down or it may have moved permanently.`;
+    errorDiv.style.display = 'flex';
+}
+
+function retryChrome() {
+    if (currentUrl) {
+        fallbackAttempts = 0;
+        loadUrlWithMethod(currentUrl, currentProxyMethod);
+    }
+}
+
+function chromeBack() {
+    // Implementation for back button
+    console.log('Back button clicked');
+}
+
+function chromeForward() {
+    // Implementation for forward button
+    console.log('Forward button clicked');
+}
+
+function chromeReload() {
+    if (currentUrl) {
+        loadUrlWithMethod(currentUrl, currentProxyMethod);
+    }
+}
+
+function initChromeProxy() {
+    const selector = document.getElementById('proxy-method-selector');
+    if (selector) {
+        selector.value = currentProxyMethod;
+        changeProxyMethod();
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initChromeProxy();
+});
+
 </script>
 </body>
 </html>
