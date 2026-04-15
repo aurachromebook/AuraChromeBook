@@ -367,7 +367,7 @@
                 <div class="play-tabs">
                     <button class="play-tab active" onclick="switchStoreTab('games')">Games</button>
                     <button class="play-tab" onclick="switchStoreTab('apps')">Apps</button>
-                    <button class="play-tab" onclick="openApp('request-game-window')" style="margin-left: auto; background: linear-gradient(135deg, #34a853, #81c995); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600;">🎮 Request Game</button>
+                    <button class="play-tab" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSfEwoHItFQn_EiyxeE1G1mPAeNtKYlDJcZ7yVKdKWmAezKCUQ/viewform?usp=dialog', '_blank')" style="margin-left: auto; background: linear-gradient(135deg, #34a853, #81c995); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600;">🎮 Request Game</button>
                 </div>
 
                 <div id="store-games-tab" class="store-tab-content active">
@@ -413,27 +413,6 @@
                         <div class="store-card"><div class="store-icon">🌐</div><div class="store-info"><strong>Google Chrome</strong><span>Web Browser • 4.9 ★</span></div><button class="store-btn" disabled style="background: transparent; color: var(--play-green);">Installed</button></div>
                         <div class="store-card"><div class="store-icon">📝</div><div class="store-info"><strong>Wordpad</strong><span>Productivity • 4.5 ★</span></div><button class="store-btn" disabled style="background: transparent; color: var(--play-green);">Installed</button></div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Request Game Window -->
-        <div class="window" id="request-game-window" style="display: none; width: 800px; height: 650px;">
-            <div class="window-header" id="request-game-window-header">
-                <span class="window-title">🎮 Request a Game</span>
-                <div>
-                    <button class="win-btn" onclick="minimizeApp('request-game-window')">−</button>
-                    <button class="win-btn" onclick="maximizeApp('request-game-window')">□</button>
-                    <button class="win-btn close-btn" onclick="closeApp('request-game-window')">✕</button>
-                </div>
-            </div>
-            <div class="window-content" style="padding: 0; overflow: hidden;">
-                <iframe id="request-game-frame" src="" data-src="https://docs.google.com/forms/d/e/1FAIpQLSfEwoHItFQn_EiyxeE1G1mPAeNtKYlDJcZ7yVKdKWmAezKCUQ/viewform?usp=dialog" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-                <div id="request-game-error" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--sys-surface); flex-direction: column; justify-content: center; align-items: center; color: var(--sys-text);">
-                    <div style="font-size: 64px; margin-bottom: 20px;">🎮</div>
-                    <h3 style="margin: 0 0 10px 0;">Request a Game</h3>
-                    <p style="color: var(--sys-text-muted); margin: 0 0 20px 0; text-align: center; padding: 0 20px;">The form couldn't be loaded in the window due to security restrictions.</p>
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfEwoHItFQn_EiyxeE1G1mPAeNtKYlDJcZ7yVKdKWmAezKCUQ/viewform?usp=dialog" target="_blank" style="background: var(--sys-primary); color: white; border: none; padding: 12px 30px; border-radius: var(--radius-full); cursor: pointer; text-decoration: none; font-weight: 600;">Open Form in New Tab</a>
                 </div>
             </div>
         </div>
