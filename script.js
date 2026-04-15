@@ -260,21 +260,27 @@ function showBlockMessage() {
     });
 }
 
+function showUpdateModal() {
+    // Show on every login (once per session), regardless of previous visits
+    if (!sessionStorage.getItem('update_v14_shown')) {
+        document.getElementById('update-modal').style.display = 'flex';
+        sessionStorage.setItem('update_v14_shown', 'true');
+    }
+}
+
 function checkAboutBlankSetting() {
     const setting = localStorage.getItem('aboutblank_setting');
-    
+
     if (setting === 'block') {
         return; // Don't show anything
     } else if (setting === 'always') {
-        // Auto open in about:blank after password entry
-        setTimeout(() => {
-            openInAboutBlank();
-        }, 1000);
+        // INSTANT about:blank - no delay
+        openInAboutBlank();
     } else {
-        // Show modal (ask mode or not set)
+        // Show modal (ask mode or not set) - small delay to let page render
         setTimeout(() => {
             showAboutBlankModal();
-        }, 3000);
+        }, 500);
     }
 }
 
@@ -498,6 +504,8 @@ function closeWelcomeModal() {
 }
 
 function initializeDesktop() {
+    // Show update modal instantly on login (once per session)
+    showUpdateModal();
     updateCalendarWidget();
     initChromeProxy();
     initTabCloak();
