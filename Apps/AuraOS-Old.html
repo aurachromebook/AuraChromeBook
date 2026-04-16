@@ -1,0 +1,3444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura OS</title>
+
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Load Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase script REMOVED -->
+
+    <style>
+        /* --- Base & Scrollbar --- */
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            user-select: none;
+        }
+
+        /* Custom scrollbar for window content */
+        .window-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .window-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .window-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        .window-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- Boot Screen --- */
+        #aura-boot-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease-out;
+        }
+        .boot-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            border-top-color: transparent;
+            animation: boot-spin 1.5s ease-in-out infinite;
+        }
+        @keyframes boot-spin {
+            0% { transform: rotate(0deg) scale(0.9); }
+            50% { transform: rotate(180deg) scale(1); }
+            100% { transform: rotate(360deg) scale(0.9); }
+        }
+
+        /* --- Desktop --- */
+        #desktop-background {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            /* The "alive" gradient */
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient-flow 30s ease infinite;
+            transition: background 0.5s ease; /* Smooth transition for custom wallpaper */
+        }
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        #desktop-icon-grid {
+            position: absolute;
+            inset: 0; /* Make it a canvas */
+            top: 2rem;
+            left: 2rem;
+        }
+        
+        .desktop-icon {
+            position: absolute; /* DRAGGABLE! */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+            text-align: center;
+            width: 80px;
+            padding: 0.25rem;
+            border-radius: 6px;
+        }
+        .desktop-icon:hover {
+            transform: scale(1.05);
+        }
+        .desktop-icon.is-dragging {
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+        }
+        .desktop-icon .icon-bg {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: background 0.2s ease;
+            pointer-events: none; /* Pass clicks to parent */
+        }
+        .desktop-icon:hover .icon-bg {
+             background: rgba(255, 255, 255, 0.2);
+        }
+        .desktop-icon span {
+            font-size: 0.8rem;
+            font-weight: 500;
+            /* Ellipsis for long names */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            pointer-events: none; /* Pass clicks to parent */
+        }
+
+        /* --- Dock --- */
+        #aura-dock {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 5000;
+        }
+        
+        #dock-app-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dock-item {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-origin: bottom;
+            position: relative;
+        }
+        .dock-item:hover {
+            transform: scale(1.15) translateY(-6px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        /* Style for when an item is being dragged */
+        .dock-item.is-dragging {
+            opacity: 0.4;
+        }
+        /* Style for the drop target (folder creation) */
+        .dock-item.drop-target {
+            background: rgba(35, 166, 213, 0.5);
+            transform: scale(1.15) translateY(-6px);
+        }
+        /* Ghost placeholder for reordering */
+        .dock-ghost {
+            width: 52px;
+            height: 52px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .dock-item[data-app-id="clock"] {
+            width: auto;
+            padding: 0 0.75rem;
+            font-size: 0.8rem;
+            cursor: default;
+            text-align: right;
+            line-height: 1.4;
+            min-width: 90px;
+        }
+        .dock-item[data-app-id="clock"] #dock-clock {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .dock-item[data-app-id="clock"]:hover {
+            transform: none;
+            background: transparent;
+        }
+        .dock-separator {
+            width: 1px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 0.25rem;
+        }
+        
+        /* Active dot */
+        .dock-item .active-dot {
+            position: absolute;
+            bottom: 4px;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #fff;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s ease;
+        }
+        .dock-item.active .active-dot {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* --- Dock Folder Flyout --- */
+        #dock-folder-flyout {
+            position: fixed;
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9998; /* Below context menu */
+            color: #fff;
+            font-size: 0.9rem;
+            transform-origin: bottom center;
+            animation: flyout-open 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #dock-folder-flyout .flyout-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            min-width: 150px;
+        }
+        #dock-folder-flyout .flyout-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        #dock-folder-flyout .flyout-name {
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.25rem;
+            cursor: text;
+        }
+        @keyframes flyout-open {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+
+        /* --- Window --- */
+        #window-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none; /* Pass clicks through */
+        }
+        
+        .app-window {
+            position: absolute;
+            min-width: 300px;
+            min-height: 200px;
+            background: rgba(24, 24, 27, 0.5); /* Darker glass */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto; /* Windows are interactive */
+            
+            /* "Spring" open animation */
+            transform: scale(0.9);
+            opacity: 0;
+            animation: window-open 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            container-type: inline-size; /* Magic! */
+            transition: all 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        /* Focus styles */
+        .app-window:not(.active) {
+            opacity: 0.9;
+        }
+        .app-window.active {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .app-window.minimized {
+            transform: scale(0.8) translateY(200px);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .app-window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 6rem) !important; /* Avoid dock */
+            border-radius: 0;
+        }
+
+        @keyframes window-open {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .window-header {
+            flex-shrink: 0;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0.75rem;
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .window-header.is-dragging {
+            cursor: grabbing;
+        }
+        
+        .window-title {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .window-control {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .window-control:hover {
+            transform: scale(1.1);
+        }
+        .window-control.close { background: #ff5f57; }
+        .window-control.minimize { background: #ffbd2e; }
+        .window-control.maximize { background: #28c940; }
+
+        .window-body {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow: auto;
+            color: #e4e4e7; /* Lighter text color */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Resize Handles --- */
+        .resize-handle {
+            position: absolute;
+            z-index: 10;
+        }
+        .resize-handle.n { top: -5px; left: 5px; right: 5px; height: 10px; cursor: n-resize; }
+        .resize-handle.s { bottom: -5px; left: 5px; right: 5px; height: 10px; cursor: s-resize; }
+        .resize-handle.e { top: 5px; bottom: 5px; right: -5px; width: 10px; cursor: e-resize; }
+        .resize-handle.w { top: 5px; bottom: 5px; left: -5px; width: 10px; cursor: w-resize; }
+        .resize-handle.nw { top: -5px; left: -5px; width: 10px; height: 10px; cursor: nw-resize; }
+        .resize-handle.ne { top: -5px; right: -5px; width: 10px; height: 10px; cursor: ne-resize; }
+        .resize-handle.sw { bottom: -5px; left: -5px; width: 10px; height: 10px; cursor: sw-resize; }
+        .resize-handle.se { bottom: -5px; right: -5px; width: 10px; height: 10px; cursor: se-resize; }
+        
+        /* --- Context Menu --- */
+        #context-menu {
+            position: fixed;
+            display: none;
+            flex-direction: column;
+            padding: 0.5rem;
+            background: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .context-menu-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+        .context-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .context-menu-separator {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        /* --- App-Specific Styles --- */
+
+        /* Utility */
+        .hidden {
+            display: none;
+        }
+        .aura-btn {
+             background: #23a6d5;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            box-shadow: 0 2px 8px rgba(35, 166, 213, 0.3);
+        }
+        .aura-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(35, 166, 213, 0.4);
+        }
+        .aura-text-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            color: #e4e4e7;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .aura-text-input:focus {
+            border-color: #23a6d5;
+        }
+
+        /* Notepad App */
+        .notepad-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .notepad-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .notepad-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .notepad-textarea {
+            width: 100%;
+            height: 100%;
+            flex-grow: 1; /* Added */
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            resize: none;
+        }
+
+        /* Settings App (Container Query Demo) */
+        .settings-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            height: 100%;
+        }
+        .settings-sidebar {
+            display: flex;
+            flex-direction: row; /* Stack horizontally on mobile */
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+        .settings-sidebar-item {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+        .settings-sidebar-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+        }
+        .settings-pane {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-y: auto; /* For update log */
+        }
+        .settings-pane.hidden {
+            display: none;
+        }
+        
+        /* Style for radio buttons */
+        .settings-pane input[type="radio"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translateY(-0.075em);
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+        }
+        .settings-pane input[type="radio"]::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #fff;
+        }
+        .settings-pane input[type="radio"]:checked::before {
+            transform: scale(1);
+        }
+        .settings-pane input[type="radio"]:focus {
+            outline: 2px solid #23a6d5;
+            outline-offset: 2px;
+        }
+
+        /* Custom file input button */
+        .file-upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        .file-upload-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .file-upload-btn input[type="file"] {
+            display: none;
+        }
+        .file-name-display {
+            font-size: 0.8rem;
+            color: #a1a1aa; /* zinc-400 */
+            margin-left: 0.5rem;
+            font-style: italic;
+        }
+
+        /* This is the container query! */
+        @container (min-width: 450px) {
+            .settings-content {
+                grid-template-columns: 1fr 2.5fr; /* Sidebar + Content */
+            }
+            .settings-sidebar {
+                flex-direction: column; /* Stack vertically */
+                overflow-x: hidden;
+                padding-bottom: 0;
+            }
+        }
+
+        /* Terminal App */
+        .terminal-output {
+            height: calc(100% - 30px);
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .terminal-line {
+            display: flex;
+        }
+        .terminal-prompt {
+            color: #28c940; /* Green prompt */
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+        .terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e4e4e7;
+            font-family: monospace;
+            flex-grow: 1;
+        }
+        
+        /* File Explorer App */
+        .file-explorer-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .file-explorer-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .file-explorer-nav-btn {
+            padding: 0.25rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .file-explorer-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .file-explorer-address-bar {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            color: #e4e4e7;
+        }
+        .file-explorer-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 1rem;
+            height: 100%;
+            overflow: hidden; /* Important for layout */
+        }
+        .file-explorer-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            overflow-y: auto;
+        }
+        .file-explorer-sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.9rem;
+        }
+        .file-explorer-sidebar-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+        }
+        .file-explorer-pane {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+        .file-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-align: center;
+            width: 80px;
+        }
+        .file-item:hover {
+            transform: scale(1.05);
+        }
+        .file-item .icon-bg {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+        .file-item:hover .icon-bg {
+             background: rgba(255, 255, 255, 0.1);
+        }
+        .file-item span {
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* Update Log Styles */
+        .update-log-entry {
+            margin-bottom: 1rem;
+        }
+        .update-log-entry h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .update-log-entry ul {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+            font-size: 0.9rem;
+            color: #e4e4e7;
+        }
+        .update-log-entry li {
+            margin-bottom: 0.25rem;
+        }
+        .update-log-entry .badge {
+            font-size: 0.75rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 99px;
+            font-weight: 600;
+            margin-left: 0.25rem;
+        }
+        .badge.new { background: #28c940; color: #000; }
+        .badge.improved { background: #23a6d5; color: #000; }
+        .badge.fix { background: #ffbd2e; color: #000; }
+
+
+        /* Calculator App */
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            height: 100%;
+        }
+        .calc-display {
+            grid-column: 1 / -1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: right;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .calc-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+        }
+        .calc-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .calc-btn.op {
+            background: rgba(23, 166, 213, 0.5); /* Blue */
+        }
+        .calc-btn.op:hover {
+            background: rgba(23, 166, 213, 0.7);
+        }
+        .calc-btn.clear {
+            background: rgba(231, 60, 126, 0.5); /* Pink/Red */
+        }
+        .calc-btn.clear:hover {
+            background: rgba(231, 60, 126, 0.7);
+        }
+        .calc-btn.span-2 {
+            grid-column: span 2;
+        }
+
+        /* Snake Game App */
+        .snake-app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .snake-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        #snake-canvas {
+            background: #111;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Sketchpad App */
+        .sketchpad-app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 0.5rem;
+        }
+        .sketchpad-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .color-swatch.active {
+            border-color: #fff;
+            transform: scale(1.1);
+        }
+        .sketchpad-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .sketchpad-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        #sketch-canvas {
+            background: #fff;
+            border-radius: 8px;
+            flex-grow: 1;
+            cursor: crosshair;
+        }
+        
+        /* --- Notification Center --- */
+        #notification-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 320px;
+        }
+        .toast-notification {
+            background: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            animation: slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .toast-notification.slide-out {
+            animation: slide-out 0.5s ease-out forwards;
+        }
+        .toast-notification .icon {
+            flex-shrink: 0;
+            color: #23a6d5;
+        }
+        .toast-notification .content h3 {
+            font-weight: 600;
+            color: #fff;
+        }
+        .toast-notification .content p {
+            font-size: 0.9rem;
+            color: #e4e4e7;
+        }
+        @keyframes slide-in {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes slide-out {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        /* App Launcher Overlay */
+        #app-launcher {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 6000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        #app-launcher.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .launcher-close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .launcher-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .launcher-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        .launcher-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            width: 100px;
+            margin: 0 auto;
+        }
+        .launcher-item:hover {
+            transform: scale(1.05);
+        }
+        .launcher-item .icon-bg {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: background 0.2s ease;
+        }
+        .launcher-item:hover .icon-bg {
+             background: rgba(255, 255, 255, 0.2);
+        }
+        .launcher-item span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* Login Modal / Warning Modal */
+        .aura-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .aura-modal-content {
+            background: rgba(30, 30, 30, 0.8);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+        
+        /* Play Store Styles */
+        .play-store-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .play-store-search {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .play-store-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .play-store-tab {
+            padding: 0.5rem 0.25rem;
+            color: #a1a1aa;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+        .play-store-tab.active {
+            color: #fff;
+            font-weight: 600;
+            border-bottom-color: #23a6d5;
+        }
+        .play-store-featured {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .play-store-featured img {
+            width: 128px;
+            height: 128px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+
+    </style>
+</head>
+<body class="bg-black text-white">
+
+    <!-- 1. Boot Screen -->
+    <div id="aura-boot-screen">
+        <div class="boot-logo"></div>
+    </div>
+
+    <!-- 2. Desktop -->
+    <div id="desktop-background"></div>
+    <div id="desktop-icon-grid">
+        <!-- Icons are now rendered by Desktop class from VFS -->
+    </div>
+
+    <!-- 3. Window Container -->
+    <div id="window-container">
+        <!-- Windows are dynamically created here -->
+    </div>
+    
+    <!-- 4. Notification Container -->
+    <div id="notification-container">
+        <!-- Pop-up notifications appear here -->
+    </div>
+
+    <!-- 5. Dock -->
+    <div id="aura-dock">
+        <div class="dock-item" data-action="open-launcher" title="App Launcher">
+            <i data-lucide="layout-grid"></i>
+        </div>
+        <div class="dock-separator"></div>
+        
+        <!-- This container will hold the draggable app icons -->
+        <div id="dock-app-container">
+            <!-- App icons are now dynamically rendered by JS -->
+        </div>
+
+        <div class="dock-separator"></div>
+        <div class="dock-item" data-app-id="clock" title="Current Time">
+            <div>
+                <span id="dock-clock">12:00:00 PM</span>
+                <span id="dock-date" class="block opacity-70">11/21/2025</span>
+            </div>
+        </div>
+        <!-- Removed Notification Bell from Dock -->
+        <div class="dock-item" data-app-id="system-network" title="Network">
+            <i data-lucide="wifi"></i>
+        </div>
+        <div class="dock-item" data-app-id="system-battery" title="Battery">
+            <i data-lucide="battery-full"></i>
+        </div>
+    </div>
+    
+    <!-- 6. Context Menu (Hidden) -->
+    <div id="context-menu">
+        <div class="context-menu-item" data-action="change-wallpaper">Change Wallpaper</div>
+        <div class="context-menu-item" data-action="new-folder">New Folder</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="about">About Aura OS</div>
+    </div>
+
+    <!-- 7. App Launcher (New) -->
+    <div id="app-launcher">
+        <div class="launcher-close-btn" data-action="close-launcher">
+            <i data-lucide="x"></i>
+        </div>
+        <div class="launcher-grid" data-app-id="launcher-grid">
+            <!-- Apps will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- 8. System Modal (for Chat warnings, etc.) -->
+    <div id="system-modal-overlay" class="aura-modal-overlay hidden">
+        <div class="aura-modal-content">
+            <h2 id="system-modal-title" class="text-xl font-bold mb-2">Modal Title</h2>
+            <p id="system-modal-message" class="text-sm text-zinc-300 mb-4">Modal message goes here.</p>
+            <button id="system-modal-confirm" class="aura-btn">OK</button>
+        </div>
+    </div>
+    
+    <!-- 9. Dock Folder Flyout (Hidden) -->
+    <div id="dock-folder-flyout">
+        <div class="flyout-name" contenteditable="true">New Folder</div>
+        <div data-app-id="flyout-content" class="flex flex-col gap-1">
+            <!-- Folder items go here -->
+        </div>
+    </div>
+
+
+    <!-- Load Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+    
+    <!-- 
+      Aura OS JavaScript (Classic Script)
+    -->
+    <script>
+        /**
+         * Aura OS (v1.8.9 "Play Store")
+         * Core JavaScript
+         * Reverted to VFS-based v1.8.5
+         * Added Dock Drag-and-Drop and Folders with localStorage persistence.
+         * Removed all Firebase/cloud dependencies to fix "invalid code" errors.
+         * Added Play Store and installable "Music Maker" app.
+         */
+        
+        // --- Global State ---
+        let maxZIndex = 100;
+        const openWindows = new Map(); // Tracks open windows by appId
+        let activeWindow = null;
+        let desktopDragState = {}; // For dragging desktop icons
+        let customWallpaperURL = null; // Store custom wallpaper
+        
+        // --- Notification Manager ---
+        class NotificationManager {
+            constructor() {
+                this.container = document.getElementById('notification-container');
+            }
+            
+            showNotification({ title, message, icon = 'info' }) {
+                const notifId = `notif-${crypto.randomUUID()}`;
+                const notifEl = document.createElement('div');
+                notifEl.className = 'toast-notification';
+                notifEl.id = notifId;
+                
+                notifEl.innerHTML = `
+                    <div class="icon">
+                        <i data-lucide="${icon}"></i>
+                    </div>
+                    <div class="content">
+                        <h3>${title}</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
+                
+                this.container.appendChild(notifEl);
+                lucide.createIcons({ nodes: [notifEl] });
+                
+                // Slide out and remove
+                setTimeout(() => {
+                    notifEl.classList.add('slide-out');
+                    notifEl.addEventListener('animationend', () => {
+                        notifEl.remove();
+                    });
+                }, 5000);
+            }
+        }
+        
+        // --- System Modal ---
+        class SystemModal {
+            constructor() {
+                this.overlay = document.getElementById('system-modal-overlay');
+                this.titleEl = document.getElementById('system-modal-title');
+                this.messageEl = document.getElementById('system-modal-message');
+                this.confirmBtn = document.getElementById('system-modal-confirm');
+                this.resolvePromise = null;
+            }
+            
+            show(title, message) {
+                this.titleEl.textContent = title;
+                this.messageEl.textContent = message;
+                this.overlay.classList.remove('hidden');
+                
+                return new Promise((resolve) => {
+                    this.resolvePromise = resolve;
+                    this.confirmBtn.onclick = () => {
+                        this.overlay.classList.add('hidden');
+                        if (this.resolvePromise) {
+                            this.resolvePromise();
+                            this.resolvePromise = null;
+                        }
+                    };
+                });
+            }
+        }
+
+        // --- System Monitor (Battery & Network) ---
+        class SystemMonitor {
+            constructor(batteryIconEl, networkIconEl) {
+                this.batteryIconEl = batteryIconEl;
+                this.networkIconEl = networkIconEl;
+                
+                this.initNetwork();
+                this.initBattery();
+            }
+            
+            initNetwork() {
+                const update = () => {
+                    const icon = navigator.onLine ? 'wifi' : 'wifi-off';
+                    this.networkIconEl.innerHTML = `<i data-lucide="${icon}"></i>`;
+                    lucide.createIcons({ nodes: [this.networkIconEl] });
+                };
+                window.addEventListener('online', update);
+                window.addEventListener('offline', update);
+                update(); // Initial check
+            }
+            
+            async initBattery() {
+                try {
+                    if (navigator.getBattery) {
+                        const battery = await navigator.getBattery();
+                        
+                        const update = () => {
+                            let icon = 'battery-full';
+                            if (battery.charging) {
+                                icon = 'battery-charging';
+                            } else if (battery.level < 0.2) {
+                                icon = 'battery-warning';
+                            } else if (battery.level < 0.5) {
+                                icon = 'battery-low';
+                            } else if (battery.level < 0.8) {
+                                icon = 'battery-medium';
+                            }
+                            
+                            this.batteryIconEl.innerHTML = `<i data-lucide="${icon}"></i>`;
+                            this.batteryIconEl.title = `${Math.round(battery.level * 100)}% ${battery.charging ? '(Charging)' : ''}`;
+                            lucide.createIcons({ nodes: [this.batteryIconEl] });
+                        };
+                        
+                        battery.addEventListener('levelchange', update);
+                        battery.addEventListener('chargingchange', update);
+                        update(); // Initial check
+                    } else {
+                         throw new Error("Battery API not supported");
+                    }
+                } catch (err) {
+                    console.warn("Battery Status API not available.", err);
+                    this.batteryIconEl.innerHTML = `<i data-lucide="battery"></i>`; // Default icon
+                    this.batteryIconEl.title = "Battery status unknown";
+                    lucide.createIcons({ nodes: [this.batteryIconEl] });
+                }
+            }
+        }
+
+        
+        // --- Desktop Environment ---
+    
+        const desktopBackground = document.getElementById('desktop-background');
+        const backgroundPresets = {
+            'aura': 'linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)',
+            'ocean': 'linear-gradient(-45deg, #023e8a, #0077b6, #0096c7, #48cae4)',
+            'sunset': 'linear-gradient(-45deg, #ff5e00, #ff9100, #ffbe0b, #fb5607)',
+            'matrix': 'linear-gradient(-45deg, #001a00, #003300, #005c00, #008000)'
+        };
+        const animationPresets = {
+            'aura': 'gradient-flow 30s ease infinite',
+            'ocean': 'gradient-flow 25s ease infinite',
+            'sunset': 'gradient-flow 20s ease infinite',
+            'matrix': 'gradient-flow 15s ease infinite'
+        };
+
+        function setDesktopBackground(preset, customURL = null) {
+            console.log("Setting background to:", preset || customURL); // DEBUG
+            if (customURL) {
+                desktopBackground.style.background = `url(${customURL})`;
+                desktopBackground.style.backgroundSize = 'cover';
+                desktopBackground.style.backgroundPosition = 'center';
+                desktopBackground.style.animation = 'none';
+            } else if (backgroundPresets[preset]) {
+                desktopBackground.style.background = backgroundPresets[preset];
+                desktopBackground.style.backgroundSize = '400% 400%';
+                desktopBackground.style.animation = animationPresets[preset];
+            }
+        }
+        
+        // --- Virtual File System (VFS) ---
+        class VirtualFileSystem extends EventTarget {
+            constructor() {
+                super();
+                this.systemApps = { ...appManifest }; // Store app definitions
+                this.fs = {
+                    id: 'root', type: 'folder', name: 'root', children: [
+                        { id: 'desktop', type: 'folder', name: 'Desktop', icon: 'layout-grid', children: [
+                            { id: 'file-explorer', name: 'File Explorer', type: 'app', icon: 'folder-search', x: 0, y: 0 },
+                            { id: 'play-store', name: 'Play Store', type: 'app', icon: 'store', x: 0, y: 96 },
+                            { id: 'music', name: 'Music', type: 'app', icon: 'music', x: 0, y: 192 },
+                            { id: 'snake', name: 'Snake', type: 'app', icon: 'gamepad-2', x: 0, y: 288 },
+                            { id: 'sketchpad', name: 'Sketchpad', type: 'app', icon: 'palette', x: 0, y: 384 },
+                            { id: 'calculator', name: 'Calculator', type: 'app', icon: 'calculator', x: 0, y: 480 },
+                            { id: 'notepad', name: 'Notepad', type: 'app', icon: 'notebook-tabs', x: 96, y: 0 },
+                            { id: 'settings', name: 'Settings', type: 'app', icon: 'sliders-horizontal', x: 96, y: 96 },
+                            { id: 'terminal', name: 'Terminal', type: 'app', icon: 'terminal', x: 96, y: 192 },
+                            { id: 'chrome', name: 'Chrome', type: 'app', icon: 'chrome', x: 96, y: 288 }
+                        ]},
+                        { id: 'documents', type: 'folder', name: 'Documents', icon: 'file-text', children: [
+                             // { id: 'notepad', name: 'Notes', type: 'app', icon: 'notebook-tabs' }
+                        ] },
+                        { id: 'pictures', type: 'folder', name: 'Pictures', icon: 'image', children: [] },
+                        { id: 'games', type: 'folder', name: 'Games', icon: 'gamepad', children: [
+                            { id: 'snake', name: 'Snake', type: 'app', icon: 'gamepad-2' }
+                        ]}
+                    ]
+                };
+                
+                // Add a default file
+                this.createFile('documents', 'Welcome.txt', 'Welcome to Aura OS!\n\nThis is a simple text file. You can create, save, and open your own .txt files using the Notepad app.');
+            }
+            
+            // Helper to find an item by path or ID
+            _findItem(pathOrId) {
+                if (pathOrId === 'root') return this.fs;
+                
+                // Search by path
+                if (pathOrId.includes('/')) {
+                    const parts = pathOrId.split('/').filter(p => p); // e.g., ['desktop', 'folder-id']
+                    let current = this.fs;
+                    for (const part of parts) {
+                        if (current.type !== 'folder') return null; // Can't search non-folders
+                        const found = current.children.find(item => item.id === part);
+                        if (found) {
+                            current = found;
+                        } else {
+                            return null; // Not found
+                        }
+                    }
+                    return current;
+                }
+                
+                // Search by ID (recursive)
+                function findById(node, id) {
+                    if (node.id === id) return node;
+                    if (node.type === 'folder') {
+                        for (const child of node.children) {
+                            const found = findById(child, id);
+                            if (found) return found;
+                        }
+                    }
+                    return null;
+                }
+                return findById(this.fs, pathOrId);
+            }
+            
+            getItems(path) {
+                const item = this._findItem(path);
+                return (item && item.type === 'folder') ? item.children : [];
+            }
+            
+            getItem(pathOrId) {
+                return this._findItem(pathOrId);
+            }
+            
+            getApp(appId) {
+                // Check for app in the manifest
+                if (this.systemApps[appId]) {
+                    return this.systemApps[appId];
+                }
+                // Check for app in VFS (e.g., a shortcut)
+                const item = this.getItem(appId);
+                if (item && item.type === 'app') {
+                    // Check manifest for the app this shortcut points to
+                    return this.systemApps[item.id]; 
+                }
+                // Check for a file
+                if (item && item.type === 'file') {
+                    return item;
+                }
+                return null;
+            }
+
+            // Create an app shortcut in a VFS location
+            createAppShortcut(path, appId) {
+                 const parent = this._findItem(path);
+                if (!parent || parent.type !== 'folder') {
+                    console.error("VFS: Invalid path to create shortcut:", path);
+                    return;
+                }
+                // Check if app exists in manifest
+                const app = this.systemApps[appId];
+                if (!app) {
+                    console.error("VFS: Cannot create shortcut, app not in manifest:", appId);
+                    return;
+                }
+                
+                // Check if shortcut already exists
+                const exists = parent.children.some(child => child.id === appId);
+                if (exists) {
+                    console.warn("VFS: Shortcut already exists for:", appId);
+                    return;
+                }
+
+                const newShortcut = {
+                    id: appId, // The ID *is* the appId
+                    name: app.title,
+                    type: 'app',
+                    icon: app.icon,
+                    x: 192, // Default position
+                    y: 192 + (parent.children.length * 20) % 200
+                };
+                
+                parent.children.push(newShortcut);
+                this.dispatchEvent(new CustomEvent('update', { detail: { path: path } }));
+                return newShortcut;
+            }
+            
+            createFile(path, filename, content) {
+                const parent = this._findItem(path);
+                if (!parent || parent.type !== 'folder') {
+                    console.error("VFS: Invalid path to create file:", path);
+                    return;
+                }
+                
+                if (!filename.endsWith('.txt')) {
+                    filename += '.txt';
+                }
+                
+                const newFile = {
+                    id: crypto.randomUUID(),
+                    name: filename,
+                    type: 'file',
+                    icon: 'file-text',
+                    content: content
+                };
+                
+                parent.children.push(newFile);
+                this.dispatchEvent(new CustomEvent('update', { detail: { path: path } }));
+                return newFile;
+            }
+            
+            updateFile(fileId, content) {
+                 const file = this._findItem(fileId);
+                 if (file && file.type === 'file') {
+                    file.content = content;
+                    console.log(`VFS: Updated file ${file.name}`);
+                 } else {
+                    console.error("VFS: Could not find file to update:", fileId);
+                 }
+            }
+
+            createFolder(path, baseName) {
+                const parent = this._findItem(path);
+                if (!parent || parent.type !== 'folder') return;
+                
+                let newName = baseName;
+                let counter = 1;
+                const existingNames = parent.children.map(i => i.name);
+                while (existingNames.includes(newName)) {
+                    newName = `${baseName} (${counter++})`;
+                }
+                
+                const newFolder = {
+                    id: crypto.randomUUID(),
+                    name: newName,
+                    type: 'folder',
+                    icon: 'folder',
+                    children: [],
+                    x: 100, // Default position for new desktop folders
+                    y: 100 + (parent.children.length * 20) % 200
+                };
+                
+                parent.children.push(newFolder);
+                this.dispatchEvent(new CustomEvent('update', { detail: { path: path } }));
+            }
+
+            updateItemPosition(itemId, newX, newY) {
+                const desktop = this._findItem('desktop');
+                const item = desktop.children.find(i => i.id === itemId);
+                if (item) {
+                    item.x = newX;
+                    item.y = newY;
+                }
+            }
+        }
+        
+
+        // --- App Manifest ---
+        const appManifest = {
+            "file-explorer": {
+                title: "File Explorer",
+                icon: "folder-search",
+                width: 650,
+                height: 450,
+                content: (data) => `
+                    <div class="file-explorer-layout">
+                        <div class="file-explorer-toolbar">
+                            <div class="file-explorer-nav-btn" data-action="back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                            </div>
+                            <input type="text" class="file-explorer-address-bar" readonly />
+                        </div>
+                        <div class="file-explorer-content">
+                            <div class="file-explorer-sidebar" data-app-id="file-explorer-sidebar">
+                                <div class="file-explorer-sidebar-item" data-path="desktop">
+                                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                    <span>Desktop</span>
+                                </div>
+                                <div class="file-explorer-sidebar-item" data-path="documents">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                                    <span>Documents</span>
+                                </div>
+                                <div class="file-explorer-sidebar-item" data-path="pictures">
+                                    <i data-lucide="image" class="w-4 h-4"></i>
+                                    <span>Pictures</span>
+                                </div>
+                                <div class="file-explorer-sidebar-item" data-path="games">
+                                    <i data-lucide="gamepad" class="w-4 h-4"></i>
+                                    <span>Games</span>
+                                </div>
+                            </div>
+                            <div class="file-explorer-pane" data-app-id="file-explorer-pane">
+                                <div class="file-grid" data-app-id="file-grid">
+                                    <!-- File icons will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "calculator": {
+                title: "Calculator",
+                icon: "calculator",
+                width: 300,
+                height: 400,
+                content: (data) => `
+                    <div class="calculator-grid h-full p-1">
+                        <div class="calc-display">0</div>
+                        <div class="calc-btn clear span-2" data-key="C">C</div>
+                        <div class="calc-btn" data-key="CE">CE</div>
+                        <div class="calc-btn op" data-key="/">/</div>
+                        <div class="calc-btn" data-key="7">7</div>
+                        <div class="calc-btn" data-key="8">8</div>
+                        <div class="calc-btn" data-key="9">9</div>
+                        <div class="calc-btn op" data-key="*">x</div>
+                        <div class="calc-btn" data-key="4">4</div>
+                        <div class="calc-btn" data-key="5">5</div>
+                        <div class="calc-btn" data-key="6">6</div>
+                        <div class="calc-btn op" data-key="-">-</div>
+                        <div class="calc-btn" data-key="1">1</div>
+                        <div class="calc-btn" data-key="2">2</div>
+                        <div class="calc-btn" data-key="3">3</div>
+                        <div class="calc-btn op" data-key="+">+</div>
+                        <div class="calc-btn span-2" data-key="0">0</div>
+                        <div class="calc-btn" data-key=".">.</div>
+                        <div class="calc-btn op" data-key="=">=</div>
+                    </div>
+                `
+            },
+            "notepad": {
+                title: "Notepad",
+                icon: "notebook-tabs",
+                width: 500,
+                height: 400,
+                content: (data) => `
+                    <div class="notepad-toolbar">
+                        <button class="notepad-btn" data-action="open">Open</button>
+                        <button class="notepad-btn" data-action="save">Save</button>
+                        <button class="notepad-btn" data-action="save-as">Save As...</button>
+                    </div>
+                    <textarea 
+                        class="notepad-textarea" 
+                        placeholder="Start typing..."
+                        data-file-id="${data?.fileId || ''}"
+                    ></textarea>
+                `
+            },
+            "settings": {
+                title: "Settings",
+                icon: "sliders-horizontal",
+                width: 550,
+                height: 400,
+                content: (data) => `
+                    <div class="settings-content h-full">
+                        <div class="settings-sidebar" data-app-id="settings-sidebar">
+                            <div class="settings-sidebar-item active" data-pane="display">Display</div>
+                            <div class="settings-sidebar-item" data-pane="appearance">Appearance</div>
+                            <div class="settings-sidebar-item" data-pane="network">Network</div>
+                            <div class="settings-sidebar-item" data-pane="updates">Update Log</div>
+                            <div class="settings-sidebar-item" data-pane="about">About</div>
+                        </div>
+                        <div class="settings-pane" data-pane-id="display">
+                            <h2 class="text-lg font-semibold mb-4">Display</h2>
+                            <p>Resolution: 1920x1080</p>
+                            <p class="mt-2">Scaling: 100%</p>
+                            <p class="mt-4 text-sm text-zinc-400">Resize this window to see the container query in action!</p>
+                        </div>
+                        <div class="settings-pane hidden" data-pane-id="appearance">
+                            <h2 class="text-lg font-semibold mb-4">Appearance</h2>
+                            <p class="mb-2">Change desktop background:</p>
+                            <div class="flex flex-col gap-3" data-app-id="appearance-setter">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="wallpaper" value="aura" class="bg-transparent" checked> Aura Flow (Default)
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="wallpaper" value="ocean" class="bg-transparent"> Ocean Deep
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="wallpaper" value="sunset" class="bg-transparent"> Sunset Vibes
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="wallpaper" value="matrix" class="bg-transparent"> Terminal Green
+                                </label>
+                                <hr class="border-t border-white/10 my-1">
+                                <div class="flex flex-col gap-2">
+                                     <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="wallpaper" value="custom" class="bg-transparent" data-app-id="custom-wallpaper-radio" disabled> Custom Image
+                                    </label>
+                                    <label class="file-upload-btn ml-6">
+                                        <input type="file" data-app-id="wallpaper-upload" accept="image/png, image/gif">
+                                        <i data-lucide="upload" class="w-4 h-4 inline-block -mt-1 mr-1"></i>
+                                        Upload Image (PNG/GIF)
+                                    </label>
+                                    <span class="file-name-display ml-6" data-app-id="wallpaper-file-name">No file chosen.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-pane hidden" data-pane-id="network">
+                            <h2 class="text-lg font-semibold mb-4">Network</h2>
+                            <p>Status: <span class="text-green-400">Connected</span></p>
+                            <p class="mt-2">SSID: AuraGuest</p>
+                        </div>
+                        <div class="settings-pane hidden" data-pane-id="updates">
+                            <h2 class="text-lg font-semibold mb-4">Update Log</h2>
+                             <div class="update-log-entry">
+                                <h3>v1.8.9 <span class="badge new">New</span></h3>
+                                <ul>
+                                    <li>Added "Play Store" app.</li>
+                                    <li>Added installable "Music Maker" app.</li>
+                                    <li>Apps can now be installed to the desktop and dock.</li>
+                                </ul>
+                            </div>
+                             <div class="update-log-entry">
+                                <h3>v1.8.8 <span class="badge fix">Fix</span></h3>
+                                <ul>
+                                    <li>Removed unused Firebase module to fix "invalid code" errors on external hosts.</li>
+                                    <li>Removed non-functional Chat and Notification apps (they will return with cloud sync).</li>
+                                    <li>Removed "Pro" tab from Settings.</li>
+                                </ul>
+                            </div>
+                             <div class="update-log-entry">
+                                <h3>v1.8.6 <span class="badge new">New</span></h3>
+                                <ul>
+                                    <li>Reverted to VFS-based system (pre-cloud).</li>
+                                    <li>Dock items can now be re-ordered via drag-and-drop.</li>
+                                    <li>Dock items can be dragged onto each other to create folders.</li>
+                                    <li>Dock layout is saved to the browser's local storage.</li>
+                                </ul>
+                            </div>
+                            <div class="update-log-entry">
+                                <h3>v1.8.4 <span class="badge fix">Fix</span></h3>
+                                <ul>
+                                    <li>Removed stray variable declarations to fix a long-standing startup error.</li>
+                                </ul>
+                            </div>
+                            <div class="update-log-entry">
+                                <h3>v1.7.0 <span class="badge new">New</span></h3>
+                                <ul>
+                                    <li>Added App Launcher, Sketchpad, and Notification Center.</li>
+                                    <li>Added a system-wide safety announcement notification.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="settings-pane hidden" data-pane-id="about">
+                            <h2 class="text-lg font-semibold mb-4">About</h2>
+                            <p>OS Name: Aura OS</p>
+                            <p class="mt-2">Version: 1.8.9 "Play Store"</p>
+                            <p class="mt-2">Kernel: Web (JavaScript V8)</p>
+                            <p class="mt-4 text-xs text-zinc-400">© 2025 Aura Labs</p>
+                        </div>
+                    </div>
+                `
+            },
+    "terminal": {
+        title: "Terminal",
+        icon: "terminal",
+        width: 500,
+        height: 350,
+        content: (data) => `
+            <div class="terminal-output" data-app-id="terminal-output">
+                <p>Welcome to Aura OS Terminal [v1.1.0]</p>
+                <p>Type 'help' for available commands.</p>
+                <br>
+            </div>
+            <div class="terminal-line">
+                <span class="terminal-prompt">aura></span>
+                <input type="text" class="terminal-input" data-app-id="terminal-input" />
+            </div>
+        `
+    },
+    "chrome": {
+        title: "Chrome",
+        icon: "chrome",
+        width: 800,
+        height: 600,
+        content: (data) => `<iframe src="https://www.google.com/search?igu=1&q=browser+os" class="w-full h-full border-0"></iframe>`
+    },
+    "music": {
+        title: "Music",
+        icon: "music",
+        width: 562,
+        height: 355,
+        content: (data) => `<iframe src="https://www.youtube.com/embed/CFGLoQIhmow?autoplay=1&si=_FEQmv3thP4htBf4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full border-0"></iframe>`
+    },
+    "snake": {
+        title: "Snake",
+        icon: "gamepad-2",
+        width: 340,
+        height: 400,
+        content: (data) => `
+            <div class="snake-app">
+                <div class="snake-score mb-2">Score: <span data-app-id="snake-score">0</span></div>
+                <canvas id="snake-canvas" width="300" height="300"></canvas>
+                <p class="text-xs text-zinc-400 mt-2">Use Arrow Keys to move</p>
+            </div>
+        `
+    },
+    "sketchpad": {
+        title: "Sketchpad",
+        icon: "palette",
+        width: 500,
+        height: 400,
+        content: (data) => `
+            <div class="sketchpad-app">
+                <div class="sketchpad-controls">
+                    <span class="text-sm font-medium mr-2">Colors:</span>
+                    <div class="color-swatch active" style="background: #FFF;" data-color="#FFF"></div>
+                    <div class="color-swatch" style="background: #ef4444;" data-color="#ef4444"></div>
+                    <div class="color-swatch" style="background: #f97316;" data-color="#f97316"></div>
+                    <div class="color-swatch" style="background: #eab308;" data-color="#eab308"></div>
+                    <div class="color-swatch" style="background: #22c55e;" data-color="#22c55e"></div>
+                    <div class="color-swatch" style="background: #3b82f6;" data-color="#3b82f6"></div>
+                    <div class="color-swatch" style="background: #a855f7;" data-color="#a855f7"></div>
+                    <button class="sketchpad-btn ml-auto" data-action="clear-canvas">Clear</button>
+                </div>
+                <canvas id="sketch-canvas" width="460" height="300"></canvas>
+            </div>
+        `
+    },
+    "play-store": {
+        title: "Play Store",
+        icon: "store",
+        width: 700,
+        height: 550,
+        content: (data) => `
+            <div class="play-store-header">
+                <i data-lucide="search" class="w-5 h-5 text-zinc-400"></i>
+                <input type="text" class="aura-text-input play-store-search" placeholder="Search apps & games...">
+            </div>
+            <div class="play-store-tabs">
+                <div class="play-store-tab active">Apps</div>
+                <div class="play-store-tab">Games</div>
+            </div>
+            
+            <h2 class="text-lg font-semibold mb-4">Featured App</h2>
+            <div class="play-store-featured">
+                <img src="https://placehold.co/128x128/282a36/e4e4e7?text=Music+Maker" alt="Music Maker Logo">
+                <div class="flex flex-col gap-2">
+                    <h3 class="text-2xl font-bold">Music Maker</h3>
+                    <p class="text-sm text-zinc-300">Create beats and loops with this simple sequencer.</p>
+                    <button class="aura-btn w-32" data-action="install-app" data-app-id="music-maker">Install</button>
+                </div>
+            </div>
+        `
+    },
+    "music-maker": {
+        title: "Music Maker",
+        icon: "music-4",
+        width: 800,
+        height: 600,
+        content: (data) => `<iframe src="https://classroom-of-doom.w3spaces.com/Music-APP.html" class="w-full h-full border-0"></iframe>`
+    },
+    "about": {
+        title: "About Aura OS",
+        icon: "info",
+        width: 350,
+        height: 300,
+        content: (data) => `
+            <div class="flex flex-col items-center justify-center h-full text-center">
+                <div class="boot-logo" style="width: 50px; height: 50px; border-width: 3px;"></div>
+                <h2 class="text-xl font-bold mt-4">Aura OS</h2>
+                <p class="text-sm text-zinc-300">v1.8.9 "Play Store"</p>
+                <p class="mt-4 text-xs">A beautiful, modern, and performant
+                <br> browser-based operating system.</p>
+                <p class="mt-4 text-xs text-zinc-400">
+                    Created by Gemini & Eren.
+                </p>
+            </div>
+        `
+    }
+};
+
+// --- Window Manager ---
+class WindowManager {
+    constructor(container, vfs, modal, notificationMgr) {
+        this.container = container;
+        this.vfs = vfs;
+        this.modal = modal;
+        this.notificationMgr = notificationMgr;
+        this.dragState = {};
+        this.resizeState = {};
+        
+        document.addEventListener('mousedown', this.onGlobalMouseDown.bind(this));
+        document.addEventListener('mousemove', this.onGlobalMouseMove.bind(this));
+        document.addEventListener('mouseup', this.onGlobalMouseUp.bind(this));
+    }
+
+    // data is for "deep-linking"
+    createWindow(appId, data = null) {
+        // Allow only one instance of most apps
+        const singleInstanceApps = ['settings', 'calculator', 'terminal', 'file-explorer', 'music', 'snake', 'sketchpad', 'play-store', 'music-maker'];
+        if (singleInstanceApps.includes(appId)) {
+            if (openWindows.has(appId) && !openWindows.get(appId).classList.contains('minimized')) {
+                this.bringToFront(openWindows.get(appId));
+                return;
+            }
+            if (openWindows.has(appId) && openWindows.get(appId).classList.contains('minimized')) {
+                this.restoreWindow(openWindows.get(appId));
+                return;
+            }
+        }
+        
+        // Exception for Notepad and Chrome: allow multiple
+        let windowId = appId;
+        if (appId === 'notepad' || appId === 'chrome') {
+            // Give notepad a unique ID if it's not opening a specific file
+            if (appId === 'notepad' && !data?.fileId) {
+                 windowId = `${appId}-${crypto.randomUUID()}`;
+            }
+            // Or if it IS opening a file, use the fileId as the windowId
+            else if (appId === 'notepad' && data?.fileId) {
+                windowId = data.fileId;
+            }
+            // Give chrome a unique ID
+            else {
+                windowId = `${appId}-${crypto.randomUUID()}`;
+            }
+        }
+        
+        if (openWindows.has(windowId)) {
+             this.bringToFront(openWindows.get(windowId));
+             return;
+        }
+
+        const app = this.vfs.getApp(appId);
+        
+        // Handle opening a VFS file (like .txt)
+        let fileData = null;
+        if (app && app.type === 'file') {
+            fileData = app; // This is a file
+            if (fileData.name.endsWith('.txt')) {
+                appId = 'notepad'; // Open with Notepad
+                data = { fileId: fileData.id }; // Pass file ID
+                windowId = fileData.id; // Use file ID as window ID
+                
+                if (openWindows.has(windowId)) {
+                     this.bringToFront(openWindows.get(windowId));
+                     return;
+                }
+            } else {
+                this.modal.show("Error", `File type not supported for "${fileData.name}".`);
+                return;
+            }
+        }
+        
+        // Get the app manifest entry again in case it changed (e.g., to notepad)
+        const appManifestEntry = this.vfs.getApp(appId);
+        if (!appManifestEntry) {
+            console.error("No app manifest entry found for:", appId);
+            return;
+        }
+
+        const windowEl = document.createElement('div');
+        windowEl.className = 'app-window';
+        windowEl.dataset.appId = appId; // The app type
+        windowEl.dataset.windowId = windowId; // The unique window ID
+        
+        // Set initial position and size
+        const initialTop = 50 + (openWindows.size * 20) % 200;
+        const initialLeft = 100 + (openWindows.size * 30) % 300;
+        windowEl.style.cssText = `
+            top: ${initialTop}px;
+            left: ${initialLeft}px;
+            width: ${appManifestEntry.width}px;
+            height: ${appManifestEntry.height}px;
+        `;
+        
+        // Get content from the app manifest function
+        const appContent = appManifestEntry.content(data);
+
+        windowEl.innerHTML = `
+            <!-- Resize Handles -->
+            <div class="resize-handle n"></div><div class="resize-handle e"></div>
+            <div class="resize-handle s"></div><div class="resize-handle w"></div>
+            <div class="resize-handle nw"></div><div class="resize-handle ne"></div>
+            <div class="resize-handle sw"></div><div class="resize-handle se"></div>
+        
+            <!-- Header -->
+            <div class="window-header">
+                <div class="window-title" data-drag-handle="true">
+                    <i data-lucide="${appManifestEntry.icon}" class="w-4 h-4"></i>
+                    <span>${appManifestEntry.title}</span>
+                </div>
+                <div class="window-controls">
+                    <div class="window-control minimize" data-action="minimize"></div>
+                    <div class="window-control maximize" data-action="maximize"></div>
+                    <div class="window-control close" data-action="close"></div>
+                </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="window-body">
+                ${appContent}
+            </div>
+        `;
+
+        this.container.appendChild(windowEl);
+        lucide.createIcons({
+            nodes: [windowEl]
+        });
+        
+        this.bringToFront(windowEl);
+        openWindows.set(windowId, windowEl); // Use windowId
+        this.updateDockActiveState(appId, true);
+        
+        // Add app-specific logic
+        if (appId === 'terminal') {
+            this.initTerminal(windowEl);
+        }
+        if (appId === 'settings') {
+            this.initSettings(windowEl, data); // Pass data
+        }
+        if (appId === 'notepad') {
+            this.initNotepad(windowEl, data); // Pass data
+        }
+        if (appId === 'chrome' || appId === 'music' || appId === 'music-maker') {
+            windowEl.querySelector('.window-body').style.padding = '0';
+        }
+        if (appId === 'file-explorer') {
+            this.initFileExplorer(windowEl, data); // Pass data
+        }
+        if (appId === 'calculator') {
+            this.initCalculator(windowEl);
+        }
+        if (appId === 'snake') {
+            this.initSnakeGame(windowEl);
+        }
+        if (appId === 'sketchpad') {
+            this.initSketchpad(windowEl);
+        }
+        if (appId === 'play-store') {
+            this.initPlayStore(windowEl);
+        }
+    }
+    
+    initPlayStore(windowEl) {
+        const installBtn = windowEl.querySelector('[data-action="install-app"]');
+        if (installBtn) {
+            installBtn.onclick = () => {
+                const appId = installBtn.dataset.appId;
+                if (appId === 'music-maker') {
+                    // 1. Add to desktop
+                    this.vfs.createAppShortcut('desktop', 'music-maker');
+                    
+                    // 2. Add to dock (find the dock instance)
+                    const dock = window.aura.dock; // We'll set this up in initAuraOS
+                    if (dock) {
+                        dock.addItem('music-maker');
+                    }
+                    
+                    // 3. Show notification
+                    this.notificationMgr.showNotification({
+                        title: "App Installed",
+                        message: "Music Maker has been added to your desktop and dock."
+                    });
+                    
+                    // 4. Disable button
+                    installBtn.textContent = "Installed";
+                    installBtn.disabled = true;
+                }
+            };
+        }
+    }
+    
+    initTerminal(windowEl) {
+        const input = windowEl.querySelector('[data-app-id="terminal-input"]');
+        const output = windowEl.querySelector('[data-app-id="terminal-output"]');
+        
+        const printLine = (text) => {
+            output.innerHTML += `<p>${text}</p>`;
+            output.scrollTop = output.scrollHeight;
+        };
+
+        const printCommand = (cmd) => {
+            output.innerHTML += `
+                <div class="terminal-line">
+                    <span class="terminal-prompt">aura></span>
+                    <span>${cmd}</span>
+                </div>
+            `;
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && input.value) {
+                const cmd = input.value.trim().toLowerCase();
+                printCommand(cmd);
+                
+                switch(cmd) {
+                    case 'help':
+                        printLine("Available commands: help, clear, hello, date, restart, developer mode, easteregg");
+                        break;
+                    case 'clear':
+                        output.innerHTML = '';
+                        break;
+                    case 'hello':
+                        printLine("Hello there, human!");
+                        break;
+                    case 'date':
+                        printLine(new Date().toLocaleString());
+                        break;
+                    case 'restart':
+                        printLine("Restarting Aura OS...");
+                        setTimeout(() => location.reload(), 1000);
+                        break;
+                    case 'developer mode':
+                        printLine("Developer mode enabled (simulated).");
+                        printLine("In a real OS, this would unlock system files.");
+                        break;
+                    case 'easteregg':
+                        printLine("Look at you, being all curious!");
+                        printLine("Try typing 'matrix'");
+                        break;
+                    case 'matrix':
+                        printLine("The matrix has you...");
+                        windowEl.style.transition = 'all 0.5s ease';
+                        windowEl.style.background = 'rgba(0, 50, 0, 0.5)';
+                        windowEl.querySelector('.window-body').style.color = '#0f0';
+                        break;
+                    default:
+                        printLine(`Command not found: ${cmd}`);
+                }
+                
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+    }
+    
+    initNotepad(windowEl, data) {
+        const textarea = windowEl.querySelector('.notepad-textarea');
+        const btnOpen = windowEl.querySelector('[data-action="open"]');
+        const btnSave = windowEl.querySelector('[data-action="save"]');
+        const btnSaveAs = windowEl.querySelector('[data-action="save-as"]');
+        const titleEl = windowEl.querySelector('.window-title span');
+        
+        let currentFileId = data?.fileId || null;
+        let currentFileName = "Untitled";
+
+        if (currentFileId) {
+            const file = this.vfs.getItem(currentFileId);
+            if (file && file.type === 'file') {
+                textarea.value = file.content;
+                currentFileName = file.name;
+                titleEl.textContent = `Notepad - ${currentFileName}`;
+            }
+        }
+        
+        const saveAs = () => {
+            const filename = prompt("Save as (e.g., notes.txt):", currentFileName);
+            if (!filename) return;
+            
+            const newFile = this.vfs.createFile('documents', filename, textarea.value);
+            if (newFile) {
+                currentFileId = newFile.id;
+                currentFileName = newFile.name;
+                textarea.dataset.fileId = currentFileId;
+                titleEl.textContent = `Notepad - ${currentFileName}`;
+                this.modal.show("File Saved", `Saved as "${currentFileName}" in Documents.`);
+            }
+        };
+        
+        btnOpen.onclick = () => {
+            this.createWindow('file-explorer', { path: 'documents' });
+        };
+        
+        btnSave.onclick = () => {
+            if (currentFileId) {
+                this.vfs.updateFile(currentFileId, textarea.value);
+                this.modal.show("File Saved", `Saved changes to "${currentFileName}".`);
+            } else {
+                saveAs();
+            }
+        };
+        
+        btnSaveAs.onclick = saveAs;
+    }
+
+    initSettings(windowEl, data) {
+        const sidebar = windowEl.querySelector('[data-app-id="settings-sidebar"]');
+        const panes = windowEl.querySelectorAll('.settings-pane');
+        const appearanceSetter = windowEl.querySelector('[data-app-id="appearance-setter"]');
+        const wallpaperUpload = windowEl.querySelector('[data-app-id="wallpaper-upload"]');
+        const customRadio = windowEl.querySelector('[data-app-id="custom-wallpaper-radio"]');
+        const fileNameDisplay = windowEl.querySelector('[data-app-id="wallpaper-file-name"]');
+
+        const setActivePane = (paneId) => {
+            sidebar.querySelectorAll('.settings-sidebar-item').forEach(i => {
+                i.classList.toggle('active', i.dataset.pane === paneId);
+            });
+            panes.forEach(p => {
+                p.classList.toggle('hidden', p.dataset.paneId !== paneId);
+            });
+        }
+
+        sidebar.addEventListener('click', (e) => {
+            const item = e.target.closest('.settings-sidebar-item');
+            if (!item) return;
+            setActivePane(item.dataset.pane);
+        });
+
+        if (appearanceSetter) {
+            appearanceSetter.addEventListener('change', (e) => {
+                if (e.target.name === 'wallpaper') {
+                    const value = e.target.value;
+                    if (value === 'custom') {
+                        if (customWallpaperURL) {
+                            setDesktopBackground(null, customWallpaperURL);
+                        }
+                    } else {
+                        setDesktopBackground(value, null);
+                    }
+                }
+            });
+        }
+        
+        if (wallpaperUpload) {
+            wallpaperUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file || !['image/png', 'image/gif'].includes(file.type)) {
+                    fileNameDisplay.textContent = 'Invalid file type (PNG/GIF only).';
+                    fileNameDisplay.style.color = '#ff5f57'; // Red
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    customWallpaperURL = event.target.result;
+                    setDesktopBackground(null, customWallpaperURL);
+                    customRadio.disabled = false;
+                    customRadio.checked = true;
+                    fileNameDisplay.textContent = file.name;
+                    fileNameDisplay.style.color = '#a1a1aa'; // Back to normal
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        if (customWallpaperURL) {
+            customRadio.disabled = false;
+        }
+        
+        if (data && data.pane) {
+            setActivePane(data.pane);
+        }
+    }
+    
+    initFileExplorer(windowEl, data) {
+        const sidebar = windowEl.querySelector('[data-app-id="file-explorer-sidebar"]');
+        const grid = windowEl.querySelector('[data-app-id="file-grid"]');
+        const backBtn = windowEl.querySelector('[data-action="back"]');
+        const addressBar = windowEl.querySelector('.file-explorer-address-bar');
+        
+        let pathHistory = [data && data.path ? data.path : 'desktop'];
+        let currentPath = pathHistory[pathHistory.length - 1];
+
+        const renderPane = (path) => {
+            const item = this.vfs.getItem(path);
+            if (!item || item.type !== 'folder') {
+                console.error("Invalid path:", path);
+                renderPane(pathHistory[pathHistory.length - 1]);
+                return;
+            }
+            const items = item.children;
+            currentPath = path;
+            addressBar.value = `${path.replaceAll('/', ' > ').replace('root > ', '')}`;
+            
+            sidebar.querySelectorAll('.file-explorer-sidebar-item').forEach(i => {
+                i.classList.toggle('active', i.dataset.path === path);
+            });
+            
+            grid.innerHTML = ''; // Clear current items
+            
+            if (items.length === 0) {
+                grid.innerHTML = `<p class="text-zinc-400 text-sm p-2">This folder is empty.</p>`;
+            }
+            
+            // Sort items: folders first, then files
+            items.sort((a, b) => {
+                if (a.type === 'folder' && b.type !== 'folder') return -1;
+                if (a.type !== 'folder' && b.type === 'folder') return 1;
+                return a.name.localeCompare(b.name);
+            });
+            
+            for (const item of items) {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'file-item';
+                itemEl.dataset.itemId = item.id;
+                itemEl.dataset.itemType = item.type;
+                itemEl.title = item.name;
+                itemEl.innerHTML = `
+                    <div class="icon-bg">
+                        <i data-lucide="${item.icon}"></i>
+                    </div>
+                    <span>${item.name}</span>
+                `;
+                grid.appendChild(itemEl);
+            }
+            lucide.createIcons({ nodes: grid.querySelectorAll('.icon-bg') });
+        }
+        
+        const navigateTo = (path) => {
+            if (this.vfs.getItem(path)) {
+                if (path !== pathHistory[pathHistory.length - 1]) {
+                    pathHistory.push(path);
+                }
+                renderPane(path);
+            }
+        }
+        
+        backBtn.addEventListener('click', () => {
+            if (pathHistory.length > 1) {
+                pathHistory.pop();
+                renderPane(pathHistory[pathHistory.length - 1]);
+            }
+        });
+        
+        sidebar.addEventListener('click', (e) => {
+            const item = e.target.closest('.file-explorer-sidebar-item');
+            if (!item) return;
+            navigateTo(item.dataset.path);
+        });
+        
+        grid.addEventListener('dblclick', (e) => {
+            const itemEl = e.target.closest('.file-item');
+            if (!itemEl) return;
+            
+            const itemId = itemEl.dataset.itemId;
+            const itemType = itemEl.dataset.itemType;
+            
+            if (itemType === 'folder') {
+                navigateTo(`${currentPath}/${itemId}`);
+            } else if (itemType === 'app') {
+                this.createWindow(itemId);
+            } else if (itemType === 'file') {
+                // Open file with its default app
+                this.createWindow(itemId); // WindowManager now handles file opening
+            }
+        });
+        
+        const onVFSUpdate = (e) => {
+            if (e.detail.path === currentPath) {
+                renderPane(currentPath);
+            }
+        };
+        this.vfs.addEventListener('update', onVFSUpdate);
+        
+        windowEl.addEventListener('close', () => {
+            this.vfs.removeEventListener('update', onVFSUpdate);
+        }, { once: true });
+
+        navigateTo(currentPath);
+    }
+    
+    initCalculator(windowEl) {
+        const display = windowEl.querySelector('.calc-display');
+        const grid = windowEl.querySelector('.calculator-grid');
+        
+        let currentValue = '0';
+        let operator = null;
+        let prevValue = null;
+        
+        const updateDisplay = () => {
+            display.textContent = currentValue;
+        };
+
+        grid.addEventListener('click', (e) => {
+            const btn = e.target.closest('.calc-btn');
+            if (!btn) return;
+            
+            const key = btn.dataset.key;
+            
+            if (/\d/.test(key)) { // Number
+                if (currentValue === '0' || currentValue === 'Error') {
+                    currentValue = key;
+                } else {
+                    currentValue += key;
+                }
+            } else if (key === '.') { // Decimal
+                if (!currentValue.includes('.')) {
+                    currentValue += '.';
+                }
+            } else if (key === 'C') { // Clear All
+                currentValue = '0';
+                operator = null;
+                prevValue = null;
+            } else if (key === 'CE') { // Clear Entry
+                currentValue = '0';
+            } else if (['+', '-', '*', '/'].includes(key)) { // Operator
+                if (prevValue) {
+                    currentValue = this.calculate(prevValue, currentValue, operator);
+                    updateDisplay();
+                }
+                operator = key;
+                prevValue = currentValue;
+                currentValue = '0';
+            } else if (key === '=') { // Equals
+                if (prevValue && operator) {
+                    currentValue = this.calculate(prevValue, currentValue, operator);
+                    prevValue = null;
+                    operator = null;
+                }
+            }
+            updateDisplay();
+        });
+    }
+    
+    calculate(val1, val2, op) {
+        const num1 = parseFloat(val1);
+        const num2 = parseFloat(val2);
+        let result;
+        
+        switch(op) {
+            case '+': result = num1 + num2; break;
+            case '-': result = num1 - num2; break;
+            case '*': result = num1 * num2; break;
+            case '/': 
+                if (num2 === 0) return 'Error';
+                result = num1 / num2; 
+                break;
+            default: return val2;
+        }
+        return String(parseFloat(result.toPrecision(10)));
+    }
+
+    initSnakeGame(windowEl) {
+        const canvas = windowEl.querySelector('#snake-canvas');
+        const scoreEl = windowEl.querySelector('[data-app-id="snake-score"]');
+        const ctx = canvas.getContext('2d');
+
+        const gridSize = 20;
+        let tileCount = canvas.width / gridSize;
+
+        let snake = [{ x: 10, y: 10 }];
+        let velocity = { x: 0, y: 0 };
+        let food = { x: 15, y: 15 };
+        let score = 0;
+        let gameLoop;
+        let isGameOver = false;
+
+        function draw() {
+            if (isGameOver) return;
+            
+            ctx.fillStyle = '#111';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y };
+            snake.unshift(head);
+
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount || checkCollision(head)) {
+                isGameOver = true;
+                clearInterval(gameLoop);
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Inter';
+                ctx.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
+                document.removeEventListener('keydown', handleKeydown); // Remove listener
+                return;
+            }
+
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreEl.textContent = score;
+                placeFood();
+            } else {
+                snake.pop();
+            }
+
+            ctx.fillStyle = '#28c940';
+            snake.forEach(part => {
+                ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
+            });
+
+            ctx.fillStyle = '#ff5f57';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+        }
+
+        function placeFood() {
+            food.x = Math.floor(Math.random() * tileCount);
+            food.y = Math.floor(Math.random() * tileCount);
+        }
+
+        function checkCollision(head) {
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function handleKeydown(e) {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                e.preventDefault();
+            }
+            
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (velocity.y === 0) velocity = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    if (velocity.y === 0) velocity = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    if (velocity.x === 0) velocity = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (velocity.x === 0) velocity = { x: 1, y: 0 };
+                    break;
+            }
+        }
+        
+        const onFocus = () => document.addEventListener('keydown', handleKeydown);
+        const onBlur = () => document.removeEventListener('keydown', handleKeydown);
+        
+        windowEl.addEventListener('focus', onFocus);
+        windowEl.addEventListener('blur', onBlur);
+        onFocus(); // Focus by default when opening
+
+        gameLoop = setInterval(draw, 100);
+
+        windowEl.addEventListener('close', () => {
+            clearInterval(gameLoop);
+            onBlur(); // Remove listener
+            windowEl.removeEventListener('focus', onFocus);
+            windowEl.removeEventListener('blur', onBlur);
+        }, { once: true });
+    }
+
+    initSketchpad(windowEl) {
+        const canvas = windowEl.querySelector('#sketch-canvas');
+        const controls = windowEl.querySelector('.sketchpad-controls');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const startDrawing = (e) => {
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        };
+
+        const draw = (e) => {
+            if (!isDrawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        };
+
+        const stopDrawing = () => {
+            isDrawing = false;
+            ctx.closePath();
+        };
+        
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing); 
+
+        controls.addEventListener('click', (e) => {
+            const swatch = e.target.closest('.color-swatch');
+            if (swatch) {
+                controls.querySelector('.color-swatch.active').classList.remove('active');
+                swatch.classList.add('active');
+                ctx.strokeStyle = swatch.dataset.color;
+            }
+            
+            const clearBtn = e.target.closest('[data-action="clear-canvas"]');
+            if (clearBtn) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+        
+        windowEl.addEventListener('close', () => {
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            canvas.removeEventListener('mouseout', stopDrawing);
+        }, { once: true });
+    }
+
+    bringToFront(windowEl) {
+        if (activeWindow && activeWindow !== windowEl) {
+            activeWindow.classList.remove('active');
+            activeWindow.dispatchEvent(new CustomEvent('blur'));
+        }
+        if (activeWindow !== windowEl) {
+            windowEl.dispatchEvent(new CustomEvent('focus'));
+        }
+        
+        maxZIndex++;
+        windowEl.style.zIndex = maxZIndex;
+        windowEl.classList.add('active');
+        activeWindow = windowEl;
+    }
+    
+    closeWindow(windowEl) {
+        const appId = windowEl.dataset.appId;
+        const windowId = windowEl.dataset.windowId;
+        
+        windowEl.dispatchEvent(new CustomEvent('close')); 
+        windowEl.remove();
+        openWindows.delete(windowId);
+        
+        let stillActive = false;
+        for (const win of openWindows.values()) {
+            if (win.dataset.appId === appId) {
+                stillActive = true;
+                break;
+            }
+        }
+        if (!stillActive) {
+            this.updateDockActiveState(appId, false);
+        }
+    }
+    
+    minimizeWindow(windowEl) {
+        windowEl.classList.add('minimized');
+        this.updateDockActiveState(windowEl.dataset.appId, true); // Still active, just minimized
+        
+        if(activeWindow === windowEl) {
+            windowEl.dispatchEvent(new CustomEvent('blur')); // Tell game to stop listening
+            activeWindow = null;
+        }
+    }
+    
+    restoreWindow(windowEl) {
+        windowEl.classList.remove('minimized');
+        this.bringToFront(windowEl);
+    }
+    
+    maximizeWindow(windowEl) {
+        if (windowEl.classList.contains('maximized')) {
+            // Restore
+            const prev = windowEl.dataset.prevSize.split(',');
+            windowEl.style.top = prev[0];
+            windowEl.style.left = prev[1];
+            windowEl.style.width = prev[2];
+            windowEl.style.height = prev[3];
+            windowEl.classList.remove('maximized');
+        } else {
+            // Maximize
+            windowEl.dataset.prevSize = `${windowEl.style.top},${windowEl.style.left},${windowEl.style.width},${windowEl.style.height}`;
+            windowEl.classList.add('maximized');
+        }
+    }
+    
+    updateDockActiveState(appId, isActive) {
+        const dockIcon = document.querySelector(`.dock-item[data-app-id="${appId}"]`);
+        if (dockIcon) {
+            dockIcon.classList.toggle('active', isActive);
+        }
+    }
+
+    // --- Event Handlers for Drag/Resize ---
+    
+    onGlobalMouseDown(e) {
+        if (!e) {
+            console.error("onGlobalMouseDown called without event object!");
+            return;
+        }
+        
+        const iconEl = e.target.closest('.desktop-icon');
+        const windowEl = e.target.closest('.app-window');
+        
+        if (e.target.closest('.dock-item') || e.target.closest('#dock-folder-flyout')) {
+            return;
+        }
+        
+        const controlButton = e.target.closest('.window-control');
+        const controlAction = controlButton ? controlButton.dataset.action : null;
+        if (controlAction) {
+            if (windowEl) {
+                this.bringToFront(windowEl);
+                 switch(controlAction) {
+                    case 'close': this.closeWindow(windowEl); break;
+                    case 'minimize': this.minimizeWindow(windowEl); break;
+                    case 'maximize': this.maximizeWindow(windowEl); break;
+                }
+            }
+            e.preventDefault(); 
+            return; 
+        }
+        
+        if (e.target.closest('#context-menu')) {
+            return;
+        }
+
+        if (windowEl) {
+            if (e.target.closest('button') || 
+                e.target.closest('input') || 
+                e.target.closest('textarea') || 
+                e.target.closest('label') ||
+                e.target.closest('.calc-btn') || 
+                e.target.closest('.settings-sidebar-item') || 
+                e.target.closest('.file-explorer-sidebar-item') || 
+                e.target.closest('.file-explorer-nav-btn') || 
+                e.target.closest('.file-item') ||
+                e.target.closest('.sketchpad-btn') || 
+                e.target.closest('.color-swatch') ||
+                e.target.closest('.chat-friend-item') ||
+                e.target.closest('.notification-btn')
+               ) {
+                this.bringToFront(windowEl); // Still bring to front
+                return; // Let the click pass through
+            }
+        }
+        
+        if (iconEl && !windowEl) { 
+            this.dragState = {};
+            this.resizeState = {};
+            desktopDragState = {
+                el: iconEl,
+                startX: e.clientX,
+                startY: e.clientY,
+                startLeft: iconEl.offsetLeft,
+                startTop: iconEl.offsetTop
+            };
+            iconEl.classList.add('is-dragging');
+            return;
+        }
+
+        if (windowEl) {
+            this.bringToFront(windowEl); 
+
+            if (e.target.classList.contains('resize-handle')) {
+                this.dragState = {};
+                this.resizeState = {
+                    el: windowEl,
+                    handle: e.target.classList,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    startWidth: windowEl.offsetWidth,
+                    startHeight: windowEl.offsetHeight,
+                    startTop: windowEl.offsetTop,
+                    startLeft: windowEl.offsetLeft
+                };
+                document.body.style.cursor = getComputedStyle(e.target).cursor;
+                e.preventDefault();
+                return;
+            }
+
+            if (e.target.closest('[data-drag-handle="true"]')) {
+                this.resizeState = {};
+                this.dragState = {
+                    el: windowEl,
+                    header: e.target.closest('[data-drag-handle="true"]'),
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    startTop: windowEl.offsetTop,
+                    startLeft: windowEl.offsetLeft
+                };
+                this.dragState.header.classList.add('is-dragging');
+                this.dragState.header.style.cursor = 'grabbing';
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        if (activeWindow) {
+            activeWindow.classList.remove('active');
+            activeWindow.dispatchEvent(new CustomEvent('blur')); // Tell game to stop listening
+            activeWindow = null;
+        }
+    }
+
+    onGlobalMouseMove(e) {
+        if (desktopDragState.el) {
+            const newTop = desktopDragState.startTop + e.clientY - desktopDragState.startY;
+            const newLeft = desktopDragState.startLeft + e.clientX - desktopDragState.startX;
+            desktopDragState.el.style.top = `${newTop}px`;
+            desktopDragState.el.style.left = `${newLeft}px`;
+        }
+    
+        if (this.dragState.el) {
+            const newTop = this.dragState.startTop + e.clientY - this.dragState.startY;
+            const newLeft = this.dragState.startLeft + e.clientX - this.dragState.startX;
+            
+            this.dragState.el.style.top = `${Math.max(0, newTop)}px`;
+            this.dragState.el.style.left = `${newLeft}px`;
+        }
+        
+        if (this.resizeState.el) {
+            const el = this.resizeState.el;
+            const { handle, startX, startY, startWidth, startHeight, startTop, startLeft } = this.resizeState;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            if (handle.contains('s')) {
+                el.style.height = `${startHeight + dy}px`;
+            }
+            if (handle.contains('n')) {
+                el.style.top = `${startTop + dy}px`;
+                el.style.height = `${startHeight - dy}px`;
+            }
+            if (handle.contains('e')) {
+                el.style.width = `${startWidth + dx}px`;
+            }
+            if (handle.contains('w')) {
+                el.style.left = `${startLeft + dx}px`;
+                el.style.width = `${startWidth - dx}px`;
+            }
+        }
+    }
+
+    onGlobalMouseUp() {
+        if (desktopDragState.el) {
+            desktopDragState.el.classList.remove('is-dragging');
+            this.vfs.updateItemPosition(
+                desktopDragState.el.dataset.itemId,
+                desktopDragState.el.offsetLeft,
+                desktopDragState.el.offsetTop
+            );
+            desktopDragState = {};
+        }
+    
+        if(this.dragState.el) {
+            this.dragState.header.classList.remove('is-dragging');
+            this.dragState.header.style.cursor = 'grab';
+        }
+        if(this.resizeState.el) {
+            document.body.style.cursor = 'default';
+        }
+        this.dragState = {};
+        this.resizeState = {};
+    }
+}
+
+// --- Context Menu Manager ---
+class ContextMenu {
+    constructor(menuEl, windowManager, vfs) {
+        this.menuEl = menuEl;
+        this.windowManager = windowManager;
+        this.vfs = vfs; 
+        
+        document.addEventListener('contextmenu', this.showMenu.bind(this));
+        document.addEventListener('click', (e) => {
+            this.hideMenu();
+            // Also hide folder flyout
+            document.getElementById('dock-folder-flyout').style.display = 'none';
+        });
+        this.menuEl.addEventListener('click', this.onItemClick.bind(this));
+    }
+    
+    showMenu(e) {
+        e.preventDefault();
+        
+        if (e.target.closest('.app-window') || e.target.closest('.desktop-icon') || e.target.closest('#aura-dock')) {
+            this.hideMenu();
+            return;
+        }
+        
+        this.menuEl.style.display = 'flex';
+        this.menuEl.style.top = `${e.clientY}px`;
+        this.menuEl.style.left = `${e.clientX}px`;
+    }
+    
+    hideMenu() {
+        this.menuEl.style.display = 'none';
+    }
+    
+    onItemClick(e) {
+        const action = e.target.dataset.action;
+        if(action) {
+            switch(action) {
+                case 'change-wallpaper':
+                    this.windowManager.createWindow('settings', { pane: 'appearance' });
+                    break;
+                case 'new-folder':
+                    this.vfs.createFolder('desktop', 'New Folder');
+                    break;
+                case 'about':
+                    this.windowManager.createWindow('about');
+                    break;
+            }
+        }
+        this.hideMenu();
+    }
+}
+
+// --- Dock Manager ---
+class Dock {
+    constructor(dockEl, windowManager, vfs, dockConfig) {
+        this.dockEl = dockEl;
+        this.windowManager = windowManager;
+        this.vfs = vfs;
+        this.items = dockConfig.items; // This is our new data model
+        
+        this.clockEl = dockEl.querySelector('#dock-clock');
+        this.dateEl = dockEl.querySelector('#dock-date');
+        this.appContainer = dockEl.querySelector('#dock-app-container');
+        this.flyout = document.getElementById('dock-folder-flyout');
+        
+        this.draggedItem = null;
+        this.ghost = null;
+
+        this.dockEl.addEventListener('click', (e) => this.onDockClick(e));
+        this.flyout.addEventListener('click', (e) => this.onFlyoutClick(e));
+        this.startClock();
+        this.renderDock();
+        this.addDragDropListeners();
+    }
+    
+    addItem(appId) {
+        // Check if item already exists
+        const exists = this.items.some(item => {
+            if (typeof item === 'string') return item === appId;
+            if (item.type === 'folder') return item.items.includes(appId);
+            return false;
+        });
+
+        if (!exists) {
+            this.items.push(appId);
+            this.saveDock();
+            this.renderDock();
+        }
+    }
+    
+    onDockClick(e) {
+        const item = e.target.closest('.dock-item');
+        if (!item) return;
+
+        const action = item.dataset.action;
+        if (action === 'open-launcher') {
+            this.toggleLauncher(true);
+            return;
+        }
+        
+        const appId = item.dataset.appId;
+        const itemId = item.dataset.itemId;
+        const itemType = item.dataset.itemType;
+
+        if (itemType === 'folder') {
+            const folderData = this.items.find(i => i.id === itemId);
+            this.showFolderFlyout(item, folderData);
+            e.stopPropagation(); // Prevent context menu from closing it
+            return;
+        }
+
+        if (appId && appId !== 'clock' && appId !== 'system-network' && appId !== 'system-battery') {
+            let windowToRestore = null;
+            for (const win of openWindows.values()) {
+                if (win.dataset.appId === appId && win.classList.contains('minimized')) {
+                    windowToRestore = win;
+                    break;
+                }
+            }
+            
+            if (windowToRestore) {
+                this.windowManager.restoreWindow(windowToRestore);
+            } else {
+                this.windowManager.createWindow(appId);
+            }
+        }
+    }
+    
+    onFlyoutClick(e) {
+        const item = e.target.closest('.flyout-item');
+        if (item && item.dataset.appId) {
+            this.windowManager.createWindow(item.dataset.appId);
+            this.flyout.style.display = 'none'; // Close flyout
+        }
+    }
+    
+    showFolderFlyout(itemEl, folderData) {
+        const flyoutContent = this.flyout.querySelector('[data-app-id="flyout-content"]');
+        const flyoutName = this.flyout.querySelector('.flyout-name');
+        
+        flyoutName.textContent = folderData.name;
+        flyoutContent.innerHTML = ''; // Clear old content
+        
+        folderData.items.forEach(appId => {
+            const app = this.vfs.getApp(appId);
+            if (app) {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flyout-item';
+                itemEl.dataset.appId = appId;
+                itemEl.innerHTML = `
+                    <i data-lucide="${app.icon}"></i>
+                    <span>${app.title}</span>
+                `;
+                flyoutContent.appendChild(itemEl);
+            }
+        });
+        
+        lucide.createIcons({ nodes: [flyoutContent] });
+        
+        // Position and show
+        const rect = itemEl.getBoundingClientRect();
+        this.flyout.style.display = 'flex';
+        const flyoutRect = this.flyout.getBoundingClientRect();
+        this.flyout.style.left = `${rect.left + (rect.width / 2) - (flyoutRect.width / 2)}px`;
+        this.flyout.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+    }
+
+    addDragDropListeners() {
+        this.appContainer.addEventListener('dragstart', (e) => this.onDragStart(e));
+        this.appContainer.addEventListener('dragover', (e) => this.onDragOver(e));
+        this.appContainer.addEventListener('dragleave', (e) => this.onDragLeave(e));
+        this.appContainer.addEventListener('dragend', (e) => this.onDragEnd(e));
+        this.appContainer.addEventListener('drop', (e) => this.onDrop(e));
+    }
+    
+    onDragStart(e) {
+        const target = e.target.closest('.dock-item');
+        if (!target || !target.draggable) return;
+        
+        this.draggedItem = target;
+        setTimeout(() => target.classList.add('is-dragging'), 0);
+        
+        e.dataTransfer.effectAllowed = 'move';
+        // Set drag data (use item ID, which is appId or folderId)
+        const itemId = target.dataset.itemId || target.dataset.appId;
+        e.dataTransfer.setData('text/plain', itemId);
+    }
+    
+    onDragOver(e) {
+        e.preventDefault();
+        const target = e.target.closest('.dock-item');
+        
+        // Scenario 1: Hovering over another item to create a folder
+        if (target && target !== this.draggedItem) {
+            target.classList.add('drop-target');
+            if (this.ghost) this.ghost.remove(); this.ghost = null; // Remove placeholder
+            return;
+        }
+        
+        // Scenario 2: Reordering
+        // Remove folder target highlight
+        this.appContainer.querySelectorAll('.dock-item').forEach(i => i.classList.remove('drop-target'));
+        
+        if (!this.ghost) {
+            this.ghost = document.createElement('div');
+            this.ghost.className = 'dock-ghost';
+        }
+        
+        const afterElement = this.getDragAfterElement(e.clientX);
+        if (afterElement == null) {
+            this.appContainer.appendChild(this.ghost);
+        } else {
+            this.appContainer.insertBefore(this.ghost, afterElement);
+        }
+    }
+    
+    onDragLeave(e) {
+        const target = e.target.closest('.dock-item');
+        if (target) {
+            target.classList.remove('drop-target');
+        }
+    }
+    
+    onDragEnd(e) {
+        if (this.draggedItem) { // Check if draggedItem exists
+            this.draggedItem.classList.remove('is-dragging');
+        }
+        if (this.ghost) this.ghost.remove();
+        this.ghost = null;
+        this.draggedItem = null;
+        this.appContainer.querySelectorAll('.dock-item').forEach(i => i.classList.remove('drop-target'));
+    }
+    
+    onDrop(e) {
+        e.preventDefault();
+        const draggedId = e.dataTransfer.getData('text/plain');
+        if (!draggedId) return;
+        
+        const targetItemEl = e.target.closest('.dock-item');
+        
+        // Find the dragged item's data and remove it from its old position
+        let draggedItemData;
+        let oldIndex = this.items.findIndex(item => (item.id || item) === draggedId);
+        
+        if (oldIndex > -1) {
+             [draggedItemData] = this.items.splice(oldIndex, 1);
+        } else {
+            // Check inside folders
+            for (const item of this.items) {
+                if (item.type === 'folder' && item.items) {
+                    oldIndex = item.items.findIndex(appId => appId === draggedId);
+                    if (oldIndex > -1) {
+                        [draggedItemData] = item.items.splice(oldIndex, 1);
+                        // If folder is now empty or has one item, dissolve it
+                        if (item.items.length === 0) {
+                            const folderIndex = this.items.findIndex(i => i.id === item.id);
+                            this.items.splice(folderIndex, 1);
+                        } else if (item.items.length === 1) {
+                            const folderIndex = this.items.findIndex(i => i.id === item.id);
+                            this.items.splice(folderIndex, 1, item.items[0]);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (!draggedItemData) {
+            console.error("Could not find dragged item data for:", draggedId);
+            return;
+        }
+
+        // Scenario 1: Dropped on another item (create/add to folder)
+        if (targetItemEl && targetItemEl !== this.draggedItem) {
+            const targetId = targetItemEl.dataset.itemId || targetItemEl.dataset.appId;
+            const targetIndex = this.items.findIndex(item => (item.id || item) === targetId);
+            const targetItemData = this.items[targetIndex];
+
+            if (typeof targetItemData === 'object' && targetItemData.type === 'folder') {
+                // Add to existing folder
+                targetItemData.items.push(draggedItemData);
+                this.items[targetIndex] = targetItemData; // Update
+            } else {
+                // Create new folder
+                const newFolder = {
+                    id: crypto.randomUUID(),
+                    type: 'folder',
+                    name: 'New Folder',
+                    icon: 'folder',
+                    items: [targetItemData, draggedItemData] // target first, then dragged
+                };
+                this.items[targetIndex] = newFolder; // Replace target with folder
+            }
+        } 
+        // Scenario 2: Dropped on the dock (reorder)
+        else {
+            let newIndex;
+            const afterElement = this.getDragAfterElement(e.clientX);
+            if (afterElement == null) {
+                newIndex = this.items.length;
+            } else {
+                const afterId = afterElement.dataset.itemId || afterElement.dataset.appId;
+                newIndex = this.items.findIndex(item => (item.id || item) === afterId);
+            }
+            this.items.splice(newIndex, 0, draggedItemData);
+        }
+
+        this.saveDock();
+        this.renderDock();
+    }
+    
+    getDragAfterElement(x) {
+        const draggableElements = [...this.appContainer.querySelectorAll('.dock-item[draggable="true"]:not(.is-dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = x - box.left - box.width / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
+    saveDock() {
+        localStorage.setItem('aura-dock-config', JSON.stringify(this.items));
+    }
+    
+    renderDock() {
+        this.appContainer.innerHTML = ''; // Clear
+        this.items.forEach(item => {
+            let itemEl;
+            let appId = null;
+            let icon, title, type, id;
+            
+            if (typeof item === 'string') {
+                // It's an app ID
+                appId = item;
+                const app = this.vfs.getApp(appId);
+                if (app) {
+                    icon = app.icon;
+                    title = app.title;
+                    type = 'app';
+                    id = appId;
+                }
+            } else if (typeof item === 'object' && item.type === 'folder') {
+                // It's a folder
+                icon = item.icon;
+                title = item.name;
+                type = 'folder';
+                id = item.id;
+            }
+            
+            if (id) {
+                itemEl = this.createDockItem(id, icon, title, type, appId);
+                this.appContainer.appendChild(itemEl);
+            }
+        });
+        
+        lucide.createIcons({ nodes: this.appContainer.querySelectorAll('.dock-item') });
+    }
+    
+    createDockItem(id, icon, title, type, appId = null) {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'dock-item';
+        itemEl.title = title;
+        itemEl.draggable = true;
+        
+        if (appId) {
+            itemEl.dataset.appId = appId;
+        }
+        itemEl.dataset.itemId = id; // Universal ID (for apps or folders)
+        itemEl.dataset.itemType = type;
+        
+        itemEl.innerHTML = `
+            <i data-lucide="${icon}"></i>
+            <div class="active-dot"></div>
+        `;
+        // Re-check active state
+        if (type === 'app' && openWindows.has(id)) {
+            itemEl.classList.add('active');
+        }
+        
+        return itemEl;
+    }
+    
+    startClock() {
+        const update = () => {
+            const now = new Date();
+            this.clockEl.textContent = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            this.dateEl.textContent = now.toLocaleDateString([], {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric'
+            });
+        };
+        update();
+        setInterval(update, 1000); // Update every second
+    }
+    
+    toggleLauncher(forceOpen) {
+        const launcher = document.getElementById('app-launcher');
+        const grid = launcher.querySelector('[data-app-id="launcher-grid"]');
+        
+        const isVisible = launcher.classList.contains('visible');
+        
+        if (forceOpen === true || !isVisible) {
+            // Build the grid
+            grid.innerHTML = ''; // Clear old icons
+            for (const [appId, app] of Object.entries(this.windowManager.vfs.systemApps)) {
+                // Don't add "About" to the launcher
+                if (appId === 'about' || appId === 'music-maker') continue;
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'launcher-item';
+                itemEl.dataset.appId = appId;
+                itemEl.title = app.title;
+                
+                itemEl.innerHTML = `
+                    <div class="icon-bg">
+                        <i data-lucide="${app.icon}"></i>
+                    </div>
+                    <span>${app.title}</span>
+                `;
+                grid.appendChild(itemEl);
+            }
+            lucide.createIcons({ nodes: grid.querySelectorAll('.icon-bg') });
+            
+            launcher.classList.add('visible');
+        } else {
+            launcher.classList.remove('visible');
+        }
+    }
+}
+
+// --- Desktop Icon Manager ---
+class Desktop {
+    constructor(containerEl, windowManager, vfs) {
+        this.containerEl = containerEl;
+        this.windowManager = windowManager;
+        this.vfs = vfs; 
+        
+        // Re-render desktop if VFS changes
+        this.vfs.addEventListener('update', (e) => {
+            if (e.detail.path === 'desktop') {
+                this.renderIcons();
+            }
+        });
+        
+        this.containerEl.addEventListener('dblclick', this.onIconClick.bind(this));
+        this.renderIcons();
+    }
+    
+    renderIcons() {
+        // Render icons from the VFS 'desktop' path
+        const items = this.vfs.getItems('desktop');
+        this.containerEl.innerHTML = ''; // Clear
+        
+        for (const item of items) {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'desktop-icon';
+            itemEl.dataset.itemId = item.id;
+            itemEl.dataset.itemType = item.type;
+            itemEl.title = item.name;
+            itemEl.style.cssText = `top: ${item.y || 0}px; left: ${item.x || 0}px;`;
+            
+            itemEl.innerHTML = `
+                <div class="icon-bg">
+                    <i data-lucide="${item.icon}"></i>
+                </div>
+                <span>${item.name}</span>
+            `;
+            this.containerEl.appendChild(itemEl);
+        }
+        lucide.createIcons({
+           nodes: this.containerEl.querySelectorAll('.icon-bg')
+        });
+    }
+    
+    onIconClick(e) {
+        const icon = e.target.closest('.desktop-icon');
+        if (!icon) return;
+        
+        const itemId = icon.dataset.itemId;
+        
+        this.windowManager.createWindow(itemId);
+    }
+}
+
+
+// --- Init ---
+function initAuraOS() {
+    
+    // --- 1. Initialize Core OS Components ---
+    const windowContainer = document.getElementById('window-container');
+    const dockEl = document.getElementById('aura-dock');
+    const contextMenuEl = document.getElementById('context-menu');
+    const desktopEl = document.getElementById('desktop-icon-grid');
+    const launcherEl = document.getElementById('app-launcher');
+    
+    const notificationMgr = new NotificationManager();
+    const modal = new SystemModal();
+    const vfs = new VirtualFileSystem();
+    const windowManager = new WindowManager(windowContainer, vfs, modal, notificationMgr);
+    
+    
+    // --- 2. Load Dock Config from localStorage ---
+    let dockConfig;
+    const savedDockConfig = localStorage.getItem('aura-dock-config');
+    if (savedDockConfig) {
+        dockConfig = JSON.parse(savedDockConfig);
+    } else {
+        // Create default dock config
+        const defaultDockItems = ['file-explorer', 'play-store', 'music', 'snake', 'sketchpad', 'calculator', 'notepad', 'settings', 'terminal', 'chrome'];
+        dockConfig = { items: defaultDockItems };
+        localStorage.setItem('aura-dock-config', JSON.stringify(dockConfig));
+    }
+    
+    // --- 3. Initialize UI Managers ---
+    const dock = new Dock(dockEl, windowManager, vfs, dockConfig);
+    // Make dock accessible globally for the Play Store
+    window.aura = { dock: dock }; 
+    
+    new ContextMenu(contextMenuEl, windowManager, vfs);
+    new Desktop(desktopEl, windowManager, vfs);
+    
+    // Init System Monitor
+    const batteryIconEl = document.querySelector('[data-app-id="system-battery"]');
+    const networkIconEl = document.querySelector('[data-app-id="system-network"]');
+    new SystemMonitor(batteryIconEl, networkIconEl);
+
+    // --- 4. App Launcher Logic ---
+    const launcherCloseBtn = launcherEl.querySelector('[data-action="close-launcher"]');
+    const launcherGrid = launcherEl.querySelector('[data-app-id="launcher-grid"]');
+    
+    launcherCloseBtn.addEventListener('click', () => dock.toggleLauncher(false));
+    launcherGrid.addEventListener('click', (e) => {
+        const item = e.target.closest('.launcher-item');
+        if (item && item.dataset.appId) {
+            windowManager.createWindow(item.dataset.appId);
+            dock.toggleLauncher(false); // Close after launching
+        }
+    });
+    
+    // --- 5. Boot Sequence ---
+    const bootScreen = document.getElementById('aura-boot-screen');
+    setTimeout(() => {
+        bootScreen.style.opacity = '0';
+        bootScreen.addEventListener('transitionend', () => {
+            bootScreen.style.display = 'none';
+        });
+    }, 1500); 
+    
+    // Pre-load a window for demo
+    setTimeout(() => {
+         windowManager.createWindow('about');
+         
+         // Welcome notification
+         notificationMgr.showNotification({
+            title: "Welcome to Aura OS!",
+            message: "Check out the Settings app to customize your desktop.",
+            icon: "sparkles"
+         });
+         
+         // Safety notification
+         const firstTuesdayOfDec = 2; // Dec 2nd, 2025
+         notificationMgr.showNotification({
+            title: "System Announcement",
+            message: `Safety is coming to Aura OS. You will be flagged if you use swear words or nasty usernames. Coming on December ${firstTuesdayOfDec}nd.`,
+            icon: "shield-alert"
+         });
+         
+    }, 2000); // Open after boot
+}
+
+// --- Start the OS ---
+window.addEventListener('load', initAuraOS);
+
+    </script>
+</body>
+</html>
