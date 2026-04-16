@@ -488,3 +488,342 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: 'Google Sans', 'S
 .ab-btn.block:hover {
     background: #6b0000;
 }
+
+/* --- DESK UI STYLES --- */
+#desk-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: rgba(128,128,128,0.15);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: 0.2s;
+    margin-right: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sys-text);
+}
+
+#desk-indicator:hover {
+    background: rgba(128,128,128,0.25);
+}
+
+#current-desk-name {
+    white-space: nowrap;
+}
+
+#desk-arrow {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* Desk Switcher Panel */
+#desk-switcher {
+    position: absolute;
+    bottom: 70px;
+    left: 80px;
+    width: 280px;
+    background: var(--sys-surface);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    color: var(--sys-text);
+    backdrop-filter: var(--sys-blur);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 9999;
+    border: 1px solid var(--sys-border);
+}
+
+.desk-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.desk-add-btn {
+    background: var(--sys-primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.desk-add-btn:hover {
+    filter: brightness(1.1);
+}
+
+.desk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.desk-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: 0.2s;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.desk-item:hover {
+    background: rgba(128,128,128,0.1);
+}
+
+.desk-item.active {
+    border-color: var(--sys-primary);
+    background: rgba(128,128,128,0.05);
+}
+
+.desk-preview {
+    width: 60px;
+    height: 40px;
+    background: var(--sys-base);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--sys-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.desk-preview::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    height: 8px;
+    background: rgba(128,128,128,0.2);
+    border-radius: 2px;
+}
+
+.desk-name {
+    flex-grow: 1;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.desk-close {
+    background: transparent;
+    border: none;
+    color: var(--sys-text-muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    opacity: 0;
+    transition: 0.2s;
+}
+
+.desk-item:hover .desk-close {
+    opacity: 1;
+}
+
+.desk-close:hover {
+    background: rgba(234, 67, 53, 0.1);
+    color: #ea4335;
+}
+
+.desk-shortcuts {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sys-border);
+    font-size: 11px;
+    color: var(--sys-text-muted);
+    text-align: center;
+}
+
+/* --- CHROME OS STYLE LOCK SCREEN --- */
+#lock-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 50%, #8ab4f8 100%);
+    z-index: 99997;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+}
+
+.lock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+}
+
+.lock-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lock-user-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.lock-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.lock-username {
+    color: white;
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 0 24px 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.lock-input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    background: rgba(255,255,255,0.95);
+    border-radius: var(--radius-full);
+    padding: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    margin-bottom: 16px;
+}
+
+.lock-password-input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: #202124;
+    outline: none;
+}
+
+.lock-password-input::placeholder {
+    color: #5f6368;
+}
+
+.lock-submit-btn {
+    background: var(--sys-primary);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    margin-right: 4px;
+}
+
+.lock-submit-btn:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.lock-error {
+    color: #ffdad6;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+}
+
+.lock-options {
+    margin-bottom: 16px;
+}
+
+.lock-option-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.lock-option-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.security-hint {
+    background: rgba(255,255,255,0.15);
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.lock-footer {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.lock-shutdown-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    backdrop-filter: blur(10px);
+}
+
+.lock-shutdown-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Hide windows on inactive desks */
+.desk-hidden {
+    display: none !important;
+}
