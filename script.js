@@ -441,6 +441,19 @@ function closeUpdateModal() {
     }
 }
 
+function openOldVersion() {
+    // Open the old version in a new window
+    const oldVersionWindow = window.open('Apps/AuraOS-Old.html', '_blank');
+    if (!oldVersionWindow) {
+        notificationMgr.showNotification({
+            title: "Popup Blocked",
+            message: "Please allow popups to open the old version.",
+            icon: "shield-alert"
+        });
+    }
+    closeUpdateModal();
+}
+
 // --- Calendar System ---
 let currentCalendarDate = new Date();
 
@@ -515,6 +528,215 @@ function changeMonth(delta) {
     currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
     renderCalendar();
 }
+
+// --- DESK UI FUNCTIONS ---
+let currentDesk = 1;
+let deskCount = 1;
+const maxDesks = 8;
+let deskWindows = {}; // Store which windows are on which desk
+
+function toggleDeskSwitcher() {
+    const switcher = document.getElementById('desk-switcher');
+    const quickSettings = document.getElementById('quick-settings');
+    const launcherMenu = document.getElementById('launcher-menu');
+
+    if (switcher.style.display === 'none') {
+        switcher.style.display = 'block';
+        if (quickSettings) quickSettings.style.display = 'none';
+        if (launcherMenu) launcherMenu.style.display = 'none';
+        updateDeskPreviews();
+    } else {
+        switcher.style.display = 'none';
+    }
+}
+
+function addNewDesk() {
+    if (deskCount >= maxDesks) {
+        notificationMgr.showNotification({
+            title: "Maximum Desks Reached",
+            message: "You can only have up to 8 desks.",
+            icon: "shield-alert"
+        });
+        return;
+    }
+
+    deskCount++;
+    const deskList = document.getElementById('desk-list');
+    const newDeskItem = document.createElement('div');
+    newDeskItem.className = 'desk-item';
+    newDeskItem.setAttribute('data-desk', deskCount);
+    newDeskItem.onclick = () => switchToDesk(deskCount);
+    newDeskItem.innerHTML = `
+        <div class="desk-preview" id="desk-preview-${deskCount}"></div>
+        <span class="desk-name">Desk ${deskCount}</span>
+        <button class="desk-close" onclick="event.stopPropagation(); closeDesk(${deskCount})">×</button>
+    `;
+    deskList.appendChild(newDeskItem);
+
+    // Initialize empty window list for new desk
+    deskWindows[deskCount] = [];
+
+    notificationMgr.showNotification({
+        title: "New Desk Created",
+        message: `Desk ${deskCount} has been created.`,
+        icon: "sparkles"
+    });
+
+    // Switch to the new desk
+    switchToDesk(deskCount);
+}
+
+function switchToDesk(deskNum) {
+    if (deskNum === currentDesk) {
+        document.getElementById('desk-switcher').style.display = 'none';
+        return;
+    }
+
+    // Save current windows to current desk
+    const currentWindows = [];
+    document.querySelectorAll('.window').forEach(win => {
+        if (win.style.display === 'flex' && !win.classList.contains('minimized')) {
+            currentWindows.push(win.id);
+        }
+    });
+    deskWindows[currentDesk] = currentWindows;
+
+    // Hide all windows from current desk
+    document.querySelectorAll('.window').forEach(win => {
+        win.classList.add('desk-hidden');
+        win.style.display = 'none';
+    });
+
+    // Show windows from target desk
+    const targetWindows = deskWindows[deskNum] || [];
+    targetWindows.forEach(winId => {
+        const win = document.getElementById(winId);
+        if (win) {
+            win.classList.remove('desk-hidden');
+            win.style.display = 'flex';
+        }
+    });
+
+    // Update UI
+    currentDesk = deskNum;
+    document.getElementById('current-desk-name').innerText = `Desk ${deskNum}`;
+
+    // Update active state in switcher
+    document.querySelectorAll('.desk-item').forEach(item => {
+        item.classList.remove('active');
+        if (parseInt(item.getAttribute('data-desk')) === deskNum) {
+            item.classList.add('active');
+        }
+    });
+
+    document.getElementById('desk-switcher').style.display = 'none';
+
+    notificationMgr.showNotification({
+        title: `Switched to Desk ${deskNum}`,
+        message: "Use keyboard shortcuts to switch desks quickly.",
+        icon: "sparkles"
+    });
+}
+
+function closeDesk(deskNum) {
+    if (deskCount <= 1) {
+        notificationMgr.showNotification({
+            title: "Cannot Close Desk",
+            message: "You must have at least one desk.",
+            icon: "shield-alert"
+        });
+        return;
+    }
+
+    // Close all windows on this desk
+    const windowsToClose = deskWindows[deskNum] || [];
+    windowsToClose.forEach(winId => {
+        const win = document.getElementById(winId);
+        if (win) {
+            win.style.display = 'none';
+            win.classList.remove('desk-hidden');
+        }
+    });
+
+    // Remove desk item
+    const deskItem = document.querySelector(`.desk-item[data-desk="${deskNum}"]`);
+    if (deskItem) deskItem.remove();
+
+    // Update desk count
+    deskCount--;
+
+    // Renumber remaining desks
+    const deskItems = document.querySelectorAll('.desk-item');
+    deskItems.forEach((item, index) => {
+        const newNum = index + 1;
+        item.setAttribute('data-desk', newNum);
+        item.querySelector('.desk-name').innerText = `Desk ${newNum}`;
+        item.querySelector('.desk-close').setAttribute('onclick', `event.stopPropagation(); closeDesk(${newNum})`);
+        item.onclick = () => switchToDesk(newNum);
+    });
+
+    // Switch to desk 1 if we closed the current desk
+    if (currentDesk === deskNum) {
+        switchToDesk(1);
+    } else if (currentDesk > deskNum) {
+        currentDesk--;
+        document.getElementById('current-desk-name').innerText = `Desk ${currentDesk}`;
+    }
+
+    notificationMgr.showNotification({
+        title: "Desk Closed",
+        message: `Desk ${deskNum} has been closed.`,
+        icon: "sparkles"
+    });
+}
+
+function updateDeskPreviews() {
+    // Update preview thumbnails for each desk
+    document.querySelectorAll('.desk-item').forEach(item => {
+        const deskNum = parseInt(item.getAttribute('data-desk'));
+        const preview = item.querySelector('.desk-preview');
+        const windows = deskWindows[deskNum] || [];
+
+        // Show window count indicator
+        if (windows.length > 0) {
+            preview.innerHTML = `<span style="position: absolute; bottom: 2px; right: 2px; background: var(--sys-primary); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px;">${windows.length}</span>`;
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+}
+
+// Keyboard shortcuts for desk switching
+document.addEventListener('keydown', (e) => {
+    // Cmd/Ctrl + Shift + Arrow Up/Down to switch desks
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevDesk = currentDesk > 1 ? currentDesk - 1 : deskCount;
+            switchToDesk(prevDesk);
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextDesk = currentDesk < deskCount ? currentDesk + 1 : 1;
+            switchToDesk(nextDesk);
+        }
+    }
+});
+
+// Track window openings for desk management
+const originalOpenApp = openApp;
+openApp = function(appId) {
+    const win = document.getElementById(appId);
+    if (win) {
+        win.classList.remove('desk-hidden');
+
+        // Add to current desk's window list
+        if (!deskWindows[currentDesk]) deskWindows[currentDesk] = [];
+        if (!deskWindows[currentDesk].includes(appId)) {
+            deskWindows[currentDesk].push(appId);
+        }
+    }
+    return originalOpenApp(appId);
+};
 
 // --- Boot Sequence & OOBE Setup ---
 window.onload = function() {
