@@ -468,8 +468,18 @@ function showUpdateModal() {
 
 function closeUpdateModal() {
     const modal = document.getElementById('update-modal');
+    const btn = document.getElementById('update-continue-btn');
+
+    // If button is still disabled (countdown running), don't close
+    if (btn && btn.disabled) return;
+
     if (modal) {
         modal.style.display = 'none';
+    }
+
+    // Clear countdown if running
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
     }
 }
 
@@ -569,6 +579,16 @@ function toggleDeskSwitcher() {
     } else {
         switcher.style.display = 'none';
     }
+}
+
+function switchToPrevDesk() {
+    const prevDesk = currentDesk > 1 ? currentDesk - 1 : deskCount;
+    switchToDesk(prevDesk);
+}
+
+function switchToNextDesk() {
+    const nextDesk = currentDesk < deskCount ? currentDesk + 1 : 1;
+    switchToDesk(nextDesk);
 }
 
 function addNewDesk() {
