@@ -827,3 +827,54 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: 'Google Sans', 'S
 .desk-hidden {
     display: none !important;
 }
+
+
+/* --- UPDATE MODAL COUNTDOWN BUTTON --- */
+.update-countdown-btn {
+    background: #3c4043;
+    color: #9aa0a6;
+    border: none;
+    padding: 12px 30px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.update-countdown-btn.active {
+    background: var(--sys-primary);
+    color: white;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.update-countdown-btn.active:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+/* --- DESK QUICK ADD BUTTON --- */
+#desk-add-quick {
+    background: rgba(128,128,128,0.15);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sys-text);
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-right: 8px;
+}
+
+#desk-add-quick:hover {
+    background: var(--sys-primary);
+    color: white;
+    transform: scale(1.1);
+}
