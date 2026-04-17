@@ -426,11 +426,43 @@ function triggerInitialNotifications() {
 
 // --- Update V1.4 Modal Functions ---
 function showUpdateModal() {
-    // Show immediately on login - no localStorage check
-    // This ensures it shows every time user logs in
     const modal = document.getElementById('update-modal');
-    if (modal) {
-        modal.style.display = 'flex';
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+
+    // Open Link Center in new tab
+    window.open('https://docs.google.com/document/d/1H8FWbv4odBnSN-J5874YiJeUGFDxNxdNGPguCjpgh70/edit?usp=sharing', '_blank');
+
+    // Check if user has seen this modal before
+    const hasSeenModal = localStorage.getItem('update_v16_seen');
+    const continueBtn = document.getElementById('update-continue-btn');
+
+    if (hasSeenModal) {
+        // User has seen it - button is immediately clickable (blue)
+        continueBtn.disabled = false;
+        continueBtn.classList.add('active');
+        continueBtn.innerText = 'Continue';
+    } else {
+        // First time - countdown from 5
+        continueBtn.disabled = true;
+        continueBtn.classList.remove('active');
+
+        let countdown = 5;
+        continueBtn.innerText = `Continue (${countdown})`;
+
+        const timer = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                continueBtn.innerText = `Continue (${countdown})`;
+            } else {
+                clearInterval(timer);
+                continueBtn.innerText = 'Continue';
+                continueBtn.disabled = false;
+                continueBtn.classList.add('active');
+                localStorage.setItem('update_v16_seen', 'true');
+            }
+        }, 1000);
     }
 }
 
@@ -441,18 +473,7 @@ function closeUpdateModal() {
     }
 }
 
-function openOldVersion() {
-    // Open the old version in a new window
-    const oldVersionWindow = window.open('Apps/AuraOS-Old.html', '_blank');
-    if (!oldVersionWindow) {
-        notificationMgr.showNotification({
-            title: "Popup Blocked",
-            message: "Please allow popups to open the old version.",
-            icon: "shield-alert"
-        });
-    }
-    closeUpdateModal();
-}
+
 
 // --- Calendar System ---
 let currentCalendarDate = new Date();
