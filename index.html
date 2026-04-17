@@ -536,9 +536,11 @@
     <div id="taskbar-container">
         <div id="taskbar">
             <button id="launcher-btn" onclick="toggleMenu()"><div class="launcher-dot"></div></button>
-            <div id="desk-indicator" onclick="toggleDeskSwitcher()">
+            <div id="desk-indicator">
                 <span id="current-desk-name">Desk 1</span>
-                <span id="desk-arrow">›</span>
+                <button id="desk-prev" onclick="event.stopPropagation(); switchToPrevDesk()" title="Previous Desk">‹</button>
+                <button id="desk-next" onclick="event.stopPropagation(); switchToNextDesk()" title="Next Desk">›</button>
+                <button id="desk-add" onclick="event.stopPropagation(); addNewDesk()" title="New Desk">+</button>
             </div>
             <button id="desk-add-quick" onclick="event.stopPropagation(); addNewDesk();" title="New Desk">+</button>
             <div id="app-icons">
