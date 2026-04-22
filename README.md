@@ -1,63 +1,27 @@
-# Aura Chrome Browser
+# Aura OS Browser
+Aura OS is a chromebook simulator for students, Just fork the project, and then play, Below this message explains how to do that.
 
-A reworked Chrome browser for Aura OS that uses Ultraviolet (UV) proxy to access websites.
+## How to Fork [Make your own link]
+Step 1: The top right of the screen on the page, Click Fork.
 
-## Features
+Step 2: Name your website, and then click create.
 
-- Modern browser interface with address bar and navigation buttons
-- Back/forward/refresh navigation
-- Bookmarks for popular sites
-- UV proxy integration for accessing websites
-- Backend server for serving UV files
+Step 3: Go to settings. Look for Pages.
 
-## Setup
+Step 4: Choose Main & /Root
 
-### Prerequisites
+Step 5: Wait a few mins, refresh the pages tab, then there you go. Your own website.
 
-- Node.js (v14 or higher)
-- npm
+-- Always remember to update your fork when i update the website. Or you website will be outdated and maybe buggy.
+<img width="967" height="63" alt="image" src="https://github.com/user-attachments/assets/1543f6ad-4dc4-47ce-9c09-4d72bf0c0584" />
 
-### Installation
+# Lisense
+The creator of this website must apply credits to Darden Proxies.
+If not, you will be asked to take down, the modifed verison of the website.
+The creator of this website haven't used a single UV proxy or Scramjet.
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the backend server:
-   ```bash
-   npm start
-   ```
-
-   The server will run on `http://localhost:3000`
-
-### Usage
-
-- For development: Access `http://localhost:3000/chrome` to use the browser
-- The browser uses UV proxy to load websites through a secure proxy
-- Enter URLs in the address bar or use the bookmark buttons
-
-### Deployment
-
-For production deployment, you may need to host the backend server separately and update the UV configuration to point to your bare server endpoint.
-
-**Note**: For the browser to work properly in the Aura OS iframe, the entire application should be served from the backend server. The current setup assumes the Chrome is accessed directly at `/chrome`.
-
-If deploying to GitHub Pages, you may need to:
-1. Host the backend on a separate service (Heroku, Render, etc.)
-2. Update the paths in `ChromeReworked.html` to point to the backend URL
-3. Or modify the Aura OS to load the Chrome from the backend URL
-
-## Architecture
-
-- **Frontend**: HTML/CSS/JavaScript browser interface
-- **Backend**: Node.js Express server serving UV static files
-- **Proxy**: Ultraviolet proxy for website access
-- **Bare Server**: Uses public bare server for WebSocket and additional proxying
-
-## Files
-
-- `server.js` - Backend server
-- `Apps/ChromeReworked.html` - Browser interface
-- `uv/` - UV proxy files
-- `package.json` - Dependencies
+# Unblocked Extensions
+- Securly
+- Hapara Highlights
+- GoGuardan
+  ||MORE ARE COMING SOON||
