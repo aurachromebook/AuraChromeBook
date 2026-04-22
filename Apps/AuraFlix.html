@@ -693,6 +693,7 @@
       .disclaimer-card { padding: 32px 24px; margin: 20px; }
     }
   </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -828,7 +829,7 @@
       
       <div class="modal-body">
         <div class="video-area">
-          <iframe id="videoFrame" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"></iframe>
+          <iframe id="videoFrame" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture; clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation allow-popups-to-escape-sandbox"></iframe>
           
           <div class="video-placeholder" id="videoPlaceholder">
             <div class="spinner"></div>
@@ -838,8 +839,11 @@
           <div class="error-screen" id="errorScreen">
             <div class="error-icon">⚠️</div>
             <div class="error-text" id="errorText">Video blocked by network</div>
-            <div class="error-subtext">Attempting automatic fallback...</div>
-            <button class="retry-btn" id="retryBtn">Try Alternative Method</button>
+            <div class="error-subtext" id="errorSubtext">Attempting automatic fallback...</div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+              <button class="retry-btn" id="retryBtn">🔄 Try Same Server</button>
+              <button class="retry-btn" id="nextServerBtn" style="background: var(--success);">⏭️ Try Next Server</button>
+            </div>
           </div>
         </div>
         
@@ -990,7 +994,7 @@
         direct(url) {
           const frame = document.getElementById('videoFrame');
           frame.src = 'about:blank';
-          setTimeout(() => { frame.src = url; }, 50);
+          setTimeout(() => { frame.src = url; UnblockEngine.startLoadTimer(); }, 50);
           return true;
         },
 
@@ -1009,7 +1013,7 @@
   </style>
 </head>
 <body>
-  <iframe src="${url}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"></iframe>
+  <iframe src="${url}" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture; clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation allow-popups-to-escape-sandbox"></iframe>
 </body>
 </html>`;
           
@@ -1018,8 +1022,10 @@
               frame.contentDocument.open();
               frame.contentDocument.write(html);
               frame.contentDocument.close();
+              UnblockEngine.startLoadTimer();
             } catch(e) {
               console.error('about:blank write failed:', e);
+              UnblockEngine.handleLoadFailure('about:blank blocked');
             }
           }, 100);
           return true;
@@ -1037,12 +1043,13 @@
   </style>
 </head>
 <body>
-  <iframe src="${url}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"></iframe>
+  <iframe src="${url}" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture; clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation allow-popups-to-escape-sandbox"></iframe>
 </body>
 </html>`;
           
           const base64 = btoa(unescape(encodeURIComponent(html)));
           frame.src = `data:text/html;base64,${base64}`;
+          UnblockEngine.startLoadTimer();
           return true;
         },
 
@@ -1058,7 +1065,7 @@
   </style>
 </head>
 <body>
-  <iframe src="${url}" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"></iframe>
+  <iframe src="${url}" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture; clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation allow-popups-to-escape-sandbox"></iframe>
 </body>
 </html>`;
           
@@ -1070,6 +1077,7 @@
           const blobUrl = URL.createObjectURL(blob);
           frame._currentBlob = blobUrl;
           frame.src = blobUrl;
+          UnblockEngine.startLoadTimer();
           
           return true;
         }
@@ -1081,30 +1089,88 @@
           console.log('Rate limited: too many rapid load attempts');
           return false;
         }
-        
-        if (this.retryCount >= CONFIG.MAX_RETRIES) {
-          this.showError('Max retries reached. Please try a different server.');
-          return false;
-        }
-        
+
         this.lastLoadTime = now;
         this.isLoading = true;
         this.currentMethod = method;
-        
+        this.clearLoadTimer();
+
         const fn = this.methods[method];
         if (fn) {
           fn(url);
           this.updateUI(method);
-          
-          setTimeout(() => {
-            this.isLoading = false;
-            this.retryCount = 0;
-          }, CONFIG.LOAD_TIMEOUT);
-          
           return true;
         }
         return false;
       },
+
+      // NEW: Auto-fallback system
+      loadTimer: null,
+
+      startLoadTimer() {
+        this.clearLoadTimer();
+        const placeholder = document.getElementById('videoPlaceholder');
+        const spinnerText = placeholder.querySelector('span');
+        if (spinnerText) spinnerText.textContent = 'Loading secure stream... (auto-fallback in 8s)';
+
+        this.loadTimer = setTimeout(() => {
+          this.handleLoadFailure('Source timed out - trying next server...');
+        }, 8000);
+      },
+
+      clearLoadTimer() {
+        if (this.loadTimer) {
+          clearTimeout(this.loadTimer);
+          this.loadTimer = null;
+        }
+      },
+
+      handleLoadFailure(reason) {
+        console.log('Load failed:', reason);
+        this.clearLoadTimer();
+
+        const servers = document.querySelectorAll('.server-btn');
+        const currentActive = document.querySelector('.server-btn.active');
+        let currentIdx = Array.from(servers).indexOf(currentActive);
+
+        const nextIdx = currentIdx + 1;
+        if (nextIdx < servers.length) {
+          console.log(`Auto-fallback: Server ${currentIdx + 1} failed, trying Server ${nextIdx + 1}`);
+
+          const placeholder = document.getElementById('videoPlaceholder');
+          placeholder.style.display = 'flex';
+          const spinnerText = placeholder.querySelector('span');
+          if (spinnerText) spinnerText.textContent = `Server ${currentIdx + 1} unavailable. Trying Server ${nextIdx + 1}...`;
+
+          setTimeout(() => {
+            servers[nextIdx].click();
+          }, 800);
+        } else {
+          this.showError('All sources failed. The video may be unavailable or blocked.');
+        }
+      },
+
+      tryNextServer() {
+        this.clearLoadTimer();
+        this.hideError();
+
+        const servers = document.querySelectorAll('.server-btn');
+        const currentActive = document.querySelector('.server-btn.active');
+        let currentIdx = Array.from(servers).indexOf(currentActive);
+
+        const nextIdx = currentIdx + 1;
+        if (nextIdx < servers.length) {
+          servers[nextIdx].click();
+        } else if (servers.length > 0) {
+          const placeholder = document.getElementById('videoPlaceholder');
+          placeholder.style.display = 'flex';
+          const spinnerText = placeholder.querySelector('span');
+          if (spinnerText) spinnerText.textContent = 'Retrying from first server...';
+          setTimeout(() => servers[0].click(), 500);
+        }
+      },
+
+      
 
       updateUI(method) {
         document.querySelectorAll('.method-tab').forEach(tab => {
@@ -1345,7 +1411,9 @@
 
     function loadVideo(source, item, season, episode) {
       const url = buildUrl(source, item, season, episode);
-      DOM.placeholder.style.display = 'none';
+      DOM.placeholder.style.display = 'flex';
+      const spinnerText = DOM.placeholder.querySelector('span');
+      if (spinnerText) spinnerText.textContent = 'Loading secure stream... (auto-fallback in 8s)';
       UnblockEngine.hideError();
       UnblockEngine.load(url, UnblockEngine.currentMethod);
     }
@@ -1596,8 +1664,13 @@
 
       document.getElementById('retryBtn').addEventListener('click', () => {
         UnblockEngine.retryCount = 0;
+        UnblockEngine.hideError();
         const activeServer = document.querySelector('.server-btn.active');
         if (activeServer) activeServer.click();
+      });
+
+      document.getElementById('nextServerBtn').addEventListener('click', () => {
+        UnblockEngine.tryNextServer();
       });
     });
   </script>
