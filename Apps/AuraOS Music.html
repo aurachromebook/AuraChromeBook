@@ -165,6 +165,7 @@
                 <button class="icon-btn" onclick="changeTrack(-1)">⏮</button>
                 <button id="play-btn" class="icon-btn play-main" onclick="togglePlay()">▶</button>
                 <button class="icon-btn" onclick="changeTrack(1)">⏭</button>
+                <button id="loop-btn" class="icon-btn" style="font-size: 1.4rem; opacity: 0.5;" onclick="toggleLoop()">🔁</button>
                 <button id="lyric-btn" class="icon-btn" style="font-size: 1.4rem;" onclick="toggleLyrics()">🎤</button>
             </div>
         </div>
@@ -195,6 +196,7 @@
         let currentTrackData = null;
         let lyricsData = [];
         let isLyricMode = false;
+        let isLooping = false;
 
         function cleanQuery(str) {
             return str.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '+');
@@ -206,7 +208,7 @@
                 const data = await res.json();
                 let results = data.results || data;
                 if (Array.isArray(results) && results.length > 0) {
-                    results = results.slice(0, 50);
+                    results = results.slice(0, 200);
                 }
                 const container = document.getElementById('search-results');
                 container.innerHTML = '';
@@ -258,17 +260,27 @@
         async function fetchLyrics(artist, title) {
             lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--accent)">Scanning Satellite Data...</p>';
             try {
-                const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`);
+                const cleanArtist = (artist || '').replace(/feat\.|ft\.|featuring/gi, '').trim();
+                const cleanTitle = (title || '').replace(/\(.*?\)|\[.*?\]/g, '').trim();
+                const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(cleanArtist)}&track_name=${encodeURIComponent(cleanTitle)}`);
+                if (!res.ok) throw new Error('No lyrics found');
                 const data = await res.json();
                 if (data.syncedLyrics) {
                     const lines = data.syncedLyrics.split('\n');
                     lyricsData = lines.map(line => {
                         const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
-                        return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3] } : null;
+                        return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3].trim() } : null;
                     }).filter(x => x);
                     lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+                } else if (data.plainLyrics) {
+                    lyricsData = [];
+                    lyricsContainer.innerHTML = `<div class="lyric-line" style="color:var(--text-dim); font-size:1rem; white-space:pre-wrap; text-align:left; padding:0 20px;">${data.plainLyrics}</div>`;
+                } else {
+                    lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--text-dim)">No synced lyrics available.</p>';
                 }
-            } catch (e) { lyricsContainer.innerHTML = ''; }
+            } catch (e) { 
+                lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--text-dim)">Lyrics not found in database.</p>'; 
+            }
         }
 
         audio.ontimeupdate = () => {
@@ -293,6 +305,13 @@
         function togglePlay() { 
             if(!audio.src) return;
             audio.paused ? (audio.play(), document.getElementById('play-btn').innerText = '⏸') : (audio.pause(), document.getElementById('play-btn').innerText = '▶'); 
+        }
+
+        function toggleLoop() {
+            isLooping = !isLooping;
+            const btn = document.getElementById('loop-btn');
+            btn.style.opacity = isLooping ? '1' : '0.5';
+            btn.style.color = isLooping ? 'var(--accent)' : 'white';
         }
         function changeTrack(dir) { playTrack(currentIndex + dir); }
         function formatTime(s) { if(isNaN(s)) return "0:00"; const m=Math.floor(s/60), sc=Math.floor(s%60); return `${m}:${sc<10?'0':''}${sc}`; }
@@ -341,7 +360,14 @@
         }
 
         document.getElementById('seek-bar').oninput = (e) => audio.currentTime = e.target.value;
-        audio.onended = () => changeTrack(1);
+        audio.onended = () => {
+            if (isLooping) {
+                audio.currentTime = 0;
+                audio.play();
+            } else {
+                changeTrack(1);
+            }
+        };
         updateQueueUI();
     </script>
 </body>
