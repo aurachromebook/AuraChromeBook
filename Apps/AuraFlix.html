@@ -694,6 +694,7 @@
     }
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -711,7 +712,7 @@
         </p>
         <div class="disclaimer-features">
           <div class="feature-pill">🔒 Unblock Tech</div>
-          <div class="feature-pill">⚡ 20+ Servers</div>
+          <div class="feature-pill">⚡ 45+ Servers</div>
           <div class="feature-pill">🎬 4K Ready</div>
         </div>
         <button class="disclaimer-btn" id="agreeBtn" onclick="enterExperience()">Enter Experience</button>
@@ -916,7 +917,7 @@
           </div>
 
           <div class="sidebar-section">
-            <div class="sidebar-title">Video Sources (20+)</div>
+            <div class="sidebar-title">Video Sources (45+)</div>
             <div class="server-grid" id="serverGrid"></div>
           </div>
         </div>
@@ -972,7 +973,7 @@
       API_KEY: '3a73619bbb8fc6d47742d1b5b2b707b5',
       BASE_URL: 'https://api.themoviedb.org/3',
       IMG_URL: 'https://image.tmdb.org/t/p/w500',
-      // NEW: VidSrc CC [Recommended] is now the default method
+      // VidSrc PM is now the default server
       DEFAULT_METHOD: 'blob',
       CURRENT_CATEGORY: 'all',
       MAX_RETRIES: 3,
@@ -1093,7 +1094,6 @@
         this.lastLoadTime = now;
         this.isLoading = true;
         this.currentMethod = method;
-        this.clearLoadTimer();
 
         const fn = this.methods[method];
         if (fn) {
@@ -1104,71 +1104,7 @@
         return false;
       },
 
-      // NEW: Auto-fallback system
-      loadTimer: null,
-
-      startLoadTimer() {
-        this.clearLoadTimer();
-        const placeholder = document.getElementById('videoPlaceholder');
-        const spinnerText = placeholder.querySelector('span');
-        if (spinnerText) spinnerText.textContent = 'Loading secure stream... (auto-fallback in 8s)';
-
-        this.loadTimer = setTimeout(() => {
-          this.handleLoadFailure('Source timed out - trying next server...');
-        }, 8000);
-      },
-
-      clearLoadTimer() {
-        if (this.loadTimer) {
-          clearTimeout(this.loadTimer);
-          this.loadTimer = null;
-        }
-      },
-
-      handleLoadFailure(reason) {
-        console.log('Load failed:', reason);
-        this.clearLoadTimer();
-
-        const servers = document.querySelectorAll('.server-btn');
-        const currentActive = document.querySelector('.server-btn.active');
-        let currentIdx = Array.from(servers).indexOf(currentActive);
-
-        const nextIdx = currentIdx + 1;
-        if (nextIdx < servers.length) {
-          console.log(`Auto-fallback: Server ${currentIdx + 1} failed, trying Server ${nextIdx + 1}`);
-
-          const placeholder = document.getElementById('videoPlaceholder');
-          placeholder.style.display = 'flex';
-          const spinnerText = placeholder.querySelector('span');
-          if (spinnerText) spinnerText.textContent = `Server ${currentIdx + 1} unavailable. Trying Server ${nextIdx + 1}...`;
-
-          setTimeout(() => {
-            servers[nextIdx].click();
-          }, 800);
-        } else {
-          this.showError('All sources failed. The video may be unavailable or blocked.');
-        }
-      },
-
-      tryNextServer() {
-        this.clearLoadTimer();
-        this.hideError();
-
-        const servers = document.querySelectorAll('.server-btn');
-        const currentActive = document.querySelector('.server-btn.active');
-        let currentIdx = Array.from(servers).indexOf(currentActive);
-
-        const nextIdx = currentIdx + 1;
-        if (nextIdx < servers.length) {
-          servers[nextIdx].click();
-        } else if (servers.length > 0) {
-          const placeholder = document.getElementById('videoPlaceholder');
-          placeholder.style.display = 'flex';
-          const spinnerText = placeholder.querySelector('span');
-          if (spinnerText) spinnerText.textContent = 'Retrying from first server...';
-          setTimeout(() => servers[0].click(), 500);
-        }
-      },
+      
 
       
 
@@ -1202,14 +1138,22 @@
     // ==========================================
     
     const VideoSources = [
-      // NEW: VidSrc CC [Recommended] - Now Priority 1 (was VidLink Pro)
+      // VidSrc PM - Now Priority 1 (Default)
       { 
-        name: 'VidSrc CC [Recommended]', 
+        name: 'VidSrc PM', 
+        url: 'https://vidsrc.pm/embed/${t}?tmdb=${id}${sea}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 1,
+        note: 'Default Server'
+      },
+      { 
+        name: 'VidSrc CC ', 
         url: 'https://vidsrc.cc/v2/embed/${t}/${id}${se}', 
         quality: 'HD', 
         speed: 'fast',
         priority: 1,
-        note: 'Most Reliable - 637M visits/month'
+        note: 'Reliable - 637M visits/month'
       },
       
       // Priority 1 alternatives
@@ -1305,6 +1249,216 @@
         quality: 'HD', 
         speed: 'slow',
         priority: 5 
+      },
+
+      // NEW SERVERS ADDED
+      { 
+        name: 'VidBinge', 
+        url: 'https://www.vidbinge.to/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 1,
+        note: 'MoviesAPI successor - Reliable'
+      },
+      { 
+        name: 'VidSrc VIP', 
+        url: 'https://vidsrc.vip/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 1,
+        note: 'Premium VidSrc instance'
+      },
+      { 
+        name: 'VidSrc Me', 
+        url: 'https://vidsrc.me/embed/${t}?tmdb=${id}${sea}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 2,
+        note: 'Alternative VidSrc domain'
+      },
+      { 
+        name: 'VidSrc In', 
+        url: 'https://vidsrc.in/embed/${t}?tmdb=${id}${sea}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 2,
+        note: 'Indian VidSrc mirror'
+      },
+      
+      { 
+        name: 'VidSrc Net', 
+        url: 'https://vidsrc.net/embed/${t}?tmdb=${id}${sea}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 2,
+        note: 'Network mirror'
+      },
+      { 
+        name: 'VidSrc Stream', 
+        url: 'https://vidsrc.stream/embed/${t}?tmdb=${id}${sea}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 2,
+        note: 'Streaming optimized'
+      },
+      { 
+        name: 'VidSrc Icu', 
+        url: 'https://vidsrc.icu/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'slow',
+        priority: 2,
+        note: 'ICU domain'
+      },
+      { 
+        name: '2Embed Russian', 
+        url: 'https://www.2embed.ru/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 3,
+        note: '2Embed mirror'
+      },
+      { 
+        name: '2Embed Skin', 
+        url: 'https://www.2embed.skin/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 3,
+        note: '2Embed skin domain'
+      },
+      { 
+        name: 'Embed CIA', 
+        url: 'https://embed.cia/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 3,
+        note: 'CIA embed service'
+      },
+      { 
+        name: 'MultiEmbed VIP', 
+        url: 'https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1${ses}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 3,
+        note: 'Direct stream variant'
+      },
+      { 
+        name: 'VidPlay', 
+        url: 'https://vidplay.online/e/${id}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 2,
+        type: 'movie',
+        note: 'VidPlay hosting'
+      },
+      { 
+        name: 'FileMoon', 
+        url: 'https://filemoon.sx/e/${id}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 4,
+        type: 'movie',
+        note: 'FileMoon hosting'
+      },
+      { 
+        name: 'StreamWish', 
+        url: 'https://streamwish.to/e/${id}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 4,
+        type: 'movie',
+        note: 'StreamWish hosting'
+      },
+      { 
+        name: 'VidHide', 
+        url: 'https://vidhidepro.com/v/${id}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 4,
+        type: 'movie',
+        note: 'VidHide hosting'
+      },
+      { 
+        name: 'VidStack', 
+        url: 'https://vidstack.io/embed/${t}/${id}${se}', 
+        quality: '4K', 
+        speed: 'fast',
+        priority: 1,
+        note: 'VidStack player'
+      },
+      { 
+        name: 'NSBX', 
+        url: 'https://nsbx.wtf/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'fast',
+        priority: 2,
+        note: 'NSBX streaming'
+      },
+      { 
+        name: 'CineSync', 
+        url: 'https://cinesync.app/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 3,
+        note: 'CineSync player'
+      },
+      { 
+        name: 'PrimeWire', 
+        url: 'https://www.primewire.tf/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 4,
+        note: 'PrimeWire embed'
+      },
+      { 
+        name: '123Embed', 
+        url: 'https://123embed.net/embed/${t}/${id}${se}', 
+        quality: 'SD', 
+        speed: 'slow',
+        priority: 5,
+        note: '123Movies embed'
+      },
+      { 
+        name: 'VidGuard', 
+        url: 'https://vidguard.to/e/${id}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 4,
+        type: 'movie',
+        note: 'VidGuard hosting'
+      },
+      { 
+        name: 'UpCloud', 
+        url: 'https://upcloud.to/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 3,
+        note: 'UpCloud streaming'
+      },
+      { 
+        name: 'VidMoly', 
+        url: 'https://vidmoly.to/embed/${t}/${id}${se}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 4,
+        note: 'VidMoly hosting'
+      },
+      { 
+        name: 'DoodStream', 
+        url: 'https://doodstream.com/e/${id}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 5,
+        type: 'movie',
+        note: 'DoodStream hosting'
+      },
+      { 
+        name: 'MixDrop', 
+        url: 'https://mixdrop.co/e/${id}', 
+        quality: 'HD', 
+        speed: 'medium',
+        priority: 5,
+        type: 'movie',
+        note: 'MixDrop hosting'
       },
       { 
         name: 'GoMovies', 
@@ -1411,9 +1565,7 @@
 
     function loadVideo(source, item, season, episode) {
       const url = buildUrl(source, item, season, episode);
-      DOM.placeholder.style.display = 'flex';
-      const spinnerText = DOM.placeholder.querySelector('span');
-      if (spinnerText) spinnerText.textContent = 'Loading secure stream... (auto-fallback in 8s)';
+      DOM.placeholder.style.display = 'none';
       UnblockEngine.hideError();
       UnblockEngine.load(url, UnblockEngine.currentMethod);
     }
@@ -1663,14 +1815,9 @@
       });
 
       document.getElementById('retryBtn').addEventListener('click', () => {
-        UnblockEngine.retryCount = 0;
         UnblockEngine.hideError();
         const activeServer = document.querySelector('.server-btn.active');
         if (activeServer) activeServer.click();
-      });
-
-      document.getElementById('nextServerBtn').addEventListener('click', () => {
-        UnblockEngine.tryNextServer();
       });
     });
   </script>
