@@ -122,6 +122,7 @@
 
         .overlay { position: fixed; inset: 0; background: rgba(2,4,10,0.95); z-index: 100; display: none; padding: 50px; flex-direction: column; }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -203,7 +204,10 @@
             try {
                 const res = await fetch(`https://0.4texasplayz4.workers.dev/s/${cleanQuery(query)}`);
                 const data = await res.json();
-                const results = data.results || data; 
+                let results = data.results || data;
+                if (Array.isArray(results) && results.length > 0) {
+                    results = results.slice(0, 50);
+                }
                 const container = document.getElementById('search-results');
                 container.innerHTML = '';
                 results.forEach(t => {
@@ -300,14 +304,40 @@
         function updateQueueUI() {
             const list = document.getElementById('queue-list');
             list.innerHTML = queue.map((t, i) => `
-                <div class="q-row ${i === currentIndex ? 'active' : ''}" onclick="playTrack(${i})">
-                    <img src="${t.artwork || ''}">
-                    <div style="flex:1; overflow:hidden">
+                <div class="q-row ${i === currentIndex ? 'active' : ''}">
+                    <img src="${t.artwork || ''}" onclick="playTrack(${i})">
+                    <div style="flex:1; overflow:hidden" onclick="playTrack(${i})">
                         <div style="font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; font-size:0.85rem;">${t.title}</div>
                         <div style="font-size:0.7rem; color:var(--text-dim)">${t.artist}</div>
                     </div>
+                    <button onclick="event.stopPropagation(); removeFromQueue(${i})" style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1.2rem; padding:5px; margin-left:5px; opacity:0.5; transition:0.2s;" onmouseover="this.style.color='#ff4757'; this.style.opacity='1'" onmouseout="this.style.color='var(--text-dim)'; this.style.opacity='0.5'">×</button>
                 </div>
             `).join('');
+        }
+
+        function removeFromQueue(index) {
+            queue.splice(index, 1);
+            if (currentIndex === index) {
+                if (queue.length === 0) {
+                    audio.pause();
+                    audio.src = '';
+                    currentIndex = -1;
+                    currentTrackData = null;
+                    document.getElementById('art-zone').innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#0a192f; color:var(--accent); font-weight:800; font-size:3rem;">Aura OS Music</div>';
+                    document.getElementById('track-title').innerText = 'Ready for Launch';
+                    document.getElementById('track-artist').innerText = 'Select a track to begin';
+                    bgBlur.style.backgroundImage = '';
+                    document.getElementById('play-btn').innerText = '▶';
+                    lyricsContainer.innerHTML = '';
+                } else if (index < queue.length) {
+                    playTrack(index);
+                } else {
+                    playTrack(queue.length - 1);
+                }
+            } else if (currentIndex > index) {
+                currentIndex--;
+            }
+            save();
         }
 
         document.getElementById('seek-bar').oninput = (e) => audio.currentTime = e.target.value;
