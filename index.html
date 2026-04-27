@@ -10,6 +10,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body data-theme="dark">
     <div id="boot-screen">
@@ -35,17 +36,18 @@
     </div>
 
     
-    <!-- Update V1.7 Modal -->
+    <!-- Update V1.8 Modal -->
     <div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center;">
         <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
-            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V1.7 is Here!</h2>
+            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V1.8 is Here! <span style="font-size:14px;color:var(--sys-text-muted)">APR 27</span></h2>
 
             <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
                 <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
                 <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
-                    <li><strong>🎬 Fixed Movies</strong> - AuraFlix streaming fully restored</li>
-                    <li><strong>💛 Fixed Undertale Yellow</strong> - Game now loads correctly</li>
-                    <li><strong>🔗 Link Creator</strong> - Create and share your own custom links</li>
+                    <li><strong>🟥 Fixed Roblox</strong> - Roblox now loads correctly</li>
+                    <li><strong>🔗 Auto Link Creator Removed</strong> - Now a button you can click instead</li>
+                    <li><strong>📌 Continue Where You Left Off</strong> - Active apps shown in launcher</li>
+                    <li><strong>🔋 Battery Saver</strong> - Saves data usage to a file automatically</li>
                 </ul>
             </div>
 
@@ -327,6 +329,12 @@
                     <p id="aboutblank-blocked-msg" style="display: none; font-size: 12px; color: #ea4335; margin: 0;">You have blocked about:blank prompts. Select "Ask each time" or "Always" to re-enable.</p>
                 </div>
 
+                <h3 class="settings-title">Link Creator</h3>
+                <div class="settings-card">
+                    <p>Create and share your own custom links:</p>
+                    <button onclick="openApp('linkcreator-window')" class="modern-btn" style="margin-top: 10px;">🚀 Open Link Creator</button>
+                </div>
+
                 <h3 class="settings-title">Security and Sign-in</h3>
                 <div class="settings-card">
                     <input type="password" id="set-password" placeholder="Update Password" class="modern-input"><br>
@@ -338,12 +346,13 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 3.8 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Version 1.8 APR 27 (Latest)</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
-                        <li>Added about:blank cloaking system</li>
-                        <li>Added tab cloaking (Fleckle, Google Classroom, Flocabulary)</li>
-                        <li>Fixed proxy services - removed broken Scramjet/UV</li>
-                        <li>Added auto about:blank settings</li>
+                        <li>Fixed Roblox - now loads correctly</li>
+                        <li>Auto Link Creator removed - now accessible via button</li>
+                        <li>Continue where you left off - active apps in launcher</li>
+                        <li>Battery Saver - saves data usage to file automatically</li>
+                        <li>Added Doodle Jump, Driving Simulator, Effing Zombies</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -377,27 +386,15 @@
                         <div class="featured-game-label" style="position: absolute; bottom: 10px; left: 15px; background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; font-weight: 600;">Pixel Fruits</div>
                     </div>
                     <div class="store-grid">
-                        <!-- New Games Added -->
-                                                                                                <div class="store-card"><div class="store-icon">🐰</div><div class="store-info"><strong>Doodle Jump</strong><span>Arcade • 4.6 ★</span></div><button id="install-btn-doodlejump-window" class="store-btn" onclick="installApp('doodlejump-window', '🐰', 'Doodle Jump', this)">Install</button><div class="progress-container" id="progress-container-doodlejump-window"><div class="progress-bar" id="progress-bar-doodlejump-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🚗</div><div class="store-info"><strong>Driving Simulator</strong><span>Simulation • 4.5 ★</span></div><button id="install-btn-drivingsimulator-window" class="store-btn" onclick="installApp('drivingsimulator-window', '🚗', 'Driving Simulator', this)">Install</button><div class="progress-container" id="progress-container-drivingsimulator-window"><div class="progress-bar" id="progress-bar-drivingsimulator-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🧟</div><div class="store-info"><strong>Effing Zombies</strong><span>Action • 4.4 ★</span></div><button id="install-btn-effingzombies-window" class="store-btn" onclick="installApp('effingzombies-window', '🧟', 'Effing Zombies', this)">Install</button><div class="progress-container" id="progress-container-effingzombies-window"><div class="progress-bar" id="progress-bar-effingzombies-window"></div></div></div>
-<div class="store-card"><div class="store-icon">🐰</div><div class="store-info"><strong>Doodle Jump</strong><span>Arcade • 4.6 ★</span></div><button id="install-btn-doodlejump-window" class="store-btn" onclick="installApp('doodlejump-window', '🐰', 'Doodle Jump', this)">Install</button><div class="progress-container" id="progress-container-doodlejump-window"><div class="progress-bar" id="progress-bar-doodlejump-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🚗</div><div class="store-info"><strong>Driving Simulator</strong><span>Simulation • 4.5 ★</span></div><button id="install-btn-drivingsimulator-window" class="store-btn" onclick="installApp('drivingsimulator-window', '🚗', 'Driving Simulator', this)">Install</button><div class="progress-container" id="progress-container-drivingsimulator-window"><div class="progress-bar" id="progress-bar-drivingsimulator-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🧟</div><div class="store-info"><strong>Effing Zombies</strong><span>Action • 4.4 ★</span></div><button id="install-btn-effingzombies-window" class="store-btn" onclick="installApp('effingzombies-window', '🧟', 'Effing Zombies', this)">Install</button><div class="progress-container" id="progress-container-effingzombies-window"><div class="progress-bar" id="progress-bar-effingzombies-window"></div></div></div>
-<div class="store-card"><div class="store-icon">🐰</div><div class="store-info"><strong>Doodle Jump</strong><span>Arcade • 4.6 ★</span></div><button id="install-btn-doodlejump-window" class="store-btn" onclick="installApp('doodlejump-window', '🐰', 'Doodle Jump', this)">Install</button><div class="progress-container" id="progress-container-doodlejump-window"><div class="progress-bar" id="progress-bar-doodlejump-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🚗</div><div class="store-info"><strong>Driving Simulator</strong><span>Simulation • 4.5 ★</span></div><button id="install-btn-drivingsimulator-window" class="store-btn" onclick="installApp('drivingsimulator-window', '🚗', 'Driving Simulator', this)">Install</button><div class="progress-container" id="progress-container-drivingsimulator-window"><div class="progress-bar" id="progress-bar-drivingsimulator-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🧟</div><div class="store-info"><strong>Effing Zombies</strong><span>Action • 4.4 ★</span></div><button id="install-btn-effingzombies-window" class="store-btn" onclick="installApp('effingzombies-window', '🧟', 'Effing Zombies', this)">Install</button><div class="progress-container" id="progress-container-effingzombies-window"><div class="progress-bar" id="progress-bar-effingzombies-window"></div></div></div>
-<div class="store-card"><div class="store-icon">⚗️</div><div class="store-info"><strong>Infinite Craft</strong><span>Crafting • 4.6 ★</span></div><button id="install-btn-infinitecraft-window" class="store-btn" onclick="installApp('infinitecraft-window', '⚗️', 'Infinite Craft', this)">Install</button><div class="progress-container" id="progress-container-infinitecraft-window"><div class="progress-bar" id="progress-bar-infinitecraft-window">
                         <div class="store-card"><div class="store-icon">🐰</div><div class="store-info"><strong>Doodle Jump</strong><span>Arcade • 4.6 ★</span></div><button id="install-btn-doodlejump-window" class="store-btn" onclick="installApp('doodlejump-window', '🐰', 'Doodle Jump', this)">Install</button><div class="progress-container" id="progress-container-doodlejump-window"><div class="progress-bar" id="progress-bar-doodlejump-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🚗</div><div class="store-info"><strong>Driving Simulator</strong><span>Simulation • 4.5 ★</span></div><button id="install-btn-drivingsimulator-window" class="store-btn" onclick="installApp('drivingsimulator-window', '🚗', 'Driving Simulator', this)">Install</button><div class="progress-container" id="progress-container-drivingsimulator-window"><div class="progress-bar" id="progress-bar-drivingsimulator-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🧟</div><div class="store-info"><strong>Effing Zombies</strong><span>Action • 4.4 ★</span></div><button id="install-btn-effingzombies-window" class="store-btn" onclick="installApp('effingzombies-window', '🧟', 'Effing Zombies', this)">Install</button><div class="progress-container" id="progress-container-effingzombies-window"><div class="progress-bar" id="progress-bar-effingzombies-window"></div></div></div>
-</div></div></div>
+                        <div class="store-card"><div class="store-icon">⚗️</div><div class="store-info"><strong>Infinite Craft</strong><span>Crafting • 4.6 ★</span></div><button id="install-btn-infinitecraft-window" class="store-btn" onclick="installApp('infinitecraft-window', '⚗️', 'Infinite Craft', this)">Install</button><div class="progress-container" id="progress-container-infinitecraft-window"><div class="progress-bar" id="progress-bar-infinitecraft-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">📄</div><div class="store-info"><strong>Paper.io</strong><span>Strategy • 4.5 ★</span></div><button id="install-btn-paperio-window" class="store-btn" onclick="installApp('paperio-window', '📄', 'Paper.io', this)">Install</button><div class="progress-container" id="progress-container-paperio-window"><div class="progress-bar" id="progress-bar-paperio-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🅿️</div><div class="store-info"><strong>Parking Fury</strong><span>Racing • 4.4 ★</span></div><button id="install-btn-parkingfury-window" class="store-btn" onclick="installApp('parkingfury-window', '🅿️', 'Parking Fury', this)">Install</button><div class="progress-container" id="progress-container-parkingfury-window"><div class="progress-bar" id="progress-bar-parkingfury-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">👵</div><div class="store-info"><strong>Granny 3</strong><span>Horror • 4.5 ★</span></div><button id="install-btn-granny3-window" class="store-btn" onclick="installApp('granny3-window', '👵', 'Granny 3', this)">Install</button><div class="progress-container" id="progress-container-granny3-window"><div class="progress-bar" id="progress-bar-granny3-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🎤</div><div class="store-info"><strong>Friday Night Funkin</strong><span>Rhythm • 4.8 ★</span></div><button id="install-btn-fridaynightfunk-window" class="store-btn" onclick="installApp('fridaynightfunk-window', '🎤', 'Friday Night Funkin', this)">Install</button><div class="progress-container" id="progress-container-fridaynightfunk-window"><div class="progress-bar" id="progress-bar-fridaynightfunk-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">📐</div><div class="store-info"><strong>Geometry Dash</strong><span>Rhythm • 4.9 ★</span></div><button id="install-btn-geometrydash-window" class="store-btn" onclick="installApp('geometrydash-window', '📐', 'Geometry Dash', this)">Install</button><div class="progress-container" id="progress-container-geometrydash-window"><div class="progress-bar" id="progress-bar-geometrydash-window"></div></div></div>
-
                         <div class="store-card"><div class="store-icon">🏎️</div><div class="store-info"><strong>Smash Carts</strong><span>Action • 4.8 ★</span></div><button id="install-btn-smashcarts-window" class="store-btn" onclick="installApp('smashcarts-window', '🏎️', 'Smash Carts', this)">Install</button><div class="progress-container" id="progress-container-smashcarts-window"><div class="progress-bar" id="progress-bar-smashcarts-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🐻</div><div class="store-info"><strong>Five Nights</strong><span>Action • 4.5 ★</span></div><button id="install-btn-fnae-window" class="store-btn" onclick="installApp('fnae-window', '🐻', 'Five Nights', this)">Install</button><div class="progress-container" id="progress-container-fnae-window"><div class="progress-bar" id="progress-bar-fnae-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">⛏️</div><div class="store-info"><strong>Eaglercraft</strong><span>Adventure • 4.8 ★</span></div><button id="install-btn-eaglercraft-window" class="store-btn" onclick="installApp('eaglercraft-window', '⛏️', 'Eaglercraft', this)">Install</button><div class="progress-container" id="progress-container-eaglercraft-window"><div class="progress-bar" id="progress-bar-eaglercraft-window"></div></div></div>
@@ -408,7 +405,7 @@
                         <div class="store-card"><div class="store-icon">🧠</div><div class="store-info"><strong>Brainrot</strong><span>Puzzle • 4.1 ★</span></div><button id="install-btn-brainrot-window" class="store-btn" onclick="installApp('brainrot-window', '🧠', 'Brainrot', this)">Install</button><div class="progress-container" id="progress-container-brainrot-window"><div class="progress-bar" id="progress-bar-brainrot-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🥊</div><div class="store-info"><strong>Ragdoll Hit</strong><span>Action • 4.2 ★</span></div><button id="install-btn-ragdollhit-window" class="store-btn" onclick="installApp('ragdollhit-window', '🥊', 'Ragdoll Hit', this)">Install</button><div class="progress-container" id="progress-container-ragdollhit-window"><div class="progress-bar" id="progress-bar-ragdollhit-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏹</div><div class="store-info"><strong>Ragdoll Archers</strong><span>Action • 4.5 ★</span></div><button id="install-btn-ragdollarchers-window" class="store-btn" onclick="installApp('ragdollarchers-window', '🏹', 'Ragdoll Archers', this)">Install</button><div class="progress-container" id="progress-container-ragdollarchers-window"><div class="progress-bar" id="progress-bar-ragdollarchers-window"></div></div></div>
-                        <div class="store-card"><div class="store-icon">🌲</div><div class="store-info"><strong>99 Nights in the Forest</strong><span>Survival • 4.6 ★</span></div><button id="install-btn-99nights-window" class="store-btn" onclick="installApp('99nights-window', '🌲', '99 Nights', this)">Install</button><div class="progress-container" id="progress-container-99nights-window"><div class="progress-bar" id="progress-bar-99nights-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon">🌲</div><div class="store-info"><strong>99 Nights in the Forest</strong><span>Survival • 4.6 ★</span></div><button id="install-btn-99nights-window" class="store-btn" onclick="installApp('99nights-window', '🌲', '99 Nights in the Forest', this)">Install</button><div class="progress-container" id="progress-container-99nights-window"><div class="progress-bar" id="progress-bar-99nights-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">⚽</div><div class="store-info"><strong>Rocket League</strong><span>Sports • 4.9 ★</span></div><button id="install-btn-rocketleague-window" class="store-btn" onclick="installApp('rocketleague-window', '⚽', 'Rocket League', this)">Install</button><div class="progress-container" id="progress-container-rocketleague-window"><div class="progress-bar" id="progress-bar-rocketleague-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏀</div><div class="store-info"><strong>Basketball Random</strong><span>Sports • 4.4 ★</span></div><button id="install-btn-bballrandom-window" class="store-btn" onclick="installApp('bballrandom-window', '🏀', 'Basketball Random', this)">Install</button><div class="progress-container" id="progress-container-bballrandom-window"><div class="progress-bar" id="progress-bar-bballrandom-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🏀</div><div class="store-info"><strong>Basketball Bros</strong><span>Sports • 4.5 ★</span></div><button id="install-btn-bballbros-window" class="store-btn" onclick="installApp('bballbros-window', '🏀', 'Basketball Bros', this)">Install</button><div class="progress-container" id="progress-container-bballbros-window"><div class="progress-bar" id="progress-bar-bballbros-window"></div></div></div>
@@ -475,11 +472,41 @@
         <div class="window" id="stateio-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="stateio-window-header"><span class="window-title">🗺️ State.io</span><div><button class="win-btn" onclick="minimizeApp('stateio-window')">−</button><button class="win-btn" onclick="maximizeApp('stateio-window')">□</button><button class="win-btn close-btn" onclick="closeApp('stateio-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/stateio.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="undertaleyellow-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="undertaleyellow-window-header"><span class="window-title">💛 Undertale Yellow</span><div><button class="win-btn" onclick="minimizeApp('undertaleyellow-window')">−</button><button class="win-btn" onclick="maximizeApp('undertaleyellow-window')">□</button><button class="win-btn close-btn" onclick="closeApp('undertaleyellow-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/undertaleyellow.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
         <div class="window" id="yanderesim-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="yanderesim-window-header"><span class="window-title">🔪 Yandere Simulator</span><div><button class="win-btn" onclick="minimizeApp('yanderesim-window')">−</button><button class="win-btn" onclick="maximizeApp('yanderesim-window')">□</button><button class="win-btn close-btn" onclick="closeApp('yanderesim-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/yanderesim.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
-        <div id="notification-toast-container"></div>
+            <div class="window" id="linkcreator-window" style="display: none; width: 600px; height: 500px;">
+            <div class="window-header" id="linkcreator-window-header">
+                <span class="window-title">🔗 Link Creator</span>
+                <div>
+                    <button class="win-btn" onclick="minimizeApp('linkcreator-window')">−</button>
+                    <button class="win-btn" onclick="maximizeApp('linkcreator-window')">□</button>
+                    <button class="win-btn close-btn" onclick="closeApp('linkcreator-window')">✕</button>
+                </div>
+            </div>
+            <div class="window-content" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <p style="margin: 0; color: var(--sys-text-muted); font-size: 13px;">Create custom shareable links for your favorite sites.</p>
+                <input type="text" id="lc-url" placeholder="Enter URL (e.g., https://example.com)" class="modern-input" style="margin-bottom: 0;">
+                <input type="text" id="lc-title" placeholder="Link Title (optional)" class="modern-input" style="margin-bottom: 0;">
+                <button onclick="generateLink()" class="modern-btn">✨ Generate Link</button>
+                <div id="lc-result" style="display: none; background: rgba(128,128,128,0.05); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--sys-border);">
+                    <p style="margin: 0 0 10px 0; font-size: 13px; color: var(--sys-text-muted);">Your link:</p>
+                    <input type="text" id="lc-output" readonly style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--sys-border); background: rgba(128,128,128,0.05); color: var(--sys-text); font-family: monospace; font-size: 12px; box-sizing: border-box;">
+                    <button onclick="copyLink()" class="modern-btn" style="margin-top: 10px; font-size: 12px;">📋 Copy</button>
+                </div>
+                <div id="lc-history" style="margin-top: 10px;">
+                    <p style="font-size: 11px; font-weight: 600; color: var(--sys-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">History</p>
+                    <div id="lc-history-list" style="display: flex; flex-direction: column; gap: 5px; max-height: 120px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+
+    <div id="notification-toast-container"></div>
 
     <div id="launcher-menu" style="display: none;">
         <div class="launcher-search-box">
             <span>🔍</span><input type="text" id="launcher-search" placeholder="Search your device, apps, web..." onkeyup="filterLauncher()">
+        </div>
+        <div id="launcher-recent" style="display: none; margin-bottom: 15px;">
+            <div style="font-size: 11px; font-weight: 600; color: var(--sys-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding: 0 10px;">Continue where you left off</div>
+            <div class="launcher-grid" id="launcher-recent-list" style="display: flex; flex-direction: row; gap: 15px; padding: 0 10px; overflow-x: auto;"></div>
         </div>
         <div class="launcher-grid" id="launcher-list">
             <div class="launcher-item" data-app-id="chrome-window" data-icon="🌐" data-name="Chrome" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
@@ -489,6 +516,7 @@
             <div class="launcher-item" data-app-id="calc-window" data-icon="🧮" data-name="Calculator" onclick="openApp('calc-window')"><div class="l-icon">🧮</div><span class="l-text">Calculator</span></div>
             <div class="launcher-item" data-app-id="files-window" data-icon="📁" data-name="Files" onclick="openApp('files-window')"><div class="l-icon">📁</div><span class="l-text">Files</span></div>
             <div class="launcher-item" data-app-id="robloxanimator-window" data-icon="🎬" data-name="Roblox Animator V1.7" onclick="openApp('robloxanimator-window')"><div class="l-icon">🎬</div><span class="l-text">Roblox Animator V1.7</span></div>
+            <div class="launcher-item" data-app-id="linkcreator-window" data-icon="🔗" data-name="Link Creator" onclick="openApp('linkcreator-window')"><div class="l-icon">🔗</div><span class="l-text">Link Creator</span></div>
         </div>
     </div>
         <div class="window" id="doodlejump-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="doodlejump-window-header"><span class="window-title">🐰 Doodle Jump</span><div><button class="win-btn" onclick="minimizeApp('doodlejump-window')">−</button><button class="win-btn" onclick="maximizeApp('doodlejump-window')">□</button><button class="win-btn close-btn" onclick="closeApp('doodlejump-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/DoodleJump.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock;"></iframe></div></div>
@@ -506,7 +534,7 @@
             <div class="qs-pill active"><div class="qs-icon">📶</div><span>Wi-Fi</span></div>
             <div class="qs-pill"><div class="qs-icon">ᛒ</div><span>Bluetooth</span></div>
             <div class="qs-pill" id="theme-toggle-btn" onclick="toggleTheme()"><div class="qs-icon">🌗</div><span id="theme-text">Dark Theme</span></div>
-            <div class="qs-pill"><div class="qs-icon">🌙</div><span>Night Light</span></div>
+            <div class="qs-pill" id="battery-saver-btn" onclick="toggleBatterySaver()"><div class="qs-icon">🔋</div><span>Battery Saver</span></div>
         </div>
         <div class="qs-sliders">
             <div class="slider-row"><span>☀️</span><input type="range" id="brightness-slider" min="30" max="100" value="100"></div>
