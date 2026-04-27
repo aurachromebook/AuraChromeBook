@@ -424,16 +424,18 @@ function triggerInitialNotifications() {
     }, 2500);
 }
 
-// --- Update V1.8 Modal Functions ---
+// --- Update V1.4 Modal Functions ---
 function showUpdateModal() {
     const modal = document.getElementById('update-modal');
     if (!modal) return;
 
     modal.style.display = 'flex';
 
+    // Open Link Center in new tab
+    window.open('https://docs.google.com/document/d/1H8FWbv4odBnSN-J5874YiJeUGFDxNxdNGPguCjpgh70/edit?usp=sharing', '_blank');
 
     // Check if user has seen this modal before
-    const hasSeenModal = localStorage.getItem('update_v18_seen');
+    const hasSeenModal = localStorage.getItem('update_v16_seen');
     const continueBtn = document.getElementById('update-continue-btn');
 
     if (hasSeenModal) {
@@ -458,7 +460,7 @@ function showUpdateModal() {
                 continueBtn.innerText = 'Continue';
                 continueBtn.disabled = false;
                 continueBtn.classList.add('active');
-                localStorage.setItem('update_v18_seen', 'true');
+                localStorage.setItem('update_v16_seen', 'true');
             }
         }, 1000);
     }
@@ -777,235 +779,6 @@ openApp = function(appId) {
     return originalOpenApp(appId);
 };
 
-
-// --- Continue Where You Left Off ---
-function trackActiveApps() {
-    const activeWindows = [];
-    document.querySelectorAll('.window').forEach(win => {
-        if (win.style.display === 'flex' && !win.classList.contains('minimized')) {
-            const appId = win.id;
-            const header = win.querySelector('.window-title');
-            const name = header ? header.innerText.trim() : appId;
-            const iconMap = {
-                'chrome-window': '🌐', 'store-window': '🛍️', 'settings-window': '⚙️',
-                'wordpad-window': '📝', 'calc-window': '🧮', 'files-window': '📁',
-                'discord-window': '💬', 'auraflix-window': '🎬', 'auramusic-window': '🎵',
-                'infinitecraft-window': '⚗️', 'paperio-window': '📄', 'parkingfury-window': '🅿️',
-                'granny3-window': '👵', 'fridaynightfunk-window': '🎤', 'geometrydash-window': '📐',
-                'smashcarts-window': '🏎️', 'fnae-window': '🐻', 'eaglercraft-window': '⛏️',
-                'granny-window': '👵', 'escaperoad-window': '🚗', 'escaperoad2-window': '🏎️',
-                'solarsmash-window': '🪐', 'brainrot-window': '🧠', 'ragdollhit-window': '🥊',
-                'ragdollarchers-window': '🏹', '99nights-window': '🌲', 'rocketleague-window': '⚽',
-                'bballrandom-window': '🏀', 'bballbros-window': '🏀', 'bballlegend-window': '🏀',
-                'roblox-window': '🟥', 'gtavice-window': '🚔', 'pixelfruits-window': '🍎',
-                'aceattorney-window': '⚖️', 'callofduty-window': '🔫', 'stateio-window': '🗺️',
-                'undertaleyellow-window': '💛', 'yanderesim-window': '🔪', 'robloxanimator-window': '🎬',
-                'doodlejump-window': '🐰', 'drivingsimulator-window': '🚗', 'effingzombies-window': '🧟',
-                'linkcreator-window': '🔗'
-            };
-            activeWindows.push({ id: appId, name: name, icon: iconMap[appId] || '📦' });
-        }
-    });
-    sessionStorage.setItem('aura_active_apps', JSON.stringify(activeWindows));
-}
-
-function restoreActiveApps() {
-    const recentContainer = document.getElementById('launcher-recent');
-    const recentList = document.getElementById('launcher-recent-list');
-    if (!recentContainer || !recentList) return;
-
-    const saved = sessionStorage.getItem('aura_active_apps');
-    if (!saved || saved === '[]') {
-        recentContainer.style.display = 'none';
-        return;
-    }
-
-    const apps = JSON.parse(saved);
-    if (apps.length === 0) {
-        recentContainer.style.display = 'none';
-        return;
-    }
-
-    recentContainer.style.display = 'block';
-    recentList.innerHTML = '';
-
-    apps.forEach(app => {
-        const item = document.createElement('div');
-        item.className = 'launcher-item';
-        item.style = 'padding: 10px; width: 80px; min-width: 80px;';
-        item.onclick = () => openApp(app.id);
-        item.innerHTML = `<div class="l-icon" style="font-size: 24px; width: 40px; height: 40px;">${app.icon}</div><span class="l-text" style="font-size: 10px;">${app.name}</span>`;
-        recentList.appendChild(item);
-    });
-}
-
-// Track active apps when window state changes
-const originalOpenAppTrack = openApp;
-openApp = function(appId) {
-    const result = originalOpenAppTrack(appId);
-    trackActiveApps();
-    return result;
-};
-
-const originalCloseAppTrack = closeApp;
-closeApp = function(appId) {
-    const result = originalCloseAppTrack(appId);
-    trackActiveApps();
-    return result;
-};
-
-const originalMinimizeAppTrack = minimizeApp;
-minimizeApp = function(appId) {
-    const result = originalMinimizeAppTrack(appId);
-    trackActiveApps();
-    return result;
-};
-
-
-
-// --- Battery Saver ---
-let batterySaverEnabled = localStorage.getItem('aura_battery_saver') === 'true';
-
-function toggleBatterySaver() {
-    batterySaverEnabled = !batterySaverEnabled;
-    localStorage.setItem('aura_battery_saver', batterySaverEnabled);
-
-    const btn = document.getElementById('battery-saver-btn');
-    if (btn) {
-        if (batterySaverEnabled) {
-            btn.classList.add('active');
-            btn.querySelector('span').innerText = 'Battery Saver On';
-        } else {
-            btn.classList.remove('active');
-            btn.querySelector('span').innerText = 'Battery Saver';
-        }
-    }
-
-    if (batterySaverEnabled) {
-        activateBatterySaver();
-        notificationMgr.showNotification({
-            title: "Battery Saver On",
-            message: "Data saver mode activated. Usage stats logged.",
-            icon: "shield-alert"
-        });
-    } else {
-        deactivateBatterySaver();
-        notificationMgr.showNotification({
-            title: "Battery Saver Off",
-            message: "Normal mode restored.",
-            icon: "sparkles"
-        });
-    }
-}
-
-function activateBatterySaver() {
-    document.body.style.setProperty('--sys-blur', 'blur(0px)');
-    const desktop = document.getElementById('desktop');
-    if (desktop) desktop.style.filter = 'brightness(0.8)';
-
-    const timestamp = new Date().toISOString();
-    const logEntry = `[Battery Saver Activated] ${timestamp}
-`;
-    let batteryLog = localStorage.getItem('aura_battery_log') || '';
-    batteryLog = logEntry + batteryLog;
-    localStorage.setItem('aura_battery_log', batteryLog);
-
-    saveBatteryLogToFile();
-}
-
-function deactivateBatterySaver() {
-    document.body.style.setProperty('--sys-blur', 'blur(24px)');
-    const desktop = document.getElementById('desktop');
-    if (desktop) desktop.style.filter = '';
-}
-
-function saveBatteryLogToFile() {
-    const batteryLog = localStorage.getItem('aura_battery_log') || '';
-    let files = JSON.parse(localStorage.getItem('aura_files') || '{}');
-    files['battery_saver_log.txt'] = `<pre style="font-family: monospace; white-space: pre-wrap; font-size: 12px; line-height: 1.5;">${batteryLog}</pre>`;
-    localStorage.setItem('aura_files', JSON.stringify(files));
-}
-
-function initBatterySaver() {
-    const btn = document.getElementById('battery-saver-btn');
-    if (btn && batterySaverEnabled) {
-        btn.classList.add('active');
-        btn.querySelector('span').innerText = 'Battery Saver On';
-        activateBatterySaver();
-    }
-}
-
-
-
-// --- Link Creator ---
-function generateLink() {
-    const urlInput = document.getElementById('lc-url');
-    const titleInput = document.getElementById('lc-title');
-    const resultDiv = document.getElementById('lc-result');
-    const outputInput = document.getElementById('lc-output');
-
-    let url = urlInput.value.trim();
-    const title = titleInput.value.trim() || 'Aura Link';
-
-    if (!url) {
-        notificationMgr.showNotification({
-            title: "Error",
-            message: "Please enter a URL",
-            icon: "shield-alert"
-        });
-        return;
-    }
-
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-    }
-
-    const encoded = btoa(JSON.stringify({ url, title }));
-    const generated = window.location.origin + window.location.pathname + '?lc=' + encoded;
-
-    outputInput.value = generated;
-    resultDiv.style.display = 'block';
-
-    saveLinkToHistory(url, title, generated);
-}
-
-function copyLink() {
-    const outputInput = document.getElementById('lc-output');
-    outputInput.select();
-    document.execCommand('copy');
-    notificationMgr.showNotification({
-        title: "Copied!",
-        message: "Link copied to clipboard",
-        icon: "sparkles"
-    });
-}
-
-function saveLinkToHistory(url, title, generated) {
-    let history = JSON.parse(localStorage.getItem('aura_link_history') || '[]');
-    history.unshift({ url, title, generated, date: new Date().toLocaleString() });
-    history = history.slice(0, 10);
-    localStorage.setItem('aura_link_history', JSON.stringify(history));
-    renderLinkHistory();
-}
-
-function renderLinkHistory() {
-    const list = document.getElementById('lc-history-list');
-    if (!list) return;
-    const history = JSON.parse(localStorage.getItem('aura_link_history') || '[]');
-    list.innerHTML = '';
-    history.forEach(item => {
-        const entry = document.createElement('div');
-        entry.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--sys-border); background: rgba(128,128,128,0.05);';
-        entry.innerHTML = `<span style="font-size: 12px; color: var(--sys-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 350px;">${item.title}</span><span style="font-size: 10px; color: var(--sys-text-muted);">${item.date}</span>`;
-        list.appendChild(entry);
-    });
-}
-
-function initLinkCreator() {
-    renderLinkHistory();
-}
-
-
 // --- Boot Sequence & OOBE Setup ---
 window.onload = function() {
     if(localStorage.getItem('os_theme') === 'light') {
@@ -1090,8 +863,6 @@ function initializeDesktop() {
     initChromeProxy();
     initTabCloak();
     initAboutBlankSettings();
-    initBatterySaver();
-    restoreActiveApps();
 
     const desktop = document.getElementById('desktop');
     const savedWallpaper = localStorage.getItem('os_wallpaper');
@@ -1110,7 +881,6 @@ function initializeDesktop() {
     initLauncherContextMenu();
     initBattery();
     renderFiles();
-    initLinkCreator();
 }
 
 function factoryReset() {
