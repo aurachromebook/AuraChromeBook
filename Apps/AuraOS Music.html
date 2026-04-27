@@ -123,6 +123,7 @@
         .overlay { position: fixed; inset: 0; background: rgba(2,4,10,0.95); z-index: 100; display: none; padding: 50px; flex-direction: column; }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -369,6 +370,54 @@
             }
         };
         updateQueueUI();
+        // --- PostMessage Communication with Aura OS Parent ---
+        function sendParentUpdate() {
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'aura-music-update',
+                    isPlaying: !audio.paused,
+                    track: currentTrackData ? (currentTrackData.song || currentTrackData.title || 'Unknown') : 'Not Playing',
+                    artist: currentTrackData ? (currentTrackData.artist || 'Unknown') : 'Aura Music',
+                    artwork: currentTrackData ? (currentTrackData.artwork || '') : '',
+                    currentTime: audio.currentTime || 0,
+                    duration: audio.duration || 0,
+                    progress: audio.duration ? (audio.currentTime / audio.duration * 100) : 0
+                }, '*');
+            }
+        }
+
+        // Send updates periodically
+        setInterval(sendParentUpdate, 500);
+
+        // Also send on play/pause/ended
+        audio.addEventListener('play', sendParentUpdate);
+        audio.addEventListener('pause', sendParentUpdate);
+        audio.addEventListener('ended', sendParentUpdate);
+        audio.addEventListener('timeupdate', sendParentUpdate);
+
+        // Listen for commands from parent
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'aura-music-command') {
+                const cmd = event.data.command;
+                switch(cmd) {
+                    case 'togglePlay':
+                        togglePlay();
+                        break;
+                    case 'prev':
+                        changeTrack(-1);
+                        break;
+                    case 'next':
+                        changeTrack(1);
+                        break;
+                    case 'seek':
+                        if (audio.duration && event.data.value !== undefined) {
+                            audio.currentTime = audio.duration * event.data.value;
+                        }
+                        break;
+                }
+            }
+        });
+
     </script>
 </body>
 </html>
