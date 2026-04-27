@@ -1006,6 +1006,138 @@ function initLinkCreator() {
 }
 
 
+
+// --- Media Control System ---
+let mediaState = {
+    isPlaying: false,
+    track: 'Not Playing',
+    artist: 'Aura Music',
+    artwork: '',
+    currentTime: 0,
+    duration: 0,
+    progress: 0
+};
+
+let mediaModalOpen = false;
+let mediaUpdateInterval = null;
+
+// Listen for messages from Aura Music iframe
+window.addEventListener('message', function(event) {
+    // Accept messages from any origin (since Aura Music is local)
+    if (event.data && event.data.type === 'aura-music-update') {
+        const data = event.data;
+        mediaState.isPlaying = data.isPlaying || false;
+        mediaState.track = data.track || 'Not Playing';
+        mediaState.artist = data.artist || 'Aura Music';
+        mediaState.artwork = data.artwork || '';
+        mediaState.currentTime = data.currentTime || 0;
+        mediaState.duration = data.duration || 0;
+        mediaState.progress = data.progress || 0;
+
+        updateMediaControlUI();
+    }
+});
+
+function updateMediaControlUI() {
+    const btn = document.getElementById('media-control-btn');
+    const modal = document.getElementById('media-control-modal');
+
+    // Show/hide button based on whether music is loaded
+    if (mediaState.track !== 'Not Playing' && mediaState.track !== 'Ready for Launch') {
+        btn.classList.add('visible');
+    } else {
+        btn.classList.remove('visible');
+        if (mediaModalOpen) toggleMediaModal();
+    }
+
+    // Update modal content
+    document.getElementById('media-modal-track').innerText = mediaState.track;
+    document.getElementById('media-modal-artist').innerText = mediaState.artist;
+
+    const artEl = document.getElementById('media-modal-art');
+    if (mediaState.artwork) {
+        artEl.style.backgroundImage = `url(${mediaState.artwork})`;
+        artEl.style.backgroundSize = 'cover';
+    } else {
+        artEl.style.backgroundImage = '';
+        artEl.style.background = 'linear-gradient(135deg, #3a7bd5, #00d2ff)';
+    }
+
+    // Update progress
+    document.getElementById('media-progress-fill').style.width = mediaState.progress + '%';
+    document.getElementById('media-time-cur').innerText = formatMediaTime(mediaState.currentTime);
+    document.getElementById('media-time-dur').innerText = formatMediaTime(mediaState.duration);
+
+    // Update play/pause button
+    document.getElementById('media-play-btn').innerText = mediaState.isPlaying ? '⏸' : '▶';
+
+    // Update taskbar button icon
+    btn.querySelector('.media-icon').innerText = mediaState.isPlaying ? '🔊' : '🎵';
+}
+
+function toggleMediaModal() {
+    const modal = document.getElementById('media-control-modal');
+    mediaModalOpen = !mediaModalOpen;
+
+    if (mediaModalOpen) {
+        modal.classList.add('show');
+        // Close other panels
+        const qs = document.getElementById('quick-settings');
+        const launcher = document.getElementById('launcher-menu');
+        if (qs) qs.style.display = 'none';
+        if (launcher) launcher.style.display = 'none';
+    } else {
+        modal.classList.remove('show');
+    }
+}
+
+function sendMediaCommand(command, value) {
+    const auraMusicFrame = document.querySelector('#aura-music-window iframe, #auramusic-window iframe');
+    if (auraMusicFrame && auraMusicFrame.contentWindow) {
+        auraMusicFrame.contentWindow.postMessage({
+            type: 'aura-music-command',
+            command: command,
+            value: value
+        }, '*');
+    }
+}
+
+function mediaTogglePlay() {
+    sendMediaCommand('togglePlay');
+}
+
+function mediaPrev() {
+    sendMediaCommand('prev');
+}
+
+function mediaNext() {
+    sendMediaCommand('next');
+}
+
+function seekMedia(event) {
+    const bar = document.getElementById('media-progress-bar');
+    const rect = bar.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    sendMediaCommand('seek', percent);
+}
+
+function formatMediaTime(seconds) {
+    if (isNaN(seconds) || seconds === 0) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+// Close media modal when clicking outside
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('media-control-modal');
+    const btn = document.getElementById('media-control-btn');
+    if (modal && btn && mediaModalOpen && !modal.contains(e.target) && !btn.contains(e.target)) {
+        toggleMediaModal();
+    }
+});
+
+
 // --- Boot Sequence & OOBE Setup ---
 window.onload = function() {
     if(localStorage.getItem('os_theme') === 'light') {
