@@ -905,3 +905,189 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: 'Google Sans', 'S
     color: white;
     transform: scale(1.1);
 }
+
+/* --- Media Control Button --- */
+#media-control-btn {
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: mediaPulse 2s infinite ease-in-out;
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+#media-control-btn.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+#media-control-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+}
+
+#media-control-btn .media-icon {
+    font-size: 16px;
+    color: white;
+    z-index: 2;
+}
+
+#media-control-btn .media-wave {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 210, 255, 0.3);
+    animation: mediaWave 1.5s infinite ease-out;
+}
+
+@keyframes mediaPulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.6), 0 0 40px rgba(0, 210, 255, 0.2); }
+}
+
+@keyframes mediaWave {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* --- Media Control Modal --- */
+#media-control-modal {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    width: 320px;
+    background: var(--sys-surface);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    color: var(--sys-text);
+    backdrop-filter: var(--sys-blur);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 9999;
+    border: 1px solid var(--sys-border);
+    display: none;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#media-control-modal.show {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.media-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--sys-border);
+}
+
+.media-modal-art {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+}
+
+.media-modal-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.media-modal-info .track-name {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--sys-text);
+}
+
+.media-modal-info .artist-name {
+    font-size: 12px;
+    color: var(--sys-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.media-modal-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 15px 0;
+}
+
+.media-modal-btn {
+    background: rgba(128,128,128,0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--sys-text);
+    transition: all 0.2s;
+}
+
+.media-modal-btn:hover {
+    background: rgba(128,128,128,0.2);
+    transform: scale(1.1);
+}
+
+.media-modal-btn.play-pause {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    color: white;
+    font-size: 22px;
+}
+
+.media-modal-btn.play-pause:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+}
+
+.media-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(128,128,128,0.2);
+    border-radius: var(--radius-full);
+    margin: 10px 0;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.media-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+    border-radius: var(--radius-full);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.media-time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--sys-text-muted);
+}
