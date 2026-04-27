@@ -1,30 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-/*        REMOVED ROBLOX BECAUSE OF ZION, Please beat him up for me. */
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Embed</title>
+    <title>Roblox Fixed</title>
     <style>
-        /* https://maddox.quackprep.com/g/708 */
+        /* Make the iframe fill the full viewport */
         html, body {
             margin: 0;
             width: 100%;
             height: 100%;
+            font-family: Arial, sans-serif;
         }
+        
+        body {
+            position: relative;
+        }
+        
         iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
+        
+        /* Warning Modal Styles */
+        #warningModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .warning-content {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid #ff3333;
+        }
+        
+        .warning-label {
+            background: #ff3333;
+            color: white;
+            padding: 10px 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .warning-text {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+        
+        #continueBtn {
+            background: #ff3333;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        #continueBtn:hover {
+            background: #cc0000;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
+    <!-- Warning Modal -->
+    <div id="warningModal">
+        <div class="warning-content">
+            <div class="warning-label">READ ME!!</div>
+            <div class="warning-text">
+                This is created by AuraOS & froggiearcade<br>
+                WATCH THIS VIDEO IF YOU GOTTEN DISABLE THE AD BLOCK WARNING
+            </div>
+            <div class="video-container">
+                <iframe 
+                    src="https://drive.google.com/file/d/1B1JaG6Ip36fgin4tTr1DW08TsLcUQiy-/preview" 
+                    allow="autoplay; encrypted-media" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <button id="continueBtn">CONTINUE</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <iframe
-        src="https://maddox.quackprep.com/g/708"
+        src="https://virtualstudybrain.com/apps/a/19900/b.html"
         title="Roblox"
         allowfullscreen
-        loading="lazy"
-    ></iframe>
+        loading="lazy">
+    </iframe>
+
+    <script>
+        document.getElementById('continueBtn').addEventListener('click', function() {
+            document.getElementById('warningModal').classList.add('hidden');
+        });
+    </script>
 </body>
 </html>
