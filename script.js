@@ -329,17 +329,16 @@ function checkAboutBlankSetting() {
     if (setting === 'block') {
         return; // Don't show anything
     } else if (setting === 'always') {
-        // Already handled by instant check above, but double-check here
-        // This is for cases where the page loads without the IIFE firing
+        // Auto open about:blank immediately
         setTimeout(() => {
-            const currentUrl = window.location.href;
-            // Check if we're in the original window (not the about:blank iframe)
             if (window.self === window.top && !window.location.href.includes('about:blank')) {
-                // Already handled by IIFE, do nothing
+                openInAboutBlank();
             }
-        }, 100);
+        }, 500);
+    } else if (setting === 'never') {
+        return; // Don't do anything
     } else {
-        // Show modal (ask mode or not set)
+        // Ask mode - show modal
         setTimeout(() => {
             showAboutBlankModal();
         }, 3000);
