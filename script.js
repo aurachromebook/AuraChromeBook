@@ -1,3 +1,674 @@
+// ===== AURA OS ACCOUNT SYSTEM =====
+// All user data is stored in localStorage with account-specific prefixes
+
+const AURA_DOMAIN = '@auraos.com';
+let currentAccount = null; // { email, username, name, password }
+
+// Initialize account database
+function initAccountDB() {
+    if (!localStorage.getItem('aura_accounts_db')) {
+        localStorage.setItem('aura_accounts_db', JSON.stringify({}));
+    }
+}
+
+// Get all accounts from database
+function getAllAccounts() {
+    const db = localStorage.getItem('aura_accounts_db');
+    return db ? JSON.parse(db) : {};
+}
+
+// Save account to database
+function saveAccountToDB(account) {
+    const accounts = getAllAccounts();
+    accounts[account.email] = account;
+    localStorage.setItem('aura_accounts_db', JSON.stringify(accounts));
+}
+
+// Get account by email
+function getAccountByEmail(email) {
+    const accounts = getAllAccounts();
+    return accounts[email] || null;
+}
+
+// Delete account from database
+function deleteAccountFromDB(email) {
+    const accounts = getAllAccounts();
+    delete accounts[email];
+    localStorage.setItem('aura_accounts_db', JSON.stringify(accounts));
+    // Also clear all account-specific data
+    clearAccountData(email);
+}
+
+// Get account-specific storage key prefix
+function getAccountPrefix(email) {
+    return 'aura_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '') + '_';
+}
+
+// Save data for current account
+function saveAccountData(key, value) {
+    if (!currentAccount) return;
+    const prefix = getAccountPrefix(currentAccount.email);
+    localStorage.setItem(prefix + key, value);
+}
+
+// Get data for current account
+function getAccountData(key, defaultValue = null) {
+    if (!currentAccount) return defaultValue;
+    const prefix = getAccountPrefix(currentAccount.email);
+    return localStorage.getItem(prefix + key) || defaultValue;
+}
+
+// Clear all data for an account
+function clearAccountData(email) {
+    const prefix = getAccountPrefix(email);
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix)) {
+            localStorage.removeItem(key);
+        }
+    }
+}
+
+// Show account modal
+function showAccountModal() {
+    const modal = document.getElementById('account-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('account-signin-view').style.display = 'block';
+        document.getElementById('account-create-view').style.display = 'none';
+        document.getElementById('account-error').innerText = '';
+    }
+}
+
+function showAccountModalFromLock() {
+    showAccountModal();
+}
+
+function hideAccountModal() {
+    const modal = document.getElementById('account-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function showCreateAccount() {
+    document.getElementById('account-signin-view').style.display = 'none';
+    document.getElementById('account-create-view').style.display = 'block';
+    document.getElementById('account-error').innerText = '';
+}
+
+function showSignIn() {
+    document.getElementById('account-signin-view').style.display = 'block';
+    document.getElementById('account-create-view').style.display = 'none';
+    document.getElementById('account-error').innerText = '';
+}
+
+function updateEmailPreview() {
+    const username = document.getElementById('create-username-input').value.trim();
+    const preview = document.getElementById('email-preview');
+    if (username) {
+        preview.innerText = 'Your email will be: ' + username + AURA_DOMAIN;
+    } else {
+        preview.innerText = '';
+    }
+}
+
+function createAccount() {
+    const name = document.getElementById('create-name-input').value.trim();
+    const username = document.getElementById('create-username-input').value.trim().toLowerCase();
+    const password = document.getElementById('create-password-input').value;
+    const confirm = document.getElementById('create-confirm-input').value;
+    const errorDiv = document.getElementById('account-error');
+
+    // Validation
+    if (!name || !username || !password) {
+        errorDiv.innerText = 'Please fill in all fields.';
+        return;
+    }
+
+    if (username.length < 3) {
+        errorDiv.innerText = 'Username must be at least 3 characters.';
+        return;
+    }
+
+    if (!/^[a-z0-9._-]+$/.test(username)) {
+        errorDiv.innerText = 'Username can only contain letters, numbers, dots, hyphens, and underscores.';
+        return;
+    }
+
+    if (password.length < 4) {
+        errorDiv.innerText = 'Password must be at least 4 characters.';
+        return;
+    }
+
+    if (password !== confirm) {
+        errorDiv.innerText = 'Passwords do not match.';
+        return;
+    }
+
+    const email = username + AURA_DOMAIN;
+
+    // Check if account already exists
+    if (getAccountByEmail(email)) {
+        errorDiv.innerText = 'An account with this username already exists.';
+        return;
+    }
+
+    // Create account
+    const account = {
+        email: email,
+        username: username,
+        name: name,
+        password: password,
+        createdAt: new Date().toISOString()
+    };
+
+    saveAccountToDB(account);
+
+    // Set as current account
+    currentAccount = account;
+    localStorage.setItem('aura_current_account', email);
+
+    // Hide modal and continue setup
+    hideAccountModal();
+
+    // Continue to OOBE setup
+    const setupScreen = document.getElementById('setup-screen');
+    if (setupScreen) {
+        setupScreen.style.display = 'flex';
+        // Pre-fill name
+        const nameInput = document.getElementById('setup-name-input');
+        if (nameInput) nameInput.value = name;
+    }
+}
+
+function signInAccount() {
+    const emailInput = document.getElementById('account-email-input').value.trim().toLowerCase();
+    const password = document.getElementById('account-password-input').value;
+    const errorDiv = document.getElementById('account-error');
+
+    if (!emailInput || !password) {
+        errorDiv.innerText = 'Please enter both email and password.';
+        return;
+    }
+
+    // Ensure @auraos.com suffix
+    let email = emailInput;
+    if (!email.includes('@')) {
+        email = email + AURA_DOMAIN;
+    }
+
+    const account = getAccountByEmail(email);
+    if (!account) {
+        errorDiv.innerText = 'Account not found. Please check your email or create a new account.';
+        return;
+    }
+
+    if (account.password !== password) {
+        errorDiv.innerText = 'Incorrect password. Please try again.';
+        return;
+    }
+
+    // Sign in successful
+    currentAccount = account;
+    localStorage.setItem('aura_current_account', email);
+
+    hideAccountModal();
+
+    // Show loading screen and load account data
+    showAccountLoadingScreen();
+}
+
+function showAccountLoadingScreen() {
+    const loadingScreen = document.getElementById('account-loading-screen');
+    const emailEl = document.getElementById('loading-email');
+    const progressEl = document.getElementById('loading-progress');
+    const detailsEl = document.getElementById('loading-details');
+
+    if (loadingScreen) loadingScreen.style.display = 'flex';
+    if (emailEl && currentAccount) emailEl.innerText = currentAccount.email;
+
+    // Simulate loading steps
+    const steps = [
+        { progress: 15, text: 'Authenticating...' },
+        { progress: 30, text: 'Loading profile...' },
+        { progress: 45, text: 'Restoring apps and games...' },
+        { progress: 60, text: 'Loading files and data...' },
+        { progress: 75, text: 'Restoring settings...' },
+        { progress: 90, text: 'Finalizing...' },
+        { progress: 100, text: 'Welcome back!' }
+    ];
+
+    let stepIndex = 0;
+    const interval = setInterval(() => {
+        if (stepIndex >= steps.length) {
+            clearInterval(interval);
+            setTimeout(() => {
+                if (loadingScreen) loadingScreen.style.display = 'none';
+                initializeDesktopWithAccount();
+            }, 500);
+            return;
+        }
+
+        const step = steps[stepIndex];
+        if (progressEl) progressEl.style.width = step.progress + '%';
+        if (detailsEl) detailsEl.innerText = step.text;
+        stepIndex++;
+    }, 400);
+}
+
+function initializeDesktopWithAccount() {
+    if (!currentAccount) return;
+
+    // Load account-specific data
+    const savedSetup = getAccountData('setup_complete');
+
+    if (!savedSetup) {
+        // First time for this account - show setup
+        const setupScreen = document.getElementById('setup-screen');
+        if (setupScreen) {
+            setupScreen.style.display = 'flex';
+            const nameInput = document.getElementById('setup-name-input');
+            if (nameInput) nameInput.value = currentAccount.name;
+        }
+    } else {
+        // Returning account - initialize desktop directly
+        initializeDesktop();
+
+        // Check if password is set for this account
+        const accountPassword = getAccountData('password');
+        if (accountPassword) {
+            const lockScreen = document.getElementById('lock-screen');
+            if (lockScreen) {
+                updateLockScreenForAccount();
+                lockScreen.style.display = 'flex';
+            }
+        } else {
+            showUpdateModal();
+            triggerInitialNotifications();
+        }
+    }
+}
+
+function updateLockScreenForAccount() {
+    if (!currentAccount) return;
+
+    const usernameEl = document.getElementById('lock-username');
+    const emailEl = document.getElementById('lock-email');
+    const avatarImg = document.getElementById('lock-avatar-img');
+
+    if (usernameEl) usernameEl.innerText = currentAccount.name;
+    if (emailEl) emailEl.innerText = currentAccount.email;
+    if (avatarImg) {
+        // Generate avatar based on username
+        avatarImg.src = 'https://www.gravatar.com/avatar/' + btoa(currentAccount.email).replace(/[^a-zA-Z0-9]/g, '') + '?d=mp&s=128';
+    }
+
+    // Update accounts list on lock screen
+    updateLockScreenAccountsList();
+}
+
+function updateLockScreenAccountsList() {
+    const listEl = document.getElementById('lock-accounts-list');
+    if (!listEl) return;
+
+    const accounts = getAllAccounts();
+    const currentEmail = currentAccount ? currentAccount.email : '';
+
+    listEl.innerHTML = '';
+
+    Object.values(accounts).forEach(account => {
+        const isActive = account.email === currentEmail;
+        const item = document.createElement('div');
+        item.className = 'lock-account-item' + (isActive ? ' active' : '');
+        item.onclick = () => switchToAccount(account.email);
+        item.innerHTML = `
+            <div class="lock-account-avatar">${account.name.charAt(0).toUpperCase()}</div>
+            <div class="lock-account-info">
+                <div class="lock-account-name">${account.name}</div>
+                <div class="lock-account-email">${account.email}</div>
+            </div>
+            <button class="lock-account-remove" onclick="event.stopPropagation(); removeAccount('${account.email}')">×</button>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+function switchToAccount(email) {
+    const account = getAccountByEmail(email);
+    if (!account) return;
+
+    // Save current session data if any
+    if (currentAccount) {
+        // Save any unsaved data here if needed
+    }
+
+    // Switch to new account
+    currentAccount = account;
+    localStorage.setItem('aura_current_account', email);
+
+    // Hide lock screen and show loading
+    const lockScreen = document.getElementById('lock-screen');
+    if (lockScreen) lockScreen.style.display = 'none';
+
+    // Reload with new account
+    showAccountLoadingScreen();
+}
+
+function removeAccount(email) {
+    if (!confirm('Remove this account? All data for this account will be deleted.')) return;
+
+    const wasCurrent = currentAccount && currentAccount.email === email;
+
+    deleteAccountFromDB(email);
+
+    if (wasCurrent) {
+        currentAccount = null;
+        localStorage.removeItem('aura_current_account');
+        location.reload();
+    } else {
+        updateLockScreenAccountsList();
+    }
+}
+
+function switchAccount() {
+    // Show account modal to switch
+    showAccountModal();
+    // Pre-fill with current account hint
+    if (currentAccount) {
+        document.getElementById('account-email-input').value = currentAccount.email;
+    }
+}
+
+function signOutAccount() {
+    if (!confirm('Sign out of ' + (currentAccount ? currentAccount.email : 'your account') + '?')) return;
+
+    currentAccount = null;
+    localStorage.removeItem('aura_current_account');
+    location.reload();
+}
+
+// Override the original finalizeSetup to save to account
+const originalFinalizeSetup = window.finalizeSetup;
+window.finalizeSetup = function() {
+    localStorage.setItem('os_setup_complete', 'true');
+    localStorage.setItem('os_username', tempUsername);
+    if (tempPassword !== '') localStorage.setItem('os_password', tempPassword);
+
+    // Also save to account-specific storage
+    if (currentAccount) {
+        saveAccountData('setup_complete', 'true');
+        saveAccountData('username', tempUsername);
+        if (tempPassword) saveAccountData('password', tempPassword);
+    }
+
+    document.getElementById('setup-screen').style.display = 'none';
+    const lockUsername = document.getElementById('lock-username');
+    if (lockUsername) lockUsername.innerText = tempUsername;
+
+    initializeDesktop();
+    const welcomeModal = document.getElementById('welcome-modal');
+    if (welcomeModal) welcomeModal.style.display = 'flex';
+};
+
+// Override unlock to check account password
+const originalUnlockOS = window.unlockOS;
+window.unlockOS = function() {
+    const input = document.getElementById('lock-password').value;
+    const lockError = document.getElementById('lock-error');
+    const lockScreen = document.getElementById('lock-screen');
+
+    // Check account password first, then fallback to local
+    let correctPassword = null;
+    if (currentAccount) {
+        correctPassword = getAccountData('password') || currentAccount.password;
+    } else {
+        correctPassword = localStorage.getItem('os_password');
+    }
+
+    const savedAnswer = currentAccount ? getAccountData('answer') : localStorage.getItem('os_answer');
+
+    if (input === correctPassword || input === savedAnswer) {
+        if (lockScreen) lockScreen.style.display = 'none';
+        document.getElementById('lock-password').value = '';
+        if (lockError) lockError.style.display = 'none';
+        showUpdateModal();
+        triggerInitialNotifications();
+    } else {
+        if (lockError) lockError.style.display = 'block';
+    }
+};
+
+// Override saveSecuritySettings to save to account
+const originalSaveSecuritySettings = window.saveSecuritySettings;
+window.saveSecuritySettings = function() {
+    const pass = document.getElementById('set-password').value;
+    const q = document.getElementById('set-question').value;
+    const a = document.getElementById('set-answer').value;
+
+    if (pass) {
+        localStorage.setItem('os_password', pass);
+        if (currentAccount) saveAccountData('password', pass);
+    }
+    if (q) {
+        localStorage.setItem('os_question', q);
+        if (currentAccount) saveAccountData('question', q);
+    }
+    if (a) {
+        localStorage.setItem('os_answer', a);
+        if (currentAccount) saveAccountData('answer', a);
+    }
+
+    const msg = document.getElementById('security-save-msg');
+    if (msg) {
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 3000);
+    }
+};
+
+// Override factoryReset to be account-aware
+const originalFactoryReset = window.factoryReset;
+window.factoryReset = function() {
+    if (confirm("WARNING: This will erase ALL data including all accounts. Continue?")) {
+        localStorage.clear();
+        location.reload();
+    }
+};
+
+// Override lockSystem to show account info
+const originalLockSystem = window.lockSystem;
+window.lockSystem = function() {
+    const accountPassword = currentAccount ? getAccountData('password') : localStorage.getItem('os_password');
+
+    if (accountPassword) {
+        updateLockScreenForAccount();
+        const lockScreen = document.getElementById('lock-screen');
+        if (lockScreen) lockScreen.style.display = 'flex';
+    } else {
+        alert("Please set a password in Settings first!");
+    }
+
+    const quickSettings = document.getElementById('quick-settings');
+    if (quickSettings) quickSettings.style.display = 'none';
+    const contextMenu = document.getElementById('context-menu');
+    if (contextMenu) contextMenu.style.display = 'none';
+};
+
+// Override initializeDesktop to load account data
+const originalInitializeDesktop = window.initializeDesktop;
+window.initializeDesktop = function() {
+    updateCalendarWidget();
+    initChromeProxy();
+    initTabCloak();
+    initAboutBlankSettings();
+    initBatterySaver();
+    restoreActiveApps();
+
+    // Update settings panel with account info
+    if (currentAccount) {
+        const nameEl = document.getElementById('settings-account-name');
+        const emailEl = document.getElementById('settings-account-email');
+        if (nameEl) nameEl.innerText = currentAccount.name;
+        if (emailEl) emailEl.innerText = currentAccount.email;
+    }
+
+    const desktop = document.getElementById('desktop');
+    const savedWallpaper = getAccountData('wallpaper') || localStorage.getItem('os_wallpaper');
+    if (savedWallpaper && desktop) desktop.style.backgroundImage = `url('${savedWallpaper}')`;
+
+    // Load account-specific installed apps
+    const savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    savedApps.forEach(app => {
+        restoreAppToLauncher(app.id, app.icon, app.name);
+        if (app.pinned) {
+            restoreAppToTaskbar(app.id, app.icon, app.name);
+        }
+    });
+
+    document.querySelectorAll('.app-icon').forEach(makeIconDraggable);
+    document.querySelectorAll('.desktop-icon').forEach(dragDesktopIcon);
+    initLauncherContextMenu();
+    initBattery();
+    renderFiles();
+    initLinkCreator();
+};
+
+// Override setWallpaper to save to account
+const originalSetWallpaper = window.setWallpaper;
+window.setWallpaper = function(url) {
+    let highResUrl = url.replace("w=400", "w=2000");
+    const desktop = document.getElementById('desktop');
+    if (desktop) desktop.style.backgroundImage = `url('${highResUrl}')`;
+    localStorage.setItem('os_wallpaper', highResUrl);
+    if (currentAccount) saveAccountData('wallpaper', highResUrl);
+};
+
+// Override saveAppToStorage to save to account
+const originalSaveAppToStorage = window.saveAppToStorage;
+window.saveAppToStorage = function(appId, iconSymbol, appName) {
+    let savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    if (!savedApps.find(app => app.id === appId)) {
+        savedApps.push({
+            id: appId,
+            icon: iconSymbol,
+            name: appName,
+            pinned: false
+        });
+        localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+        if (currentAccount) saveAccountData('installed_apps', JSON.stringify(savedApps));
+    }
+};
+
+// Override notepadSave to save to account
+const originalNotepadSave = window.notepadSave;
+window.notepadSave = function() {
+    if(!currentNotepadFile) { notepadSaveAs(); return; }
+    let content = document.getElementById('wordpad-editor').innerHTML;
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    files[currentNotepadFile] = content;
+    localStorage.setItem('aura_files', JSON.stringify(files));
+    if (currentAccount) saveAccountData('files', JSON.stringify(files));
+    notificationMgr.showNotification({ title: "File Saved", message: `${currentNotepadFile} was saved successfully!`, icon: "sparkles" });
+    renderFiles();
+};
+
+// Override renderFiles to load from account
+const originalRenderFiles = window.renderFiles;
+window.renderFiles = function() {
+    const grid = document.getElementById('file-explorer-grid');
+    if(!grid) return;
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    grid.innerHTML = '';
+    for(let name in files) {
+        grid.innerHTML += `<div class="file-item" ondblclick="window.openFileFromExplorer('${name}')"><div class="f-icon">📄</div><span>${name}</span></div>`;
+    }
+};
+
+// Override openFileFromExplorer to load from account
+const originalOpenFileFromExplorer = window.openFileFromExplorer;
+window.openFileFromExplorer = function(name) {
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    document.getElementById('wordpad-editor').innerHTML = files[name];
+    currentNotepadFile = name;
+    openApp('wordpad-window');
+};
+
+// Override saveBatteryLogToFile to save to account
+const originalSaveBatteryLogToFile = window.saveBatteryLogToFile;
+window.saveBatteryLogToFile = function() {
+    const batteryLog = localStorage.getItem('aura_battery_log') || '';
+    let files = JSON.parse(getAccountData('files') || localStorage.getItem('aura_files') || '{}');
+    files['battery_saver_log.txt'] = `<pre style="font-family: monospace; white-space: pre-wrap; font-size: 12px; line-height: 1.5;">${batteryLog}</pre>`;
+    localStorage.setItem('aura_files', JSON.stringify(files));
+    if (currentAccount) saveAccountData('files', JSON.stringify(files));
+};
+
+// Override wallpaper upload handler
+const originalWallpaperUploadHandler = null;
+document.addEventListener('DOMContentLoaded', function() {
+    const wallpaperUpload = document.getElementById('wallpaper-upload');
+    if (wallpaperUpload) {
+        wallpaperUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const desktop = document.getElementById('desktop');
+                    if (desktop) desktop.style.backgroundImage = `url('${ev.target.result}')`;
+                    try {
+                        localStorage.setItem('os_wallpaper', ev.target.result);
+                        if (currentAccount) saveAccountData('wallpaper', ev.target.result);
+                    } catch(err) {
+                        alert("Image applied for this session.");
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+// ===== BOOT SEQUENCE WITH ACCOUNT SYSTEM =====
+window.onload = function() {
+    initAccountDB();
+
+    // Check if there's a current account
+    const savedAccountEmail = localStorage.getItem('aura_current_account');
+    if (savedAccountEmail) {
+        currentAccount = getAccountByEmail(savedAccountEmail);
+    }
+
+    if(localStorage.getItem('os_theme') === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+        const themeText = document.getElementById('theme-text');
+        if (themeText) themeText.innerText = "Light Theme";
+    }
+
+    setTimeout(() => {
+        const boot = document.getElementById('boot-screen');
+        if(boot) {
+            boot.style.opacity = '0';
+            setTimeout(() => boot.style.display = 'none', 500);
+        }
+
+        // Check if user has an account
+        const accounts = getAllAccounts();
+        const hasAccounts = Object.keys(accounts).length > 0;
+
+        if (!hasAccounts && !currentAccount) {
+            // First time ever - show account creation (no skipping)
+            showAccountModal();
+        } else if (currentAccount) {
+            // Has current account - show loading screen
+            showAccountLoadingScreen();
+        } else {
+            // Has accounts but none selected - show sign in
+            showAccountModal();
+        }
+    }, 2500);
+};
+
+// ===== ORIGINAL FUNCTIONS (preserved) =====
+
+
 // --- CORS PROXY CONFIGURATION FOR CHROME ---
 const CORS_PROXIES = {
     corsproxy: 'https://corsproxy.io/?',
