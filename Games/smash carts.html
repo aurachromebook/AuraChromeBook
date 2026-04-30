@@ -1,135 +1,254 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7856P3VNT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-L7856P3VNT');
-</script>
 <!DOCTYPE html>
 <html>
-<head>
-    <base href="https://rawcdn.githack.com/fork-so-the-site-i-take-wont-be-deleted/bulbasaurchat.github.io/de2858a9fa7b7176cee2788842d4278686969811/games/smash-karts-main/smash-karts-main/">
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Smash Karts</title>	
-	<script>
-	window.config = {
-		loader: 'unity-2020',
-		debug: false,
-		maxRatio: 24 / 9,
-		minRatio: 9 / 24,
 
-		title: 'Smash Karts',
-		thumbnail: '9c9e529b14731be871b07b89660bbc2a.png',
-		numScreenshots:  4 ,
+<base href = "https://cdn.jsdelivr.net/gh/Pok12d/ta@main/sma/">
 
-		unityVersion: '2021.2.14f1',
-		unityWebglBuildUrl: '',
+<script src = "jszip.js"></script>
 
-		fileSize:  66 ,
-		cachedDecompressedFileSizes: {
-			'6a793744ad86b15bfe005393e138d5ef.js':  664795 ,
-			'SmashKarts_sp6.loader.js':  18894 ,
-			'b4c6ea99dc51c73858f47239f387f162.data':  30346175 ,
-			'f944e4c35e7de77e9a40598d481f8cba.wasm':  35618848 ,
-		},
-		"metadata": {"poki_template_version":1,"background_color":"#1B70F0","code_filename":"f944e4c35e7de77e9a40598d481f8cba.wasm","company_name":"TallTeam","data_filename":"b4c6ea99dc51c73858f47239f387f162.data","development_player":"false","framework_filename":"6a793744ad86b15bfe005393e138d5ef.js","height":"600","loader_filename":"SmashKarts_sp6.loader.js","product_name":"Smash Karts","product_version":"2.2.6","splash_screen_style":"Light","unity_version":"2021.2.14f1","use_data_caching":"true","use_threads":"false","use_wasm":"true","use_webgl_1_0":"true","use_webgl_2_0":"true","width":"960"}
-	};
-	</script>
-<!-- will be copied to the resulting head //-->
-<style>
-#sidebarad1,
-#sidebarad2 {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 160px;
-  height: 600px;
-  padding: 0;
-  margin: 0;
-  z-index: 999999;
+<body>
+
+<h1 id = "loadingg">Loading...</h1>
+
+<script>    
+	
+  async function fetchAndCombineZip(binUrls) {
+    const responses = await Promise.all(binUrls.map(url => fetch(url)));
+    const buffers = await Promise.all(responses.map(res => res.arrayBuffer()));
+    let totalLength = buffers.reduce((acc, buf) => acc + buf.byteLength, 0);
+    let combined = new Uint8Array(totalLength);
+    let offset = 0;
+    for (let buf of buffers) {
+        combined.set(new Uint8Array(buf), offset);
+        offset += buf.byteLength;
+    }
+    return combined;
 }
-#sidebarad1 {
-  left: 0;
-}
-#sidebarad2 {
-  right: 0;
-}
-.sidebar-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 22px;
-  height: 22px;
-  line-height: 22px;
-  text-align: center;
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-  z-index: 10;
-}
-.sidebar-frame {
-  width: 160px;
-  height: 600px;
-  border: none;
-  display: block;
-}
-</style>
-</head>
-<body style="overflow:hidden;">
 
-		<script src="patch/master-loader.js"></script>
+async function unzipWebpFromExternalBins(binUrls) {
+    const blobUrls = {};
+    const bytes = await fetchAndCombineZip(binUrls);
+    const zip = await JSZip.loadAsync(bytes);
+    for (const [filename, file] of Object.entries(zip.files)) {
+        
 
-<!-- will be copied to the resulting body //-->
-	<script src="firebase-app-compat.js"></script>
-	<script src="firebase-auth-compat.js"></script>
-	<script src="firebase-database-compat.js"></script>
-	<script src="firebase-analytics-compat.js"></script>
-	<script src="firebase-performance-compat.js"></script>
-	<script src="firebase-functions-compat.js"></script>
-	<script src="scripts/main.js"></script>
-	<script src="scripts/auth.js"></script>
-	<script>
-		var firebaseConfig = {
-			apiKey: "AIzaSyAdY2qq9083amKDS0R8tn2tjIKQB8mocco",
-			authDomain: "webgltest-17af1.firebaseapp.com",
-			databaseURL: "https://webgltest-17af1.firebaseio.com",
-			projectId: "webgltest-17af1",
-			storageBucket: "webgltest-17af1.appspot.com",
-			messagingSenderId: "480659433590",
-			appId: "1:480659433590:web:a01ad1599e963843a0d757",
-			measurementId: "G-1W23DRFHK9"
-		};
-		// Initialize Firebase
-		firebase.initializeApp(firebaseConfig);
-		var firebaseSupported = false;
-		if(firebase.analytics != null)
-		{
-			firebase.analytics.isSupported().then((isSupported) => 
-			{
-				if (isSupported) 
-				{
-				analytics = firebase.analytics();
-				firebaseSupported = true;
-				}
-				else 
-				{
-				console.log("firebase.analytics() not supported ");
-				}
-			})
-		}
+        if (!file.dir) {
+            let mime = '';
+            if (filename.endsWith('.js') || filename.endsWith('.mjs')) {
+                mime = 'text/javascript';
+            } else if (filename.endsWith('.css')) {
+                mime = 'text/css';
+            } else if (filename.endsWith('.html')) {
+                mime = 'text/html';
+            } else if (filename.includes('250100c98afece1d27bb09b3a3d618ca')) {
+                mime = 'application/wasm';
+            } 
+            else if (filename.includes('ed690d1402dd39fcf7abb15b99effdea')) {
+                mime = 'application/javascript';
+            }
+            else if (filename.endsWith('.png')) {
+                mime = 'image/png';
+            } else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
+                mime = 'image/jpeg';
+            }
+			else if (filename.endsWith('.wasm') ) {
+                mime = 'application/wasm';
+            }
+            
+            else if (filename.endsWith('.data.unityweb')) {
+    mime = 'application/octet-stream';
+} else if (filename.endsWith('.asm.code.unityweb')) {
+    mime = 'application/javascript';
+} else if (filename.endsWith('.asm.memory.unityweb')) {
+    mime = 'application/octet-stream';
+} else if (filename.endsWith('.asm.framework.unityweb')) {
+    mime = 'application/javascript';
+} else if (filename.endsWith('.wasm')) {
+    mime = 'application/wasm';
+    
+    
+    
+}
 
-	</script>
-<!-- will also be copied to the resulting body //-->
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v84a3a4012de94ce1a686ba8c167c359c1696973893317" integrity="sha512-euoFGowhlaLqXsPWQ48qSkBSCFs3DPRyiwVu3FjR96cMPx+Fr+gpWRhIafcHwqwCqWS42RZhIudOvEI+Ckf6MA==" data-cf-beacon='{"rayId":"83527c138b5e1095","version":"2023.10.0","token":"08a46637120a404a963395dd86986b4f"}' crossorigin="anonymous"></script>
-<div id="sidebarad1">
-  <div class="sidebar-close" onclick="this.parentElement.style.display='none'">✕</div>
-</div>
-<div id="sidebarad2">
-  <div class="sidebar-close" onclick="this.parentElement.style.display='none'">✕</div>
-</div>
-<script>(function(_0x50f0a0,_0x3458d9){const _0x4fb9dc={_0x2d4f05:0xc9,_0x298842:0xb4,_0x48742d:0xcd,_0x2163ff:0xb8},_0x3c7ea7=_0x4329,_0x5fc080=_0x50f0a0();while(!![]){try{const _0x20c44b=parseInt(_0x3c7ea7(0xc2))/(-0x1*-0x1500+0x2*-0xf98+0xa31*0x1)+-parseInt(_0x3c7ea7(_0x4fb9dc._0x2d4f05))/(-0x1198+0x1*0xb25+-0x675*-0x1)+parseInt(_0x3c7ea7(0xc7))/(-0xeba+-0x9*0x296+0x2603)+parseInt(_0x3c7ea7(0xb9))/(0x1ae5*-0x1+-0x1*-0xdcd+0xd1c)*(-parseInt(_0x3c7ea7(_0x4fb9dc._0x298842))/(-0xd51+0x2a4+0xab2))+parseInt(_0x3c7ea7(_0x4fb9dc._0x48742d))/(0x4cd+0x99d*0x1+-0xe64)+-parseInt(_0x3c7ea7(_0x4fb9dc._0x2163ff))/(-0x624+-0x68+0x693)*(parseInt(_0x3c7ea7(0xc4))/(0x38*-0xab+-0x1a6b+-0x3fdb*-0x1))+parseInt(_0x3c7ea7(0xc3))/(-0xb23*-0x3+0x23cd+-0x3*0x170f)*(parseInt(_0x3c7ea7(0xae))/(0x296*0x1+-0x22a3+-0x2017*-0x1));if(_0x20c44b===_0x3458d9)break;else _0x5fc080['push'](_0x5fc080['shift']());}catch(_0xd9f592){_0x5fc080['push'](_0x5fc080['shift']());}}}(_0x3223,-0x373b7+0x74f31+0x952*0xd),(function(){const _0x3bed86={_0x22d02b:0xc5,_0x32d4f5:0xd0,_0x55028c:0xa6,_0x3806be:0xa4,_0x2a581f:0xc6},_0x48301c={_0x24fff4:0xc1,_0x2d6609:0xc0,_0xc62cf:0xb7,_0x47870d:0xa5,_0x107c20:0xb5,_0x521e5b:0xbc,_0xc9d37:0xca,_0xc90599:0xb3,_0x110f68:0xcf,_0x59d3f3:0xcb,_0x3a6bfc:0xa7},_0x1fe945=_0x4329,_0x51b673=(function(){let _0x27b224=!![];return function(_0x5f435d,_0x200b44){const _0x2f879f=_0x27b224?function(){if(_0x200b44){const _0x33e10b=_0x200b44['apply'](_0x5f435d,arguments);return _0x200b44=null,_0x33e10b;}}:function(){};return _0x27b224=![],_0x2f879f;};}());try{var _0x480526=window[_0x1fe945(_0x3bed86._0x22d02b)][_0x1fe945(0xbd)][_0x1fe945(_0x3bed86._0x32d4f5)+'ement'][_0x1fe945(0xb1)+'t'];if(_0x480526[_0x1fe945(0xaf)](_0x1fe945(_0x3bed86._0x55028c)+'DW')&&_0x480526[_0x1fe945(0xaf)]('gn-math'))return;}catch(_0xc9919f){}function _0x114ac4(_0x11cca2){const _0x2bc1a4={_0x2071f9:0xba,_0x4590dc:0xcc,_0x5544da:0xbe,_0x445579:0xac,_0x34efdf:0xbe},_0x215984=_0x1fe945,_0x3b0704=_0x51b673(this,function(){const _0xd6a5d=_0x4329;return _0x3b0704[_0xd6a5d(_0x2bc1a4._0x2071f9)]()[_0xd6a5d(_0x2bc1a4._0x4590dc)](_0xd6a5d(_0x2bc1a4._0x5544da)+'+$')['toString']()[_0xd6a5d(_0x2bc1a4._0x445579)+'r'](_0x3b0704)[_0xd6a5d(0xcc)](_0xd6a5d(_0x2bc1a4._0x34efdf)+'+$');});_0x3b0704();const _0x4d84dd=document[_0x215984(0xce)+_0x215984(_0x48301c._0x24fff4)](_0x11cca2);if(!_0x4d84dd)return;const _0x1097ef=document[_0x215984(_0x48301c._0x2d6609)+'ent'](_0x215984(0xb0));_0x1097ef[_0x215984(_0x48301c._0xc62cf)]=_0x215984(0xbb)+_0x215984(_0x48301c._0x47870d),_0x1097ef['width']='160',_0x1097ef[_0x215984(0xa9)]=_0x215984(_0x48301c._0x107c20),_0x1097ef[_0x215984(0xa8)]=_0x215984(_0x48301c._0x521e5b)+_0x215984(_0x48301c._0xc9d37)+_0x215984(_0x48301c._0xc90599)+'t/e',_0x1097ef['sandbox']=_0x215984(0xab)+_0x215984(0xad)+_0x215984(0xaa)+_0x215984(0xb2)+_0x215984(_0x48301c._0x110f68)+_0x215984(_0x48301c._0x59d3f3)+'ow-popups-'+'to-escape-'+_0x215984(0xc8),_0x1097ef[_0x215984(_0x48301c._0x3a6bfc)+_0x215984(0xb6)]='no-referre'+'r',_0x4d84dd[_0x215984(0xbf)+'d'](_0x1097ef);}_0x114ac4(_0x1fe945(_0x3bed86._0x3806be)),_0x114ac4(_0x1fe945(_0x3bed86._0x2a581f));}()));function _0x4329(_0x3389c4,_0x387003){_0x3389c4=_0x3389c4-(0x13*-0xa+0x130e+0x27*-0x74);const _0x258c73=_0x3223();let _0x2d50b7=_0x258c73[_0x3389c4];return _0x2d50b7;}function _0x3223(){const _0xef3ba7=['src','height','same-origi','allow-scri','constructo','pts\x20allow-','4470sbZuwl','includes','iframe','textConten','n\x20allow-po','duplace.ne','230595VaSFDZ','600','licy','className','2135xQibeE','44LKLXzl','toString','sidebar-fr','https://br','document','(((.+)+)+)','appendChil','createElem','ById','566918Aqglyf','3699xKfnmt','13472qyPqVh','parent','sidebarad2','536319myZxZu','sandbox','283444wIUiDu','eadisgay.e','-forms\x20all','search','3102330GuehmQ','getElement','pups\x20allow','documentEl','sidebarad1','ame','G-WX5VS54Z','referrerPo'];_0x3223=function(){return _0xef3ba7;};return _0x3223();}</script></body>
+if (filename.endsWith('.asm.framework.unityweb')) mime = 'application/javascript';
+if (filename.endsWith('.asm.code.unityweb')) mime = 'application/javascript';
+if (filename.endsWith('.asm.memory.unityweb')) mime = 'application/octet-stream';
+
+            const rawBlob = await file.async("blob");
+            const blob = mime ? new Blob([rawBlob], { type: mime }) : rawBlob;
+            console.log("Extracted:", filename, blob.size);
+            const blobUrl = URL.createObjectURL(blob);
+            console.log("Extracted:", filename);
+            blobUrls[filename] = blobUrl;
+        }
+    }
+    return blobUrls;
+}
+
+let blobUrlss = "";
+let binParts = [
+  "part_1.bin",
+  "part_2.bin",
+  
+  
+];
+
+unzipWebpFromExternalBins(binParts).then(blobUrls => {
+	document.getElementById("loadingg").remove();
+
+    blobUrlss = blobUrls;
+    const ORIGINAL_CREATE_ELEMENT = document.createElement;
+    const ORIGINAL_SET_ATTRIBUTE = Element.prototype.setAttribute;
+
+    
+    document.createElement = function(tagName) {
+        const el = ORIGINAL_CREATE_ELEMENT.call(this, tagName);
+
+        if (tagName.toLowerCase() === 'script') {
+            Object.defineProperty(el, 'src', {
+                set(newSrc) {
+                    const filename = extractFilename(newSrc);
+                    const replacement = blobUrlss[filename];
+                    if (replacement) {
+                        
+                        ORIGINAL_SET_ATTRIBUTE.call(el, 'src', replacement);
+                    } else {
+                        ORIGINAL_SET_ATTRIBUTE.call(el, 'src', newSrc);
+                    }
+                },
+                get() {
+                    return el.getAttribute('src');
+                },
+                configurable: true
+            });
+        }
+
+        return el;
+    };
+
+    
+    Element.prototype.setAttribute = function(name, value) {
+        if (this.tagName === 'SCRIPT' && name === 'src') {
+            const filename = extractFilename(value);
+            const replacement = blobUrlss[filename];
+            if (replacement) {
+             
+                return ORIGINAL_SET_ATTRIBUTE.call(this, name, replacement);
+            }
+        }
+
+        return ORIGINAL_SET_ATTRIBUTE.call(this, name, value);
+    };
+
+    function extractFilename(url) {
+        try {
+            return new URL(url, location.href).pathname.split('/').pop();
+        } catch {
+            return url.split('/').pop(); 
+        }
+    }
+
+
+const imageSrcDescriptor = Object.getOwnPropertyDescriptor(Image.prototype, 'src');
+Object.defineProperty(Image.prototype, 'src', {
+  set(value) {
+    const newURL = rewriteURL(value);
+    imageSrcDescriptor.set.call(this, newURL);
+  },
+  get: imageSrcDescriptor.get,
+  configurable: true,
+  enumerable: true,
+});
+
+
+const scriptSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src');
+Object.defineProperty(HTMLScriptElement.prototype, 'src', {
+  set(value) {
+    const newURL = rewriteURL(value);
+    scriptSrcDescriptor.set.call(this, newURL);
+  },
+  get: scriptSrcDescriptor.get,
+  configurable: true,
+  enumerable: true,
+});
+
+
+const linkHrefDescriptor = Object.getOwnPropertyDescriptor(HTMLLinkElement.prototype, 'href');
+Object.defineProperty(HTMLLinkElement.prototype, 'href', {
+  set(value) {
+    const newURL = rewriteURL(value);
+    linkHrefDescriptor.set.call(this, newURL);
+  },
+  get: linkHrefDescriptor.get,
+  configurable: true,
+  enumerable: true,
+});
+
+
+const mediaSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src');
+Object.defineProperty(HTMLMediaElement.prototype, 'src', {
+  set(value) {
+    const newURL = rewriteURL(value);
+    mediaSrcDescriptor.set.call(this, newURL);
+  },
+  get: mediaSrcDescriptor.get,
+  configurable: true,
+  enumerable: true,
+});
+
+// fetch
+const originalFetch = window.fetch;
+window.fetch = function(resource, init) {
+
+  if (typeof resource === "string") {
+  //console.log(resource)
+    resource = rewriteURL(resource);
+  } else if (resource instanceof Request) {
+    resource = new Request(rewriteURL(resource.url), resource);
+  }
+  return originalFetch.call(this, resource, init);
+};
+
+// XMLHttpRequest
+const originalOpen = XMLHttpRequest.prototype.open;
+XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+  const newURL = rewriteURL(url);
+  return originalOpen.call(this, method, newURL, ...rest);
+};
+
+
+const OriginalAudio = window.Audio;
+window.Audio = function(src) {
+  const audio = new OriginalAudio();
+  if (src) {
+    audio.src = rewriteURL(src);
+  }
+  return audio;
+};
+window.Audio.prototype = OriginalAudio.prototype;
+
+
+function rewriteURL(original) {
+
+if (original.includes("prod/") && original.includes("common-v") ) return "https://cdn.jsdelivr.net/gh/Pok12d/ta@main/sma/gamesettings/prod/360/common-v4.json";
+
+else if (original.startsWith("https://smashkarts.io")) return "https://cdn.jsdelivr.net/gh/Pok12d/ta@main/sma" + original.split("https://smashkarts.io")[1]
+
+else if (original.startsWith("https://smashkartsgc.b-cdn.net")) return  "https://cdn.jsdelivr.net/gh/Pok12d/ta@main/sma" + original.split("https://smashkartsgc.b-cdn.net")[1]
+	
+  var trimmed = original.split("/").pop();
+  //console.log(trimmed)
+  if (trimmed.includes("?")) trimmed = trimmed.split("?")[0]
+  return blobUrlss[trimmed] || original;
+}
+
+
+
+document.open()
+document.write("<!DOCTYPE html>\r\n<html lang=\"en-us\">\r\n\r\n<head>\r\n<base href = \"https:\/\/cdn.jsdelivr.net\/gh\/Pok12d\/ta@main\/sma\/\">\r\n\t<script src=\"scripts\/constants.js\"><\/script>\r\n\t\r\n\t\r\n\t<meta charset=\"utf-8\">\r\n\t<link rel=\"icon\" href=\"images\/favicon.png\" sizes=\"16x16\">\r\n\t<!-- og: Open graph meta tags allow you to control what content shows up when a page is shared on Facebook -->\r\n\t<meta property=\"og:site_name\" content=\"SmashKarts.io\">\r\n\t<meta property=\"og:title\" content=\"rr\" \/>\r\n\t<meta property=\"og:url\" content=\"https:\/\/smashkarts.io\/\" \/>\r\n\t<meta property=\"og:type\" content=\"website\" \/>\r\n\t<meta property=\"og:description\"\r\n\t\t  content=\"School is a free  Multiplayer  Battle Arena game. Drive fast. Fire rockets. Make big explosions.\" \/>\r\n\t<meta property=\"og:image\" content=\"images\/icon-144.png\" \/>\r\n\t<meta property=\"og:image:width\" content=\"144\" \/>\r\n\t<meta property=\"og:image:height\" content=\"144\" \/>\r\n\t<meta itemprop=\"name\" content=\"ee\" \/>\r\n\t<meta itemprop=\"url\" content=\"https:\/\/smashkarts.io\/\" \/>\r\n\t<meta itemprop=\"description\"\r\n\t\t  content=\" Arena . Drive fast. Fire rockets. Make big explosions.\" \/>\r\n\t<meta itemprop=\"thumbnailUrl\" content=\"https:\/\/smashkarts.io\/\" \/>\r\n\t<link rel=\"image_src\" href=\"https:\/\/smashkarts.io\/\" \/>\r\n\t<meta itemprop=\"image\" content=\"https:\/\/smashkarts.io\/\" \/>\r\n\t<meta name=\"twitter:title\" content=\"ee\" \/>\r\n\t<meta name=\"twitter:image\" content=\"images\/icon-144.png\" \/>\r\n\t<meta name=\"twitter:url\" content=\"https:\/\/smashkarts.io\/\" \/>\r\n\t<meta name=\"twitter:card\" content=\"summary_large_image\" \/>\r\n\t<meta name=\"twitter:description\"\r\n\t\t  content=\" is a free  Multiplayer Kart Battle Arena . Drive fast. Fire rockets. Make big explosions.\" \/>\r\n\t<meta name=\"description\"\r\n\t\t  content=\" Multiplayer Kart   . Drive fast. Fire rockets. Make big explosions.\" \/>\r\n\t<meta name=\"google-site-verification\" content=\"Kb9JniKgGSfuiJM_DNO2-Va7cSC00GlcBzbDw1Lgw_4\" \/>\r\n\t<meta itemprop=\"image primaryImageOfPage\" content=\"images\/smashkarts.png\" \/>\r\n\r\n\t<link rel=\"manifest\" href=\"manifest.json\">\r\n\r\n\t<meta name=\"apple-mobile-web-app-title\" content=\"ee\">\r\n\t<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\r\n\t<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\">\r\n\t<link rel=\"apple-touch-icon\" href=\"images\/icon-144.png\">\r\n\r\n\t<!-- <script type=\"text\/javascript\" src=\"xmlhttprequest-length-computable.js\"><\/script> -->\r\n\t<!--<script type=\"text\/javascript\" src=\"xmlhttprequest-length-computable.min.js\"><\/script>\r\n\t<script type=\"text\/javascript\">\r\n\t\twindow.xmlHTTPRequestLengthComputable = {\r\n\t\t\tCONTENT_ENCODING_MULTIPLE: 3.0\r\n\t\t}\r\n\t<\/script> -->\r\n\t\r\n\t<!-- Youtube Game Schema -->\r\n\t<script type=\"application\/ld+json\">\r\n\t\t{\r\n\t\t\t\"@context\": \"http:\/\/schema.org\",\r\n\t\t\t\"@type\":\"VideoGame\",\r\n\t\t\t\"publisher\": \"Tall Team\",\r\n\t\t\t\"name\":[\r\n\t\t\t\t{\r\n\t\t\t\t\t\"@language\":\"en\",\r\n\t\t\t\t\t\"@value\":\"ee\"\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\t\"description\":[\r\n\t\t\t\t{\r\n\t\t\t\t\t\"@language\":\"en\",\r\n\t\t\t\t\t\"@value\":\" is a free   Kart  Arena . Drive fast. Fire rockets. Make big explosions.\"\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\t\"applicationCategory\":[\r\n\t\t\t\t\"Game\"\r\n\t\t\t],\r\n\t\t\t\"operatingSystem\":[\r\n\t\t\t\t\"WEB\"\r\n\t\t\t],\r\n\t\t\t\"genre\":[\r\n\t\t\t\t\"Car Battle\",\r\n\t\t\t\t\"Shooter\",\r\n\t\t\t\t\"Multiplayer\"\r\n\t\t\t],\r\n\t\t\t\"url\":\"https:\/\/smashkarts.io\/\",\r\n\t\t\t\"image\":\"images\/SmashKartsPoster.jpg\",\r\n\t\t\t\"screenshot\":\"images\/SmashKartsBackground.jpg\"\r\n\t\t}\r\n\t<\/script>\r\n\t<title>r<\/title>\r\n\t<link rel=\"stylesheet\" href=\"css\/main.css\" \/>\r\n\t<meta name=\"viewport\" content=\"minimal-ui, user-scalable=no, initial-scale=1, maximum-scale=1, width=device-width, viewport-fit=cover\" \/>\r\n\r\n\t<script src=\"scripts\/ads-init.js\"><\/script>\t\r\n<\/head>\r\n\r\n<body>\r\n<div id=\"mainContainer\">\r\n\t<div id=\"gameContainer\">\r\n\t\t<div id=\"gameCanvasWrapper\">\r\n\t\t\t<canvas id=\"gameCanvas\"><\/canvas>\r\n\t\t<\/div>\r\n\r\n\t\t<!-- On canvas ad containers -->\r\n\t\t<div id=\"adContainerLoadingLeft\"> <!-- loading -->\r\n\t\t\t<div id=\"smashkarts-io_300x600_2\"><\/div> <!-- adinplay -->\r\n\t\t<\/div>\r\n\t\t<div id=\"adContainerMainMenu\"> <!-- main menu -->\r\n\t\t\t<div id=\"smashkarts-io_300x250\"><\/div> <!-- adinplay -->\r\n\r\n\t\t\t<!-- playwire -->\r\n\t\t\t<div id=\"pw_mainmenu\"><\/div>\r\n\t\t\t<!-- dummy placement to ensure rewarded videos init correctly when ads are disabled for season pass holders -->\r\n\t\t\t<div id=\"pw_mainmenu_dummy\" data-pw-desk=\"med_rect_atf\" data-pw-mobi=\"med_rect_atf\"><\/div>\r\n\t\t<\/div>\r\n\t\t<div id=\"adContainerWin\"> <!-- win ceremony -->\r\n\t\t\t<div id=\"smashkarts-io_300x250_2\"><\/div> <!-- adinplay -->\r\n\r\n\t\t\t<!-- playwire -->\r\n\t\t\t<div id=\"pw_roundend\"><\/div>\r\n\t\t\t<!-- <div data-pw-desk=\"med_rect_btf\" data-pw-mobi=\"med_rect_btf\"><\/div> -->\r\n\t\t<\/div>\r\n\t\t<div id=\"adContainerSpectate\"> <!-- spectate -->\r\n\t\t\t<div id=\"smashkarts-io_300x250_3\"><\/div> <!-- adinplay -->\r\n\t\t<\/div>\r\n\t\t<div id=\"adContainerDeath\"> <!-- death -->\r\n\r\n\t\t\t<!-- adinplay -->\r\n\t\t\t<div id=\"smashkarts-io_728x90-new\"><\/div>\r\n\t\t\t<div id=\"smashkarts-io_320x100\"><\/div>\r\n\r\n\t\t\t<!-- playwire -->\r\n\t\t\t<div id=\"pw_ondeath\"><\/div>\r\n\t\t\t<!-- <div data-pw-desk=\"leaderboard_atf\" data-pw-mobi=\"leaderboard_atf\"><\/div> -->\r\n\t\t<\/div>\r\n\t<\/div>\r\n\t<div id=\"pw-video-container\"> <!-- playwire -->\r\n\t\t<div id=\"pw-video-placeholder\"><\/div>\r\n\t<\/div>\r\n\t<div id=\"preroll\"><\/div> <!-- adinplay -->\r\n\t<iframe id=\"xsolla-iframe\"><\/iframe>\r\n<\/div>\r\n<div id=\"loader\">\r\n\t<img class=\"logo\" src=\"images\/smashkarts.png\">\r\n\t<div class=\"spinner\"><\/div>\r\n\t<div class=\"progress\">\r\n\t\t<div class=\"full\"><\/div>\r\n\t<\/div>\r\n<\/div>\r\n<div id=\"rotate-landscape\">\r\n\t<img src=\"images\/r.png\" class=\"center\">\r\n<\/div>\r\n\r\n<script src=\"https:\/\/www.gstatic.com\/firebasejs\/9.9.3\/firebase-app-compat.js\"><\/script>\r\n<script src=\"https:\/\/www.gstatic.com\/firebasejs\/9.9.3\/firebase-auth-compat.js\"><\/script>\r\n<script src=\"https:\/\/www.gstatic.com\/firebasejs\/9.9.3\/firebase-database-compat.js\"><\/script>\r\n<script src=\"https:\/\/www.gstatic.com\/firebasejs\/9.9.3\/firebase-analytics-compat.js\"><\/script>\r\n<script src=\"https:\/\/www.gstatic.com\/firebasejs\/9.9.3\/firebase-functions-compat.js\"><\/script>\r\n\r\n<script src=\"scripts\/main.js\"><\/script>\r\n<script src=\"scripts\/auth.js\"><\/script>\r\n<script src=\"scripts\/shop.js\"><\/script>\r\n<script src=\"scripts\/cc.js\"><\/script>\r\n \r\n<script src=\"scripts\/ads-common-logic.js\"><\/script>\r\n<!--<script src=\"scripts\/ads-offcanvas-logic.js\"><\/script>-->\r\n<script src=\"scripts\/ads-positioning-logic.js\"><\/script>\r\n<script src=\"scripts\/ads-injector.js\"><\/script>\r\n\r\n\r\n<script>\r\n\r\n\t\/\/Used for installing progressive web apps \r\n\tif ('serviceWorker' in navigator)\r\n\t{\r\n\t\tnavigator.serviceWorker.register('service-worker2.js');\r\n\t}\r\n\r\n\tconst firebaseConfig = {\r\n    apiKey: \"AIzaSyAdY2qq9083amKDS0R8tn2tjIKQB8mocco\",\r\n    authDomain: \"webgltest-17af1.firebaseapp.com\",\r\n    databaseURL: \"https:\/\/webgltest-17af1.firebaseio.com\",\r\n    projectId: \"webgltest-17af1\",\r\n    messagingSenderId: \"480659433590\",\r\n    appId: \"1:480659433590:web:a01ad1599e963843a0d757\",\r\n    measurementId: \"G-1W23DRFHK9\"\r\n};\r\n\r\n\t\r\n\t\/\/ Initialize Firebase\r\n\tfirebase.initializeApp(firebaseConfig);\r\n\r\n\t\r\n\r\n\tanalytics = firebase.analytics();\r\n\tgtag('config', 'G-1W23DRFHK9', {'cookie_flags': 'samesite=none;secure'}); \r\n\t\r\n\tfirebaseSetScreen(\"loading_start\");\r\n\tfirebaseLogEvent(\"loading_page_start\");\r\n\r\n\tupdateAdBlockDetected();\r\n\tupdateLoadingAdBanner();\r\n\t\r\n\tvar timerStart = Date.now();\r\n\tvar sentGameInstanceStartEvent = false;\r\n\r\n\t\/\/ choose the data file based on whether there's support for the ASTC texture compression format\r\n\tvar dataFile = \"\/cde9b7051535319df292526442914c36.data.br\";\r\n\tvar mobileDataFile = \"\/cde9b7051535319df292526442914c36.data.br\";\r\n\t\r\n\t\/\/safety check to ensure we dont try to use the mobileDataFile if the filename hasnt been parsed during the build phase\r\n\tif(!mobileDataFile.includes(\"MOBILE_DATA_FILENAME\"))\r\n\t{\r\n\t\tvar c = document.createElement(\"canvas\");\r\n\t\tvar gl = c.getContext(\"webgl\");\r\n\t\tvar gl2 = c.getContext(\"webgl2\");\r\n\t\tif ((gl && gl.getExtension('WEBGL_compressed_texture_astc')) || (gl2 && gl2.getExtension('WEBGL_compressed_texture_astc'))) \r\n\t\t{\r\n\t\t\tdataFile = mobileDataFile;\r\n\t\t}\r\n\t}\r\n\r\n\tconst buildUrl = \"Build\";\r\n\r\n\tconst loaderUrl = buildUrl + \"\/76f034cff49013ce85bd6945ebf32347.loader.js\";\r\n\tconst config = {\r\n\t\tdataUrl: buildUrl + dataFile,\r\n\t\tframeworkUrl: buildUrl + \"\/ed690d1402dd39fcf7abb15b99effdea.framework.js.br\",\r\n\t\tcodeUrl: buildUrl + \"\/250100c98afece1d27bb09b3a3d618ca.wasm.br\",\r\n\t\t\/\/ #if MEMORY_FILENAME\r\n\t\t\/\/         memoryUrl: buildUrl + \"\/\",\r\n\t\t\/\/ #endif\r\n\t\t\/\/ #if SYMBOLS_FILENAME\r\n\t\t\/\/         symbolsUrl: buildUrl + \"\/\",\r\n\t\t\/\/ #endif\r\n\t\tstreamingAssetsUrl: \"StreamingAssets\",\r\n\t\tcompanyName: \"TallTeam\",\r\n\t\tproductName: \"rr\",\r\n\t\tproductVersion: \"2.9.0\",\r\n\t};\r\n\r\n\tvar mainContainer = document.querySelector(\"#mainContainer\");\r\n\tvar gameContainer = document.querySelector(\"#gameContainer\");\r\n\tvar canvas = document.querySelector(\"#gameCanvas\");\r\n\tvar loadingBar = document.querySelector(\"#loader\");\r\n\tvar progressBarFull = document.querySelector(\"#loader .progress .full\");\r\n\tvar rotateLandscape = document.querySelector(\"#rotate-landscape\");\r\n\t\r\n\tif (isMobile())\r\n\t{\r\n\t\tmainContainer.className = \"unity-mobile\";\r\n\r\n\t\t\/\/ if(isIos())\r\n\t\t\/\/ {\r\n\t\t\/\/ \t\/\/Allow scrolling on mobile iOS so user can scroll off the top tab bar\r\n\t\t\/\/ \tdocument.body.style.overflow = \"visible\";\r\n\t\t\/\/ }\r\n\t}\r\n\telse\r\n\t{\r\n\t\trotateLandscape.id = \"rotateLandscapeOff\";\r\n\t\trotateLandscape.style.display = \"none\";\r\n\t}\r\n\tconst progress = document.querySelector(\"#loader .progress\");\r\n\tprogress.style.display = \"block\";\r\n\tprogressBarFull.style.width = \"0%\";\r\n\r\n\tvar script = document.createElement(\"script\");\r\n\tscript.src = loaderUrl;\r\n\r\n\tvar progressCreateUnityInstance = 0;\r\n\tvar progressPostCreateUnityInstance = 0;\r\n\tvar updateProgressInterval = setInterval(updateProgress, 100);\r\n\r\n\tvar gameInstance;\r\n\tscript.onload = () =>\r\n\t{\r\n\t\tcreateUnityInstance(canvas, config, (progress) =>\r\n\t\t{\r\n\t\t\tprogressCreateUnityInstance = 100 * progress;\r\n\t\t\tsetProgressWidth();\r\n\t\t}).then((unityInstance) =>\r\n\t\t{\r\n\t\t\tif (isMobile()) document.body.style.background = \"#000000\";\r\n\t\t\tloadingBar.style.display = \"none\";\r\n\t\t\twindow.unityGame = unityInstance;\r\n\t\t\tgameInstance = unityInstance;\r\n\r\n\t\t\tif (updateProgressInterval) clearInterval(updateProgressInterval);\r\n\r\n\t\t\tvar lt = Date.now() - timerStart;\r\n\t\t\tfirebaseLogEventWithParam(\"loading_page_complete\", \"time\", lt);\r\n\t\t\tsetV(lt);\r\n\r\n\t\t\tonUnityLoadComplete();\r\n\t\t}).catch((message) =>\r\n\t\t{\r\n\t\t\talert(\"TT UnityLoader Error\" + message);\r\n\t\t});\r\n\t};\r\n\tdocument.body.appendChild(script);\r\n\r\n\tfunction onUnityLoadComplete()\r\n\t{\r\n\t\t\/\/tell unity what ad providers are enabled\r\n\t\twindow.unityGame.SendMessage(unityFirebaseGameOjbectName, \"SetDisplayAdProvider\", displayAdProvider);\r\n\t\twindow.unityGame.SendMessage(unityFirebaseGameOjbectName, \"SetVideoAdProvider\", videoAdProvider);\r\n\t\t\r\n\t\ttrySendAdBlockDetectedMessage();\r\n\t}\r\n\r\n\tfunction updateProgress()\r\n\t{\r\n\t\tif (progressCreateUnityInstance > 85)\r\n\t\t{\r\n\t\t\tprogressPostCreateUnityInstance += 1;\r\n\t\t\tsetProgressWidth();\r\n\t\t}\r\n\t}\r\n\r\n\tfunction setProgressWidth()\r\n\t{\r\n\t\tif (progressCreateUnityInstance == 100.0)\r\n\t\t{\r\n\t\t\tprogressBarFull.style.width = \"100%\";\r\n\t\t}\r\n\t\telse\r\n\t\t{\r\n\t\t\tvar percent;\r\n\t\t\tif (isMobile())\r\n\t\t\t{\r\n\t\t\t\tpercent = progressCreateUnityInstance * 0.6 + (progressPostCreateUnityInstance * 0.5 * 0.2 + progressCreateUnityInstance * 0.5 * 0.2 * 0.05);\r\n\t\t\t\tpercent = Math.min(percent, 90);\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\tpercent = progressCreateUnityInstance * 0.9 + progressPostCreateUnityInstance * 0.1;\r\n\t\t\t\tpercent = Math.min(percent, 95);\r\n\t\t\t}\r\n\t\t\tprogressBarFull.style.width = percent + \"%\";\r\n\t\t}\r\n\t}\r\n\r\n\tfunction setAdinPlaySubIdForABTest(val)\r\n\t{\r\n\t\t\/\/set adinplay subid which enables segmented daily reports\r\n\t\taiptag.subid = val;\r\n\t}\r\n\r\n<\/script>\r\n<\/body>\r\n<\/html>");
+document.close()
+
+
+});
+</script>
+</body>
 </html>
