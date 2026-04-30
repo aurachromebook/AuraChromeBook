@@ -1,3 +1,421 @@
+
+
+/* ===== ACCOUNT SYSTEM STYLES ===== */
+
+/* Account Loading Screen */
+#account-loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 50%, #8ab4f8 100%);
+    z-index: 99995;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+}
+
+.account-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.account-loading-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.account-loading-email {
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.account-loading-status {
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.account-loading-bar {
+    width: 280px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.account-loading-progress {
+    height: 100%;
+    width: 0%;
+    background: white;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.account-loading-details {
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    min-height: 18px;
+}
+
+/* Account Modal */
+#account-modal {
+    font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+}
+
+.account-box {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 40px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    backdrop-filter: blur(20px);
+}
+
+.account-logo {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #1a73e8, #8ab4f8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 4px 20px rgba(26,115,232,0.3);
+}
+
+.account-box h2 {
+    margin: 0 0 8px 0;
+    color: #202124;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.account-subtitle {
+    color: #5f6368;
+    font-size: 14px;
+    margin: 0 0 30px 0;
+}
+
+.account-input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.account-input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #5f6368;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.account-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid #dadce0;
+    background: white;
+    color: #202124;
+    outline: none;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.account-input:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+}
+
+.account-username-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid #dadce0;
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.account-username-wrapper:focus-within {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.1);
+}
+
+.account-username-wrapper .account-input {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    flex: 1;
+}
+
+.account-domain {
+    padding: 14px 16px;
+    color: #5f6368;
+    font-size: 14px;
+    font-weight: 500;
+    background: #f8f9fa;
+    border-left: 1px solid #dadce0;
+    white-space: nowrap;
+}
+
+.account-email-preview {
+    font-size: 12px;
+    color: #1a73e8;
+    margin-top: 6px;
+    font-weight: 500;
+    min-height: 18px;
+}
+
+.account-btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #1a73e8, #4285f4);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 15px;
+    font-family: inherit;
+}
+
+.account-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(26,115,232,0.3);
+}
+
+.account-btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: #1a73e8;
+    border: 2px solid #dadce0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    font-family: inherit;
+}
+
+.account-btn-secondary:hover {
+    background: rgba(26,115,232,0.05);
+    border-color: #1a73e8;
+}
+
+.account-btn-text {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: #5f6368;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-family: inherit;
+}
+
+.account-btn-text:hover {
+    color: #1a73e8;
+}
+
+.account-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: #dadce0;
+}
+
+.account-divider::before,
+.account-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #dadce0;
+}
+
+.account-divider span {
+    padding: 0 15px;
+    font-size: 13px;
+    color: #5f6368;
+}
+
+.account-error {
+    color: #ea4335;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 18px;
+    font-weight: 500;
+}
+
+/* Lock Screen Email */
+.lock-email {
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    margin: -15px 0 20px 0;
+    font-weight: 400;
+}
+
+/* Lock Screen Accounts Section */
+.lock-accounts-section {
+    position: absolute;
+    bottom: 100px;
+    width: 100%;
+    max-width: 360px;
+    padding: 0 20px;
+}
+
+.lock-accounts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 5px;
+}
+
+.lock-accounts-header span {
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.lock-add-account-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+}
+
+.lock-add-account-btn:hover {
+    background: rgba(255,255,255,0.25);
+}
+
+.lock-accounts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.lock-account-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 15px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    backdrop-filter: blur(10px);
+}
+
+.lock-account-item:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(4px);
+}
+
+.lock-account-item.active {
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.lock-account-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a73e8, #8ab4f8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.lock-account-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.lock-account-name {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lock-account-email {
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lock-account-remove {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 16px;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.lock-account-item:hover .lock-account-remove {
+    opacity: 1;
+}
+
+.lock-account-remove:hover {
+    background: rgba(234, 67, 53, 0.2);
+    color: #ffdad6;
+}
+
+/* ===== EXISTING STYLES ===== */
 /* Dynamic Aura OS Theme Variables */
 :root {
     --sys-base: rgba(255, 255, 255, 0.85); 
