@@ -918,6 +918,43 @@ function initTabCloak() {
     }
 })();
 
+function goIntoAboutBlank() {
+    // Prevent multiple about:blank tabs
+    if (window.self !== window.top) {
+        return;
+    }
+
+    if (sessionStorage.getItem('aboutblank_opened')) {
+        return;
+    }
+    sessionStorage.setItem('aboutblank_opened', 'true');
+
+    const currentUrl = window.location.href;
+    const newWindow = window.open('about:blank', '_blank');
+
+    if (newWindow) {
+        newWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Aura OS</title>
+                <style>
+                    body { margin: 0; overflow: hidden; }
+                    iframe { width: 100vw; height: 100vh; border: none; }
+                </style>
+            </head>
+            <body>
+                <iframe src="${currentUrl}" allowfullscreen></iframe>
+            </body>
+            </html>
+        `);
+        newWindow.document.close();
+
+        // Close the original tab
+        window.close();
+    }
+}
+
 // --- ABOUT:BLANK CLOAKING SYSTEM ---
 let aboutBlankPending = false;
 
