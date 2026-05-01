@@ -1471,7 +1471,10 @@ function trackActiveApps() {
                 'aceattorney-window': '⚖️', 'callofduty-window': '🔫', 'stateio-window': '🗺️',
                 'undertaleyellow-window': '💛', 'yanderesim-window': '🔪', 'robloxanimator-window': '🎬',
                 'doodlejump-window': '🐰', 'drivingsimulator-window': '🚗', 'effingzombies-window': '🧟',
-                'linkcreator-window': '🔗'
+                'linkcreator-window': '🔗',
+                'granny2-window': '👵',
+                'pokemon-window': '⚡',
+                '1v1lol-window': '🔫'
             };
             activeWindows.push({ id: appId, name: name, icon: iconMap[appId] || '📦' });
         }
