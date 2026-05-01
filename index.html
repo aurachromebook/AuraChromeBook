@@ -8,6 +8,7 @@
     <link id="page-favicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
     <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body data-theme="dark">
     <div id="boot-screen">
@@ -48,12 +49,18 @@
     <!-- Update V1.8 Modal -->
     <div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center;">
         <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
-            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V1.8 is Here! <span style="font-size:14px;color:var(--sys-text-muted)">APR 27</span></h2>
+            <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Update V1.9 is Here! <span style="font-size:14px;color:var(--sys-text-muted)">APR 30</span></h2>
             <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
                 <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
                 <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
                     <li><strong>👤 Account System</strong> - Create and manage Aura OS accounts with @auraos.com</li>
-                    <li><strong>🟥 Fixed Roblox</strong> - Roblox now loads correctly</li>
+                    <li><strong>🏠 Fixed Granny 3</strong> - Granny 3 now loads correctly</li>
+                    <li><strong>👵 Added Granny 2</strong> - New horror game available</li>
+                    <li><strong>⚡ Added Pokemon</strong> - Pokemon game now available</li>
+                    <li><strong>🏎️ Fixed Smash Karts</strong> - Smash Karts now loads correctly</li>
+                    <li><strong>🎵 Aura Music Media Controller</strong> - Control music from taskbar</li>
+                    <li><strong>🎤 Fixed Friday Night Funkin</strong> - FNF now loads correctly</li>
+                    <li><strong>🔫 Added 1v1.LOL</strong> - New battle royale shooter available</li>
                     <li><strong>🔗 Auto Link Creator Removed</strong> - Now a button you can click instead</li>
                     <li><strong>📌 Continue Where You Left Off</strong> - Active apps shown in launcher</li>
                     <li><strong>🔋 Battery Saver</strong> - Saves data usage to a file automatically</li>
@@ -405,15 +412,20 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Version 1.8 APR 27 (Latest)</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Version 1.9 APR 30 (Latest)</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
                         <li>👤 Account System - Create and manage Aura OS accounts</li>
-                        <li>🟥 Fixed Roblox - now loads correctly</li>
+                        <li>🏠 Fixed Granny 3 - now loads correctly</li>
+                        <li>👵 Added Granny 2 - new horror game</li>
+                        <li>⚡ Added Pokemon - new RPG game</li>
+                        <li>🏎️ Fixed Smash Karts - now loads correctly</li>
+                        <li>🎵 Aura Music Media Controller - control from taskbar</li>
+                        <li>🎤 Fixed Friday Night Funkin - now loads correctly</li>
+                        <li>🔫 Added 1v1.LOL - new battle royale shooter</li>
                         <li>Auto Link Creator removed - now accessible via button</li>
                         <li>Continue where you left off - active apps in launcher</li>
                         <li>Battery Saver - saves data usage to file automatically</li>
                         <li>Added Doodle Jump, Driving Simulator, Effing Zombies</li>
-                        <li>Media Control - control Aura Music from taskbar</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -473,6 +485,9 @@
                         <div class="store-card"><div class="store-icon">💛</div><div class="store-info"><strong>Undertale Yellow</strong><span>RPG • 4.9 ★</span></div><button id="install-btn-undertaleyellow-window" class="store-btn" onclick="installApp('undertaleyellow-window', '💛', 'Undertale Yellow', this)">Install</button><div class="progress-container" id="progress-container-undertaleyellow-window"><div class="progress-bar" id="progress-bar-undertaleyellow-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🔪</div><div class="store-info"><strong>Yandere Simulator</strong><span>Simulation • 4.6 ★</span></div><button id="install-btn-yanderesim-window" class="store-btn" onclick="installApp('yanderesim-window', '🔪', 'Yandere Simulator', this)">Install</button><div class="progress-container" id="progress-container-yanderesim-window"><div class="progress-bar" id="progress-bar-yanderesim-window"></div></div></div>
                         <div class="store-card"><div class="store-icon">🟥</div><div class="store-info"><strong>Roblox</strong><span>Adventure • 4.8 ★</span></div><button id="install-btn-roblox-window" class="store-btn" onclick="installApp('roblox-window', '🟥', 'Roblox', this)">Install</button><div class="progress-container" id="progress-container-roblox-window"><div class="progress-bar" id="progress-bar-roblox-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon">👵</div><div class="store-info"><strong>Granny 2</strong><span>Horror • 4.6 ★</span></div><button id="install-btn-granny2-window" class="store-btn" onclick="installApp('granny2-window', '👵', 'Granny 2', this)">Install</button><div class="progress-container" id="progress-container-granny2-window"><div class="progress-bar" id="progress-bar-granny2-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon">⚡</div><div class="store-info"><strong>Pokemon</strong><span>RPG • 4.9 ★</span></div><button id="install-btn-pokemon-window" class="store-btn" onclick="installApp('pokemon-window', '⚡', 'Pokemon', this)">Install</button><div class="progress-container" id="progress-container-pokemon-window"><div class="progress-bar" id="progress-bar-pokemon-window"></div></div></div>
+                        <div class="store-card"><div class="store-icon">🔫</div><div class="store-info"><strong>1v1.LOL</strong><span>Battle Royale • 4.7 ★</span></div><button id="install-btn-1v1lol-window" class="store-btn" onclick="installApp('1v1lol-window', '🔫', '1v1.LOL', this)">Install</button><div class="progress-container" id="progress-container-1v1lol-window"><div class="progress-bar" id="progress-bar-1v1lol-window"></div></div></div>
                     </div>
                 </div>
                 <div id="store-apps-tab" class="store-tab-content">
@@ -523,6 +538,9 @@
         <div class="window" id="doodlejump-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="doodlejump-window-header"><span class="window-title">🐰 Doodle Jump</span><div><button class="win-btn" onclick="minimizeApp('doodlejump-window')">−</button><button class="win-btn" onclick="maximizeApp('doodlejump-window')">□</button><button class="win-btn close-btn" onclick="closeApp('doodlejump-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/DoodleJump.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="drivingsimulator-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="drivingsimulator-window-header"><span class="window-title">🚗 Driving Simulator</span><div><button class="win-btn" onclick="minimizeApp('drivingsimulator-window')">−</button><button class="win-btn" onclick="maximizeApp('drivingsimulator-window')">□</button><button class="win-btn close-btn" onclick="closeApp('drivingsimulator-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/Driving Simulator.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="effingzombies-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="effingzombies-window-header"><span class="window-title">🧟 Effing Zombies</span><div><button class="win-btn" onclick="minimizeApp('effingzombies-window')">−</button><button class="win-btn" onclick="maximizeApp('effingzombies-window')">□</button><button class="win-btn close-btn" onclick="closeApp('effingzombies-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/effing zombies.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="granny2-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="granny2-window-header"><span class="window-title">👵 Granny 2</span><div><button class="win-btn" onclick="minimizeApp('granny2-window')">−</button><button class="win-btn" onclick="maximizeApp('granny2-window')">□</button><button class="win-btn close-btn" onclick="closeApp('granny2-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/granny2.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="pokemon-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="pokemon-window-header"><span class="window-title">⚡ Pokemon</span><div><button class="win-btn" onclick="minimizeApp('pokemon-window')">−</button><button class="win-btn" onclick="maximizeApp('pokemon-window')">□</button><button class="win-btn close-btn" onclick="closeApp('pokemon-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/pokemon-wip.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="1v1lol-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="1v1lol-window-header"><span class="window-title">🔫 1v1.LOL</span><div><button class="win-btn" onclick="minimizeApp('1v1lol-window')">−</button><button class="win-btn" onclick="maximizeApp('1v1lol-window')">□</button><button class="win-btn close-btn" onclick="closeApp('1v1lol-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/1v1 LOL.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="linkcreator-window" style="display: none; width: 600px; height: 500px;">
             <div class="window-header" id="linkcreator-window-header">
                 <span class="window-title">🔗 Link Creator</span>
@@ -568,6 +586,9 @@
             <div class="launcher-item" data-app-id="files-window" data-icon="📁" data-name="Files" onclick="openApp('files-window')"><div class="l-icon">📁</div><span class="l-text">Files</span></div>
             <div class="launcher-item" data-app-id="robloxanimator-window" data-icon="🎬" data-name="Roblox Animator V1.7" onclick="openApp('robloxanimator-window')"><div class="l-icon">🎬</div><span class="l-text">Roblox Animator V1.7</span></div>
             <div class="launcher-item" data-app-id="linkcreator-window" data-icon="🔗" data-name="Link Creator" onclick="openApp('linkcreator-window')"><div class="l-icon">🔗</div><span class="l-text">Link Creator</span></div>
+            <div class="launcher-item" data-app-id="granny2-window" data-icon="👵" data-name="Granny 2" onclick="openApp('granny2-window')"><div class="l-icon">👵</div><span class="l-text">Granny 2</span></div>
+            <div class="launcher-item" data-app-id="pokemon-window" data-icon="⚡" data-name="Pokemon" onclick="openApp('pokemon-window')"><div class="l-icon">⚡</div><span class="l-text">Pokemon</span></div>
+            <div class="launcher-item" data-app-id="1v1lol-window" data-icon="🔫" data-name="1v1.LOL" onclick="openApp('1v1lol-window')"><div class="l-icon">🔫</div><span class="l-text">1v1.LOL</span></div>
         </div>
     </div>
 
