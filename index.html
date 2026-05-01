@@ -182,6 +182,13 @@
                 </div>
                 <h2 id="lock-username" class="lock-username">User</h2>
                 <div id="lock-email" class="lock-email"></div>
+                <button class="lock-option-btn" onclick="goIntoAboutBlank()" style="margin-bottom: 20px; background: rgba(255,255,255,0.2); font-size: 12px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <line x1="3" y1="3" x2="21" y2="21"/>
+                    </svg>
+                    🔒 Go into about:blank
+                </button>
                 <div class="lock-input-wrapper">
                     <input type="password" id="lock-password" class="lock-password-input" placeholder="Enter password">
                     <button class="lock-submit-btn" onclick="unlockOS()">
