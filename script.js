@@ -1078,6 +1078,456 @@ function initAboutBlankSettings() {
     }
 }
 
+
+
+// ===== PLAY STORE V2 SYSTEM =====
+// Game database with metadata
+const PS_GAMES = {
+    'doodlejump-window': { id: 'doodlejump-window', name: 'Doodle Jump', icon: '🐰', category: 'arcade', rating: 4.6, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Jump endlessly upward in this classic arcade game.', controls: 'Arrow keys to move left/right' },
+    'drivingsimulator-window': { id: 'drivingsimulator-window', name: 'Driving Simulator', icon: '🚗', category: 'simulation', rating: 4.5, banner: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800', desc: 'Realistic driving simulation experience.', controls: 'WASD to drive, Space to brake' },
+    'effingzombies-window': { id: 'effingzombies-window', name: 'Effing Zombies', icon: '🧟', category: 'action', rating: 4.4, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'Survive waves of zombie attacks.', controls: 'Mouse to aim, Click to shoot' },
+    'infinitecraft-window': { id: 'infinitecraft-window', name: 'Infinite Craft', icon: '⚗️', category: 'simulation', rating: 4.6, banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800', desc: 'Combine elements to create new items.', controls: 'Drag and drop to combine' },
+    'paperio-window': { id: 'paperio-window', name: 'Paper.io', icon: '📄', category: 'arcade', rating: 4.5, banner: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=800', desc: 'Capture territory in this addictive strategy game.', controls: 'Arrow keys to move' },
+    'parkingfury-window': { id: 'parkingfury-window', name: 'Parking Fury', icon: '🅿️', category: 'racing', rating: 4.4, banner: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800', desc: 'Master the art of parking under pressure.', controls: 'Arrow keys to drive' },
+    'granny3-window': { id: 'granny3-window', name: 'Granny 3', icon: '👵', category: 'horror', rating: 4.5, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'Escape from Granny's haunted house.', controls: 'WASD to move, E to interact' },
+    'granny2-window': { id: 'granny2-window', name: 'Granny 2', icon: '👵', category: 'horror', rating: 4.6, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'The sequel horror escape game.', controls: 'WASD to move, E to interact' },
+    'fridaynightfunk-window': { id: 'fridaynightfunk-window', name: 'Friday Night Funkin', icon: '🎤', category: 'arcade', rating: 4.8, banner: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800', desc: 'Rhythm battle game with catchy beats.', controls: 'Arrow keys to match beats' },
+    'geometrydash-window': { id: 'geometrydash-window', name: 'Geometry Dash', icon: '📐', category: 'arcade', rating: 4.9, banner: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800', desc: 'Jump and fly through dangerous passages.', controls: 'Space/Click to jump' },
+    'smashcarts-window': { id: 'smashcarts-window', name: 'Smash Karts', icon: '🏎️', category: 'racing', rating: 4.8, banner: 'https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?q=80&w=800', desc: 'Kart racing battle royale with weapons.', controls: 'WASD to drive, Space to shoot' },
+    'fnae-window': { id: 'fnae-window', name: 'Five Nights', icon: '🐻', category: 'horror', rating: 4.5, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'Survive the night shift at the pizzeria.', controls: 'Mouse to interact' },
+    'eaglercraft-window': { id: 'eaglercraft-window', name: 'Eaglercraft', icon: '⛏️', category: 'simulation', rating: 4.8, banner: 'https://images.unsplash.com/photo-1587573089734-09cb69c0f2b4?q=80&w=800', desc: 'Minecraft-style sandbox building game.', controls: 'WASD to move, Mouse to look' },
+    'granny-window': { id: 'granny-window', name: 'Granny', icon: '👵', category: 'horror', rating: 4.3, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'Escape from Granny's house in 5 days.', controls: 'WASD to move, E to interact' },
+    'escaperoad-window': { id: 'escaperoad-window', name: 'Escape Road', icon: '🚗', category: 'racing', rating: 4.6, banner: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800', desc: 'High-speed escape driving game.', controls: 'Arrow keys to drive' },
+    'escaperoad2-window': { id: 'escaperoad2-window', name: 'Escape Road 2', icon: '🏎️', category: 'racing', rating: 4.7, banner: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800', desc: 'Sequel with more vehicles and maps.', controls: 'Arrow keys to drive' },
+    'solarsmash-window': { id: 'solarsmash-window', name: 'Solar Smash', icon: '🪐', category: 'simulation', rating: 4.4, banner: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800', desc: 'Destroy planets with various weapons.', controls: 'Click to select weapons' },
+    'brainrot-window': { id: 'brainrot-window', name: 'Brainrot', icon: '🧠', category: 'puzzle', rating: 4.1, banner: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?q=80&w=800', desc: 'Steal the brainrot in this puzzle game.', controls: 'Mouse to interact' },
+    'ragdollhit-window': { id: 'ragdollhit-window', name: 'Ragdoll Hit', icon: '🥊', category: 'action', rating: 4.2, banner: 'https://images.unsplash.com/photo-1552072092-7f9b8d63efcb?q=80&w=800', desc: 'Physics-based ragdoll fighting game.', controls: 'Mouse to aim and swing' },
+    'ragdollarchers-window': { id: 'ragdollarchers-window', name: 'Ragdoll Archers', icon: '🏹', category: 'action', rating: 4.5, banner: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=800', desc: 'Archery with realistic ragdoll physics.', controls: 'Mouse to aim and shoot' },
+    '99nights-window': { id: '99nights-window', name: '99 Nights', icon: '🌲', category: 'survival', rating: 4.6, banner: 'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=800', desc: 'Survive 99 nights in the forest.', controls: 'WASD to move, Click to attack' },
+    'rocketleague-window': { id: 'rocketleague-window', name: 'Rocket League', icon: '⚽', category: 'sports', rating: 4.9, banner: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=800', desc: 'Soccer with rocket-powered cars.', controls: 'WASD to drive, Space to jump' },
+    'bballrandom-window': { id: 'bballrandom-window', name: 'Basketball Random', icon: '🏀', category: 'sports', rating: 4.4, banner: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800', desc: 'Randomized basketball physics game.', controls: 'Arrow keys to move' },
+    'bballbros-window': { id: 'bballbros-window', name: 'Basketball Bros', icon: '🏀', category: 'sports', rating: 4.5, banner: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800', desc: '2-player basketball showdown.', controls: 'WASD and Arrow keys' },
+    'bballlegend-window': { id: 'bballlegend-window', name: 'Basketball Legend', icon: '🏀', category: 'sports', rating: 4.6, banner: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800', desc: 'Become a basketball legend.', controls: 'Arrow keys to move, Space to shoot' },
+    'roblox-window': { id: 'roblox-window', name: 'Roblox', icon: '🟥', category: 'adventure', rating: 4.8, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Play millions of user-created games.', controls: 'WASD to move, Mouse to look' },
+    'gtavice-window': { id: 'gtavice-window', name: 'GTA Vice City', icon: '🚔', category: 'action', rating: 4.9, banner: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800', desc: 'Classic open-world crime adventure.', controls: 'WASD to move, Mouse to aim' },
+    'pixelfruits-window': { id: 'pixelfruits-window', name: 'Pixel Fruits', icon: '🍎', category: 'arcade', rating: 4.7, banner: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=800', desc: 'Slice fruits in this pixel art game.', controls: 'Mouse to slice' },
+    'aceattorney-window': { id: 'aceattorney-window', name: 'Ace Attorney', icon: '⚖️', category: 'rpg', rating: 4.8, banner: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=800', desc: 'Courtroom drama visual novel.', controls: 'Click to advance dialogue' },
+    'callofduty-window': { id: 'callofduty-window', name: 'Call of Duty', icon: '🔫', category: 'action', rating: 4.7, banner: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800', desc: 'First-person shooter action.', controls: 'WASD to move, Mouse to aim' },
+    'stateio-window': { id: 'stateio-window', name: 'State.io', icon: '🗺️', category: 'strategy', rating: 4.5, banner: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800', desc: 'Conquer territories in this strategy game.', controls: 'Click to send troops' },
+    'undertaleyellow-window': { id: 'undertaleyellow-window', name: 'Undertale Yellow', icon: '💛', category: 'rpg', rating: 4.9, banner: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800', desc: 'Fan-made Undertale prequel.', controls: 'Arrow keys to move, Z to interact' },
+    'yanderesim-window': { id: 'yanderesim-window', name: 'Yandere Simulator', icon: '🔪', category: 'simulation', rating: 4.6, banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800', desc: 'Stealth simulation game.', controls: 'WASD to move, E to interact' },
+    'pokemon-window': { id: 'pokemon-window', name: 'Pokemon', icon: '⚡', category: 'rpg', rating: 4.9, banner: 'https://images.unsplash.com/photo-1542779283-429eb70b4d98?q=80&w=800', desc: 'Catch and train Pokemon in this RPG adventure.', controls: 'Arrow keys to move, Z to interact' },
+    '1v1lol-window': { id: '1v1lol-window', name: '1v1.LOL', icon: '🔫', category: 'action', rating: 4.7, banner: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800', desc: 'Build and battle in this competitive shooter.', controls: 'WASD to move, Mouse to aim/build' }
+};
+
+// Play time tracking (stored per account)
+function getPlayTimeData() {
+    const data = getAccountData('playtime_data');
+    return data ? JSON.parse(data) : {};
+}
+
+function savePlayTimeData(data) {
+    saveAccountData('playtime_data', JSON.stringify(data));
+}
+
+function getRecentPlays() {
+    const data = getAccountData('recent_plays');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveRecentPlays(data) {
+    saveAccountData('recent_plays', JSON.stringify(data));
+}
+
+function getFavorites() {
+    const data = getAccountData('ps_favorites');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveFavorites(data) {
+    saveAccountData('ps_favorites', JSON.stringify(data));
+}
+
+// Track when a game is opened
+const originalOpenAppForPS = openApp;
+openApp = function(appId) {
+    const result = originalOpenAppForPS(appId);
+
+    // Track play time
+    if (PS_GAMES[appId]) {
+        trackGameOpen(appId);
+    }
+
+    return result;
+};
+
+function trackGameOpen(appId) {
+    const now = Date.now();
+
+    // Update play time data
+    let playTimeData = getPlayTimeData();
+    if (!playTimeData[appId]) {
+        playTimeData[appId] = { totalSeconds: 0, lastOpened: now, sessions: 0 };
+    }
+    playTimeData[appId].lastOpened = now;
+    playTimeData[appId].sessions++;
+    savePlayTimeData(playTimeData);
+
+    // Update recent plays (keep last 10)
+    let recent = getRecentPlays();
+    recent = recent.filter(id => id !== appId);
+    recent.unshift(appId);
+    recent = recent.slice(0, 10);
+    saveRecentPlays(recent);
+
+    // Refresh Play Store UI if open
+    if (document.getElementById('store-window').style.display === 'flex') {
+        renderPlayStoreHome();
+        renderPlayStoreSidebar();
+    }
+}
+
+// Format play time
+function formatPlayTime(seconds) {
+    if (seconds < 60) return seconds + 's';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    if (mins === 0) return hours + 'h';
+    return hours + 'h ' + mins + 'm';
+}
+
+// Render sidebar game list
+function renderPlayStoreSidebar() {
+    const list = document.getElementById('ps-game-list');
+    if (!list) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const recent = getRecentPlays();
+
+    let html = '';
+
+    // Show installed games in sidebar
+    installed.forEach(app => {
+        const game = PS_GAMES[app.id];
+        if (game) {
+            const isActive = recent.length > 0 && recent[0] === app.id;
+            html += `<div class="ps-game-item ${isActive ? 'active' : ''}" onclick="playStoreSelectGame('${app.id}')">
+                <div class="ps-game-icon">${game.icon}</div>
+                <span>${game.name}</span>
+            </div>`;
+        }
+    });
+
+    if (installed.length === 0) {
+        html = '<div style="padding: 20px; text-align: center; color: #9aa0a6; font-size: 12px;">No games installed</div>';
+    }
+
+    list.innerHTML = html;
+}
+
+// Select a game in the sidebar
+function playStoreSelectGame(appId) {
+    const game = PS_GAMES[appId];
+    if (!game) return;
+
+    showPlayStoreTab('home');
+    renderFeaturedGame(appId);
+}
+
+// Render featured game banner
+function renderFeaturedGame(appId) {
+    const game = PS_GAMES[appId];
+    if (!game) return;
+
+    const playTimeData = getPlayTimeData();
+    const pt = playTimeData[appId] || { totalSeconds: 0, sessions: 0 };
+    const timeStr = formatPlayTime(pt.totalSeconds);
+
+    const featured = document.getElementById('ps-featured-game');
+    if (!featured) return;
+
+    featured.innerHTML = `
+        <div class="ps-featured-banner">
+            <img src="${game.banner}" alt="${game.name}" onerror="this.style.display='none'">
+            <div class="ps-featured-overlay">
+                <div class="ps-featured-tags">
+                    <span class="ps-tag full">Full</span>
+                    <span class="ps-tag">3D</span>
+                    <span class="ps-tag">${game.category.charAt(0).toUpperCase() + game.category.slice(1)}</span>
+                </div>
+                <h2 class="ps-featured-title">${game.name}</h2>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button class="ps-play-btn" onclick="openApp('${appId}')">▶ Play</button>
+                    <button class="ps-more-btn" onclick="toggleFavorite('${appId}')" title="Favorite">⭐</button>
+                    <button class="ps-more-btn" onclick="uninstallPlayStoreGame('${appId}')" title="Uninstall">🗑️</button>
+                </div>
+                <div class="ps-stats-row">
+                    <div class="ps-stat"><span>⏱️</span> <strong>Playtime</strong> ${timeStr}</div>
+                    <div class="ps-stat"><span>🔥</span> <strong>Sessions</strong> ${pt.sessions}</div>
+                    <div class="ps-stat"><span>⭐</span> <strong>Rating</strong> ${game.rating}/5</div>
+                </div>
+            </div>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-top: 15px;">
+            <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #c5c5c5;">${game.desc}</p>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <h4 style="margin: 0 0 8px; font-size: 13px; color: #9aa0a6;">Controls</h4>
+                <p style="margin: 0; font-size: 13px; color: #c5c5c5;">${game.controls}</p>
+            </div>
+        </div>
+    `;
+}
+
+// Render Home tab
+function renderPlayStoreHome() {
+    const recent = getRecentPlays();
+    const emptyDiv = document.getElementById('ps-home-empty');
+    const contentDiv = document.getElementById('ps-home-content');
+    const recentSection = document.getElementById('ps-recent-section');
+    const recentGrid = document.getElementById('ps-recent-grid');
+
+    if (recent.length === 0) {
+        if (emptyDiv) emptyDiv.style.display = 'block';
+        if (contentDiv) contentDiv.style.display = 'none';
+        return;
+    }
+
+    if (emptyDiv) emptyDiv.style.display = 'none';
+    if (contentDiv) contentDiv.style.display = 'block';
+
+    // Show featured = most recent
+    renderFeaturedGame(recent[0]);
+
+    // Show recent grid
+    if (recentSection && recentGrid) {
+        recentSection.style.display = 'block';
+        recentGrid.innerHTML = recent.slice(1).map(appId => {
+            const game = PS_GAMES[appId];
+            if (!game) return '';
+            return `<div class="ps-store-card" onclick="playStoreSelectGame('${appId}')">
+                <div class="card-icon">${game.icon}</div>
+                <div class="card-title">${game.name}</div>
+                <div class="card-meta">${game.category} • ⭐${game.rating}</div>
+            </div>`;
+        }).join('');
+    }
+}
+
+// Render Library tab
+function renderPlayStoreLibrary() {
+    const grid = document.getElementById('ps-library-grid');
+    const empty = document.getElementById('ps-library-empty');
+    if (!grid) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const playTimeData = getPlayTimeData();
+
+    if (installed.length === 0) {
+        grid.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        return;
+    }
+
+    grid.style.display = 'grid';
+    if (empty) empty.style.display = 'none';
+
+    grid.innerHTML = installed.map(app => {
+        const game = PS_GAMES[app.id];
+        if (!game) return '';
+        const pt = playTimeData[app.id] || { totalSeconds: 0 };
+        const timeStr = formatPlayTime(pt.totalSeconds);
+        return `<div class="ps-lib-card" onclick="openApp('${app.id}')">
+            <div class="lib-icon">${game.icon}</div>
+            <div class="lib-title">${game.name}</div>
+            <div class="lib-playtime">⏱️ ${timeStr}</div>
+        </div>`;
+    }).join('');
+}
+
+// Render Store tab
+function renderPlayStoreStore() {
+    const grid = document.getElementById('ps-store-grid');
+    if (!grid) return;
+
+    const installed = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    const installedIds = installed.map(a => a.id);
+
+    let html = '';
+    Object.values(PS_GAMES).forEach(game => {
+        const isInstalled = installedIds.includes(game.id);
+        html += `<div class="ps-store-card" data-category="${game.category}">
+            <div class="card-icon">${game.icon}</div>
+            <div class="card-title">${game.name}</div>
+            <div class="card-meta">${game.category} • ⭐${game.rating}</div>
+            <div class="install-overlay">
+                ${isInstalled 
+                    ? `<button onclick="openApp('${game.id}')">▶ Play</button>`
+                    : `<button onclick="installPlayStoreGame('${game.id}', '${game.icon}', '${game.name}')">⬇ Install</button>`
+                }
+            </div>
+        </div>`;
+    });
+
+    grid.innerHTML = html;
+}
+
+// Install game from Play Store
+function installPlayStoreGame(appId, icon, name) {
+    const launcherList = document.getElementById('launcher-list');
+    const existingItem = launcherList ? launcherList.querySelector(`[data-app-id="${appId}"]`) : null;
+    if (existingItem) {
+        notificationMgr.showNotification({ title: "Already Installed", message: `${name} is already installed.`, icon: "sparkles" });
+        return;
+    }
+
+    // Simulate install progress
+    notificationMgr.showNotification({ title: "Installing...", message: `${name} is being installed.`, icon: "sparkles" });
+
+    setTimeout(() => {
+        restoreAppToLauncher(appId, icon, name);
+        saveAppToStorage(appId, icon, name);
+
+        notificationMgr.showNotification({ title: "Installed!", message: `${name} has been added to your library.`, icon: "sparkles" });
+
+        // Refresh UI
+        renderPlayStoreSidebar();
+        renderPlayStoreLibrary();
+        renderPlayStoreStore();
+    }, 1000);
+}
+
+// Uninstall game
+function uninstallPlayStoreGame(appId) {
+    const game = PS_GAMES[appId];
+    if (!game) return;
+
+    if (!confirm(`Remove ${game.name}? All playtime data will be kept.`)) return;
+
+    // Remove from taskbar
+    const tbIcon = document.getElementById('taskbar-' + appId);
+    if (tbIcon) tbIcon.remove();
+
+    // Remove from launcher
+    document.querySelectorAll('.launcher-item').forEach(item => {
+        if (item.getAttribute('onclick') === `openApp('${appId}')`) item.remove();
+    });
+
+    // Update storage
+    let savedApps = JSON.parse(getAccountData('installed_apps') || localStorage.getItem('os_installed_apps') || '[]');
+    savedApps = savedApps.filter(app => app.id !== appId);
+    localStorage.setItem('os_installed_apps', JSON.stringify(savedApps));
+    if (currentAccount) saveAccountData('installed_apps', JSON.stringify(savedApps));
+
+    notificationMgr.showNotification({ title: "Uninstalled", message: `${game.name} has been removed.`, icon: "sparkles" });
+
+    // Refresh UI
+    renderPlayStoreSidebar();
+    renderPlayStoreLibrary();
+    renderPlayStoreStore();
+    renderPlayStoreHome();
+}
+
+// Toggle favorite
+function toggleFavorite(appId) {
+    let favs = getFavorites();
+    if (favs.includes(appId)) {
+        favs = favs.filter(id => id !== appId);
+        notificationMgr.showNotification({ title: "Removed from Favorites", message: "Game removed from favorites.", icon: "sparkles" });
+    } else {
+        favs.push(appId);
+        notificationMgr.showNotification({ title: "Added to Favorites", message: "Game added to favorites!", icon: "sparkles" });
+    }
+    saveFavorites(favs);
+}
+
+// Tab switching
+function showPlayStoreTab(tabName) {
+    // Update nav buttons
+    document.querySelectorAll('.ps-nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    // Update tab visibility
+    document.querySelectorAll('.ps-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    const targetTab = document.getElementById('ps-tab-' + tabName);
+    if (targetTab) targetTab.classList.add('active');
+
+    // Refresh content
+    if (tabName === 'home') renderPlayStoreHome();
+    if (tabName === 'library') renderPlayStoreLibrary();
+    if (tabName === 'store') renderPlayStoreStore();
+}
+
+// Filter store by category
+function filterStoreCategory(category) {
+    document.querySelectorAll('.ps-category').forEach(cat => {
+        cat.classList.toggle('active', cat.innerText.toLowerCase() === category);
+    });
+
+    const cards = document.querySelectorAll('#ps-store-grid .ps-store-card');
+    cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Search store games
+function filterPlayStoreGames() {
+    const query = document.getElementById('ps-store-search').value.toLowerCase();
+    const cards = document.querySelectorAll('#ps-store-grid .ps-store-card');
+
+    cards.forEach(card => {
+        const title = card.querySelector('.card-title').innerText.toLowerCase();
+        card.style.display = title.includes(query) ? 'block' : 'none';
+    });
+}
+
+// Clear all Play Store data
+function clearPlayStoreData() {
+    if (!confirm('Clear all Play Store data including playtime and favorites?')) return;
+
+    if (currentAccount) {
+        saveAccountData('playtime_data', '{}');
+        saveAccountData('recent_plays', '[]');
+        saveAccountData('ps_favorites', '[]');
+    }
+
+    notificationMgr.showNotification({ title: "Data Cleared", message: "All Play Store data has been reset.", icon: "sparkles" });
+    renderPlayStoreHome();
+    renderPlayStoreLibrary();
+}
+
+// Initialize Play Store when opened
+const originalOpenAppPS = openApp;
+openApp = function(appId) {
+    const result = originalOpenAppPS(appId);
+
+    if (appId === 'store-window') {
+        setTimeout(() => {
+            // Set username
+            const usernameEl = document.getElementById('ps-username');
+            if (usernameEl && currentAccount) {
+                usernameEl.innerText = currentAccount.name || currentAccount.username;
+            } else if (usernameEl) {
+                usernameEl.innerText = localStorage.getItem('os_username') || 'User';
+            }
+
+            renderPlayStoreSidebar();
+            renderPlayStoreHome();
+        }, 100);
+    }
+
+    return result;
+};
+
+// ===== END PLAY STORE V2 =====
+
 // --- 1. Notification System ---
 const notificationMgr = {
     showNotification: function({title, message, icon}) {
