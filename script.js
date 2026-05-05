@@ -223,6 +223,10 @@ function showAccountLoadingScreen() {
     const progressEl = document.getElementById('loading-progress');
     const detailsEl = document.getElementById('loading-details');
 
+        // Hide lock screen if visible
+    const lockScreen = document.getElementById('lock-screen');
+    if (lockScreen) lockScreen.style.display = 'none';
+
     if (loadingScreen) loadingScreen.style.display = 'flex';
     if (emailEl && currentAccount) emailEl.innerText = currentAccount.email;
 
@@ -275,13 +279,11 @@ function initializeDesktopWithAccount() {
 
         // Check if password is set for this account
         const accountPassword = getAccountData('password');
-        if (accountPassword) {
-            const lockScreen = document.getElementById('lock-screen');
-            if (lockScreen) {
-                updateLockScreenForAccount();
-                lockScreen.style.display = 'flex';
-            }
-        } else {
+        const lockScreen = document.getElementById('lock-screen');
+        if (accountPassword && lockScreen && lockScreen.style.display !== 'flex') {
+            updateLockScreenForAccount();
+            lockScreen.style.display = 'flex';
+        } else if (!accountPassword) {
             showUpdateModal();
             triggerInitialNotifications();
         }
@@ -628,6 +630,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== BOOT SEQUENCE WITH ACCOUNT SYSTEM =====
 window.onload = function() {
+        // Theme setup (from original boot sequence)
+    if(localStorage.getItem('os_theme') === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+        const themeText = document.getElementById('theme-text');
+        if (themeText) themeText.innerText = "Light Theme";
+    }
+
     initAccountDB();
 
     // Check if there's a current account
@@ -2298,41 +2307,7 @@ document.addEventListener('click', (e) => {
 });
 
 
-// --- Boot Sequence & OOBE Setup ---
-window.onload = function() {
-    if(localStorage.getItem('os_theme') === 'light') {
-        document.body.setAttribute('data-theme', 'light');
-        const themeText = document.getElementById('theme-text');
-        if (themeText) themeText.innerText = "Light Theme";
-    }
-
-    setTimeout(() => {
-        const boot = document.getElementById('boot-screen');
-        if(boot) {
-            boot.style.opacity = '0';
-            setTimeout(() => boot.style.display = 'none', 500);
-        }
-
-        const isSetupComplete = localStorage.getItem('os_setup_complete');
-
-        if (!isSetupComplete) {
-            const setupScreen = document.getElementById('setup-screen');
-            if (setupScreen) setupScreen.style.display = 'flex';
-        } else {
-            initializeDesktop();
-            if (localStorage.getItem('os_password')) {
-                const lockUsername = document.getElementById('lock-username');
-                if (lockUsername) lockUsername.innerText = localStorage.getItem('os_username') || 'User';
-                const lockScreen = document.getElementById('lock-screen');
-                if (lockScreen) lockScreen.style.display = 'flex';
-            } else {
-                // No password set - show update modal immediately and trigger notifications
-                showUpdateModal();
-                triggerInitialNotifications();
-            }
-        }
-    }, 2500);
-};
+;
 
 let tempUsername = '';
 let tempPassword = '';
