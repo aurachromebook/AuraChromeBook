@@ -1,3 +1,4 @@
+
 /* ===== ACCOUNT SYSTEM STYLES ===== */
 
 /* Account Loading Screen */
@@ -2070,4 +2071,2199 @@ body, html { margin: 0; padding: 0; height: 100%; font-family: 'Google Sans', 'S
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* ===== XBOX SERIES X TRANSFORMATION ===== */
+
+
+/* ===== XBOX SERIES X BOOT SEQUENCE ===== */
+#boot-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    transition: opacity 0.8s ease-out;
+}
+
+.boot-logo-xbox {
+    animation: xboxPulse 2s ease-in-out infinite;
+}
+
+.boot-logo-xbox svg {
+    width: 120px;
+    height: 120px;
+    filter: drop-shadow(0 0 30px rgba(16, 124, 16, 0.6));
+}
+
+@keyframes xboxPulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+.boot-loader-xbox {
+    margin-top: 40px;
+    width: 200px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.boot-loader-xbox::after {
+    content: '';
+    position: absolute;
+    left: -100px;
+    top: 0;
+    height: 100%;
+    width: 100px;
+    background: linear-gradient(90deg, transparent, #107C10, transparent);
+    animation: xboxSlide 1.8s infinite ease-in-out;
+}
+
+@keyframes xboxSlide {
+    0% { left: -100px; }
+    100% { left: 200px; }
+}
+
+.boot-text-xbox {
+    margin-top: 30px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+
+
+/* ===== XBOX DASHBOARD HOME SCREEN ===== */
+#xbox-dashboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#xbox-dashboard.active {
+    display: flex;
+}
+
+/* Xbox Top Bar */
+.xbox-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    z-index: 10;
+}
+
+.xbox-logo-small {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.xbox-logo-small svg {
+    width: 24px;
+    height: 24px;
+}
+
+.xbox-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    font-size: 14px;
+}
+
+.xbox-gamertag {
+    font-weight: 600;
+    color: #9bf00b;
+}
+
+.xbox-avatar-small {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #107C10, #9bf00b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+/* Xbox Navigation Tabs */
+.xbox-nav-tabs {
+    display: flex;
+    gap: 5px;
+    padding: 0 30px;
+    margin-bottom: 20px;
+}
+
+.xbox-nav-tab {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.xbox-nav-tab:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+.xbox-nav-tab.active {
+    color: #9bf00b;
+    background: rgba(155, 240, 11, 0.1);
+    border-bottom: 2px solid #9bf00b;
+}
+
+.xbox-nav-tab:focus {
+    outline: 2px solid #9bf00b;
+    outline-offset: 2px;
+}
+
+/* Xbox Content Area */
+.xbox-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 30px 30px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Xbox Featured Game (Hero) */
+.xbox-hero {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.xbox-hero:hover {
+    transform: scale(1.01);
+}
+
+.xbox-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.xbox-hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+}
+
+.xbox-hero-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 10px 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.xbox-hero-subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    margin: 0 0 20px 0;
+}
+
+.xbox-hero-btn {
+    background: #9bf00b;
+    color: #000;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.xbox-hero-btn:hover {
+    background: #b4ff3a;
+    transform: scale(1.05);
+}
+
+/* Xbox Game Row */
+.xbox-game-row {
+    margin-bottom: 30px;
+}
+
+.xbox-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.xbox-row-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.xbox-row-see-all {
+    color: #9bf00b;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.xbox-row-see-all:hover {
+    color: #b4ff3a;
+}
+
+.xbox-games-grid {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #107C10 transparent;
+}
+
+.xbox-games-grid::-webkit-scrollbar {
+    height: 4px;
+}
+
+.xbox-games-grid::-webkit-scrollbar-thumb {
+    background: #107C10;
+    border-radius: 2px;
+}
+
+/* Xbox Game Tile */
+.xbox-game-tile {
+    flex-shrink: 0;
+    width: 180px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.xbox-game-tile:hover {
+    transform: translateY(-5px);
+}
+
+.xbox-game-tile:focus {
+    outline: 3px solid #9bf00b;
+    outline-offset: 3px;
+}
+
+.xbox-tile-image {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.xbox-tile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.xbox-game-tile:hover .xbox-tile-image img {
+    transform: scale(1.1);
+}
+
+.xbox-tile-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+}
+
+.xbox-tile-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.xbox-tile-meta {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+}
+
+.xbox-tile-installed {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #107C10;
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Xbox Quick Resume Section */
+.xbox-quick-resume {
+    background: linear-gradient(135deg, rgba(16, 124, 16, 0.2), rgba(155, 240, 11, 0.1));
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(155, 240, 11, 0.2);
+}
+
+.xbox-quick-resume-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.xbox-quick-resume-header h3 {
+    margin: 0;
+    color: #9bf00b;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Xbox Guide Button (Xbox button overlay) */
+#xbox-guide {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(20px);
+    z-index: 9998;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#xbox-guide.active {
+    display: flex;
+}
+
+.xbox-guide-content {
+    width: 900px;
+    max-height: 80vh;
+    background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.xbox-guide-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.xbox-guide-header h2 {
+    margin: 0;
+    color: white;
+    font-size: 24px;
+}
+
+.xbox-guide-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    transition: 0.2s;
+}
+
+.xbox-guide-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+
+
+/* ===== XBOX ACCOUNT & OOBE STYLES ===== */
+
+/* Xbox Account Loading Screen */
+#account-loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 99995;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.account-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.account-loading-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #107C10, #9bf00b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    margin-bottom: 25px;
+    border: 3px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 40px rgba(16, 124, 16, 0.4);
+}
+
+.account-loading-email {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.account-loading-status {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.account-loading-bar {
+    width: 300px;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.account-loading-progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #107C10, #9bf00b);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(155, 240, 11, 0.5);
+}
+
+.account-loading-details {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    margin-top: 15px;
+    min-height: 18px;
+}
+
+/* Xbox Account Modal */
+#account-modal {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%) !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.account-box {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border-radius: 16px !important;
+    padding: 50px !important;
+    width: 480px !important;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    backdrop-filter: blur(20px);
+}
+
+.account-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    box-shadow: 0 4px 30px rgba(16, 124, 16, 0.4);
+}
+
+.account-logo svg {
+    width: 40px;
+    height: 40px;
+}
+
+.account-box h2 {
+    margin: 0 0 10px 0;
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.account-subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    margin: 0 0 35px 0;
+}
+
+.account-input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.account-input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.account-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    outline: none;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.account-input:focus {
+    border-color: #9bf00b;
+    box-shadow: 0 0 0 3px rgba(155, 240, 11, 0.1);
+    background: rgba(255,255,255,0.08);
+}
+
+.account-input::placeholder {
+    color: rgba(255,255,255,0.3);
+}
+
+.account-username-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.account-username-wrapper:focus-within {
+    border-color: #9bf00b;
+    box-shadow: 0 0 0 3px rgba(155, 240, 11, 0.1);
+}
+
+.account-username-wrapper .account-input {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    flex: 1;
+}
+
+.account-domain {
+    padding: 14px 16px;
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255,255,255,0.05);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
+}
+
+.account-email-preview {
+    font-size: 12px;
+    color: #9bf00b;
+    margin-top: 8px;
+    font-weight: 500;
+    min-height: 18px;
+}
+
+.account-btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 15px;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.account-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(155, 240, 11, 0.3);
+    filter: brightness(1.1);
+}
+
+.account-btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: #9bf00b;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    font-family: inherit;
+}
+
+.account-btn-secondary:hover {
+    background: rgba(155, 240, 11, 0.1);
+    border-color: #9bf00b;
+}
+
+.account-btn-text {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-family: inherit;
+}
+
+.account-btn-text:hover {
+    color: #9bf00b;
+}
+
+.account-divider {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+    color: rgba(255,255,255,0.2);
+}
+
+.account-divider::before,
+.account-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+}
+
+.account-divider span {
+    padding: 0 15px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+}
+
+.account-error {
+    color: #ff4444;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 18px;
+    font-weight: 500;
+}
+
+/* Xbox OOBE Setup Screen */
+#setup-screen {
+    background: #000 !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.setup-card {
+    background: rgba(30, 30, 30, 0.95) !important;
+    width: 500px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    padding: 50px !important;
+}
+
+.setup-icon {
+    font-size: 56px !important;
+    margin-bottom: 25px !important;
+}
+
+.setup-title {
+    color: white !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+}
+
+.setup-text {
+    color: rgba(255,255,255,0.5) !important;
+    font-size: 15px !important;
+}
+
+.setup-input {
+    background: rgba(255,255,255,0.05) !important;
+    border: 2px solid rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+.setup-input:focus {
+    border-color: #9bf00b !important;
+    box-shadow: 0 0 0 3px rgba(155, 240, 11, 0.1) !important;
+}
+
+.setup-input::placeholder {
+    color: rgba(255,255,255,0.3) !important;
+}
+
+.tou-box {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.7) !important;
+    border-radius: 8px !important;
+}
+
+.setup-btn-primary {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.setup-btn-primary:hover {
+    box-shadow: 0 4px 20px rgba(155, 240, 11, 0.3) !important;
+}
+
+.setup-btn-secondary {
+    color: #9bf00b !important;
+    border-radius: 8px !important;
+}
+
+.setup-btn-secondary:hover {
+    background: rgba(155, 240, 11, 0.1) !important;
+}
+
+/* Xbox Lock Screen */
+#lock-screen {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%) !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.lock-container {
+    max-width: 450px !important;
+}
+
+.lock-user-avatar {
+    width: 120px !important;
+    height: 120px !important;
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    border: 3px solid rgba(255,255,255,0.2) !important;
+    box-shadow: 0 0 40px rgba(16, 124, 16, 0.3) !important;
+}
+
+.lock-username {
+    color: white !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+}
+
+.lock-email {
+    color: rgba(255,255,255,0.5) !important;
+    font-size: 14px !important;
+}
+
+.lock-input-wrapper {
+    background: rgba(255,255,255,0.1) !important;
+    border-radius: 8px !important;
+}
+
+.lock-password-input {
+    color: white !important;
+    font-size: 16px !important;
+}
+
+.lock-password-input::placeholder {
+    color: rgba(255,255,255,0.4) !important;
+}
+
+.lock-submit-btn {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    width: 44px !important;
+    height: 44px !important;
+}
+
+.lock-submit-btn:hover {
+    box-shadow: 0 0 20px rgba(155, 240, 11, 0.4) !important;
+}
+
+.lock-error {
+    color: #ff4444 !important;
+}
+
+.lock-option-btn {
+    background: rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.7) !important;
+    border-radius: 8px !important;
+}
+
+.lock-option-btn:hover {
+    background: rgba(255,255,255,0.15) !important;
+    color: white !important;
+}
+
+.security-hint {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 8px !important;
+    color: rgba(255,255,255,0.7) !important;
+}
+
+.lock-accounts-section {
+    bottom: 80px !important;
+}
+
+.lock-accounts-header span {
+    color: rgba(255,255,255,0.4) !important;
+}
+
+.lock-add-account-btn {
+    background: rgba(155, 240, 11, 0.2) !important;
+    color: #9bf00b !important;
+}
+
+.lock-add-account-btn:hover {
+    background: rgba(155, 240, 11, 0.3) !important;
+}
+
+.lock-account-item {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 8px !important;
+}
+
+.lock-account-item:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.lock-account-item.active {
+    background: rgba(155, 240, 11, 0.1) !important;
+    border: 1px solid rgba(155, 240, 11, 0.3) !important;
+}
+
+.lock-account-avatar {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+}
+
+.lock-account-name {
+    color: white !important;
+}
+
+.lock-account-email {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+.lock-account-remove:hover {
+    background: rgba(255, 68, 68, 0.2) !important;
+    color: #ff4444 !important;
+}
+
+.lock-shutdown-btn {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.lock-shutdown-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+
+
+
+/* ===== MICROSOFT STORE (Replacing Play Store) ===== */
+#store-window .window-content {
+    background: #0d0d0d !important;
+}
+
+#new-play-store {
+    --ms-bg: #0d0d0d;
+    --ms-sidebar: #1a1a1a;
+    --ms-card: rgba(255,255,255,0.05);
+    --ms-card-hover: rgba(255,255,255,0.08);
+    --ms-primary: #9bf00b;
+    --ms-primary-dark: #107C10;
+    --ms-text: #ffffff;
+    --ms-text-muted: rgba(255,255,255,0.5);
+    --ms-border: rgba(255,255,255,0.1);
+    --ms-accent: #0078d4;
+    background: var(--ms-bg) !important;
+    color: var(--ms-text) !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+#ps-sidebar {
+    background: var(--ms-sidebar) !important;
+    border-right: 1px solid var(--ms-border) !important;
+    width: 220px !important;
+}
+
+#ps-user-avatar {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+#ps-username {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+#ps-fav-btn {
+    color: #9bf00b !important;
+    background: rgba(155, 240, 11, 0.1) !important;
+    border-radius: 8px !important;
+}
+
+#ps-fav-btn:hover {
+    background: rgba(155, 240, 11, 0.2) !important;
+}
+
+#ps-sidebar-categories button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+#ps-sidebar-games-btn {
+    background: var(--ms-primary-dark) !important;
+    color: white !important;
+}
+
+#ps-sidebar-apps-btn {
+    background: rgba(255,255,255,0.05) !important;
+    color: var(--ms-text-muted) !important;
+}
+
+.ps-game-item {
+    border-radius: 8px !important;
+    padding: 10px 15px !important;
+}
+
+.ps-game-item:hover {
+    background: rgba(255,255,255,0.08) !important;
+}
+
+.ps-game-item.active {
+    background: rgba(155, 240, 11, 0.1) !important;
+    border-left-color: #9bf00b !important;
+}
+
+.ps-game-item .ps-game-icon {
+    background: rgba(255,255,255,0.1) !important;
+    border-radius: 8px !important;
+}
+
+/* Microsoft Store Navigation */
+#ps-nav {
+    border-bottom: 1px solid var(--ms-border) !important;
+    padding: 15px 25px !important;
+    gap: 8px !important;
+}
+
+.ps-nav-btn {
+    color: var(--ms-text-muted) !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px !important;
+}
+
+.ps-nav-btn:hover {
+    color: white !important;
+    background: rgba(255,255,255,0.05) !important;
+}
+
+.ps-nav-btn.active {
+    color: #9bf00b !important;
+    background: rgba(155, 240, 11, 0.1) !important;
+}
+
+/* Microsoft Store Content */
+#ps-content {
+    background: var(--ms-bg) !important;
+}
+
+#ps-content h3 {
+    color: white !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Microsoft Store Search */
+#ps-store-search {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+}
+
+#ps-store-search:focus {
+    border-color: #9bf00b !important;
+    box-shadow: 0 0 0 3px rgba(155, 240, 11, 0.1) !important;
+}
+
+#ps-store-search::placeholder {
+    color: rgba(255,255,255,0.3) !important;
+}
+
+/* Microsoft Store Categories */
+.ps-category {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid transparent !important;
+    color: rgba(255,255,255,0.6) !important;
+    border-radius: 20px !important;
+    padding: 8px 18px !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ps-category:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+.ps-category.active {
+    background: var(--ms-primary-dark) !important;
+    color: white !important;
+    border-color: #9bf00b !important;
+}
+
+/* Microsoft Store Featured Banner */
+.ps-featured-banner {
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%) !important;
+    height: 350px !important;
+}
+
+.ps-featured-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%) !important;
+    padding: 40px !important;
+}
+
+.ps-featured-title {
+    font-size: 36px !important;
+    font-weight: 700 !important;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.8) !important;
+}
+
+.ps-play-btn {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ps-play-btn:hover {
+    box-shadow: 0 4px 20px rgba(155, 240, 11, 0.4) !important;
+    transform: scale(1.02) !important;
+}
+
+.ps-more-btn {
+    background: rgba(255,255,255,0.1) !important;
+    border-radius: 8px !important;
+}
+
+.ps-more-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+
+.ps-stats-row {
+    border-top: 1px solid var(--ms-border) !important;
+}
+
+.ps-stat {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 8px !important;
+}
+
+.ps-stat strong {
+    color: white !important;
+}
+
+/* Microsoft Store Cards */
+.ps-store-card {
+    background: var(--ms-card) !important;
+    border-radius: 12px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s !important;
+}
+
+.ps-store-card:hover {
+    background: var(--ms-card-hover) !important;
+    border-color: var(--ms-border) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
+.ps-store-card .card-icon {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
+}
+
+.ps-store-card .card-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.ps-store-card .card-meta {
+    color: var(--ms-text-muted) !important;
+}
+
+.ps-store-card .install-overlay {
+    background: rgba(0,0,0,0.8) !important;
+    border-radius: 12px !important;
+}
+
+.ps-store-card .install-overlay button {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Microsoft Store Library Cards */
+.ps-lib-card {
+    background: var(--ms-card) !important;
+    border-radius: 12px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s !important;
+}
+
+.ps-lib-card:hover {
+    background: var(--ms-card-hover) !important;
+    border-color: var(--ms-border) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
+.ps-lib-card .lib-icon {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 16px !important;
+}
+
+.ps-lib-card .lib-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.ps-lib-card .lib-playtime {
+    color: var(--ms-text-muted) !important;
+}
+
+/* Microsoft Store Detail Overlay */
+#ps-detail-overlay {
+    background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%) !important;
+}
+
+#ps-detail-overlay button {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+#ps-detail-overlay button:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+
+.ps-detail-banner {
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%) !important;
+}
+
+.ps-detail-icon {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+}
+
+.ps-detail-title {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+.ps-detail-meta span {
+    background: rgba(255,255,255,0.05) !important;
+    color: var(--ms-text-muted) !important;
+    border-radius: 8px !important;
+}
+
+.ps-detail-actions {
+    gap: 12px !important;
+}
+
+.ps-detail-btn.play {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ps-detail-btn.play:hover {
+    box-shadow: 0 4px 20px rgba(155, 240, 11, 0.4) !important;
+}
+
+.ps-detail-btn.install {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+.ps-detail-btn.install:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+
+.ps-detail-stats {
+    gap: 15px !important;
+}
+
+.ps-detail-stat {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
+}
+
+.ps-detail-stat .stat-value {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+.ps-detail-stat .stat-label {
+    color: var(--ms-text-muted) !important;
+}
+
+.ps-detail-desc {
+    color: rgba(255,255,255,0.7) !important;
+    line-height: 1.7 !important;
+}
+
+.ps-detail-controls {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
+}
+
+.ps-detail-controls h4 {
+    color: var(--ms-text-muted) !important;
+}
+
+.ps-detail-controls p {
+    color: rgba(255,255,255,0.7) !important;
+}
+
+/* Microsoft Store Settings Tab */
+#ps-tab-settings button {
+    background: rgba(234, 67, 53, 0.2) !important;
+    color: #ff4444 !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+#ps-tab-settings button:hover {
+    background: rgba(234, 67, 53, 0.3) !important;
+}
+
+/* Microsoft Store Empty States */
+#ps-home-empty,
+#ps-library-empty,
+#ps-favorites-empty,
+#ps-apps-store-empty {
+    color: var(--ms-text-muted) !important;
+}
+
+#ps-home-empty h3,
+#ps-library-empty h3,
+#ps-favorites-empty h3 {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* Microsoft Store App Cards */
+.ps-app-card {
+    background: var(--ms-card) !important;
+    border-radius: 12px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s !important;
+}
+
+.ps-app-card:hover {
+    background: var(--ms-card-hover) !important;
+    border-color: var(--ms-border) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
+.ps-app-card .card-icon {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
+}
+
+.ps-app-card .card-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.ps-app-card .card-meta {
+    color: var(--ms-text-muted) !important;
+}
+
+
+
+/* ===== XBOX UI INTEGRATION ===== */
+
+/* Xbox Windows Styling */
+.window {
+    background: #1a1a1a !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8) !important;
+}
+
+.window-header {
+    background: #252525 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    padding: 10px 15px !important;
+}
+
+.window-title {
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+
+.win-btn {
+    color: rgba(255,255,255,0.6) !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+}
+
+.win-btn:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+.close-btn:hover {
+    background: #ea4335 !important;
+    color: white !important;
+}
+
+.window-content {
+    background: #1a1a1a !important;
+    color: white !important;
+}
+
+/* Xbox Taskbar */
+#taskbar-container {
+    bottom: 0 !important;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent) !important;
+}
+
+#taskbar {
+    background: rgba(20, 20, 20, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 12px 12px 0 0 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-bottom: none !important;
+    height: 56px !important;
+    padding: 0 20px !important;
+    gap: 15px !important;
+}
+
+#launcher-btn {
+    background: rgba(255,255,255,0.1) !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+}
+
+#launcher-btn:hover {
+    background: rgba(155, 240, 11, 0.2) !important;
+}
+
+.launcher-dot {
+    border-color: #9bf00b !important;
+    width: 18px !important;
+    height: 18px !important;
+    border-width: 3px !important;
+}
+
+.app-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,0.05) !important;
+    font-size: 20px !important;
+    transition: all 0.2s !important;
+}
+
+.app-icon:hover {
+    background: rgba(255,255,255,0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+.app-icon.active::after {
+    background: #9bf00b !important;
+    width: 16px !important;
+    height: 3px !important;
+    border-radius: 2px !important;
+}
+
+/* Xbox Status Area */
+#status-area {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 10px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
+}
+
+#status-area:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+#clock {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.status-icons {
+    color: rgba(255,255,255,0.6) !important;
+}
+
+/* Xbox Calendar Widget */
+#calendar-widget {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 10px !important;
+    padding: 6px 14px !important;
+}
+
+#calendar-widget:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+#calendar-day {
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+#calendar-date {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+/* Xbox Quick Settings */
+#quick-settings {
+    background: rgba(20, 20, 20, 0.95) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+    bottom: 60px !important;
+}
+
+#qs-notifications {
+    background: rgba(255,255,255,0.03) !important;
+    border-radius: 12px !important;
+}
+
+.qs-notif-header {
+    color: #9bf00b !important;
+}
+
+.qs-notif-item {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 8px !important;
+}
+
+.qs-notif-item .notif-content strong {
+    color: white !important;
+}
+
+.qs-notif-item .notif-content p {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+.qs-pill {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 10px !important;
+    color: rgba(255,255,255,0.7) !important;
+}
+
+.qs-pill:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.qs-pill.active {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+.qs-sliders {
+    background: rgba(255,255,255,0.03) !important;
+    border-radius: 12px !important;
+}
+
+.slider-row input[type=range] {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.slider-row input[type=range]::-webkit-slider-thumb {
+    background: #9bf00b !important;
+}
+
+.qs-footer {
+    border-top: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.qs-battery-info {
+    color: white !important;
+}
+
+.qs-actions button {
+    background: rgba(255,255,255,0.05) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+.qs-actions button:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+/* Xbox Launcher Menu */
+#launcher-menu {
+    background: rgba(20, 20, 20, 0.95) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+    bottom: 65px !important;
+}
+
+.launcher-search-box {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 10px !important;
+}
+
+.launcher-search-box input {
+    color: white !important;
+}
+
+.launcher-search-box input::placeholder {
+    color: rgba(255,255,255,0.4) !important;
+}
+
+.launcher-item {
+    border-radius: 10px !important;
+}
+
+.launcher-item:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.l-icon {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 12px !important;
+}
+
+.l-text {
+    color: white !important;
+}
+
+/* Xbox Media Control */
+#media-control-btn {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    border-radius: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+#media-control-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 20px rgba(155, 240, 11, 0.4) !important;
+}
+
+#media-control-modal {
+    background: rgba(20, 20, 20, 0.95) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+    bottom: 65px !important;
+}
+
+.media-modal-art {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    border-radius: 8px !important;
+}
+
+.media-modal-info .track-name {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.media-modal-btn {
+    background: rgba(255,255,255,0.05) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+.media-modal-btn:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.media-modal-btn.play-pause {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+.media-progress-fill {
+    background: linear-gradient(90deg, #107C10, #9bf00b) !important;
+}
+
+/* Xbox Context Menus */
+#context-menu,
+#launcher-context-menu {
+    background: rgba(30, 30, 30, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+}
+
+.context-item {
+    color: rgba(255,255,255,0.8) !important;
+    border-radius: 6px !important;
+    margin: 2px 8px !important;
+}
+
+.context-item:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+.context-divider {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+/* Xbox Calendar Modal */
+#calendar-modal {
+    background: rgba(0,0,0,0.7) !important;
+}
+
+.calendar-box {
+    background: rgba(30, 30, 30, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+}
+
+.calendar-header h3 {
+    color: white !important;
+}
+
+.calendar-header button {
+    color: #9bf00b !important;
+}
+
+.calendar-weekdays span {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+.calendar-day {
+    color: white !important;
+}
+
+.calendar-day:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+}
+
+.calendar-day.other-month {
+    color: rgba(255,255,255,0.3) !important;
+}
+
+/* Xbox Desk Switcher */
+#desk-switcher {
+    background: rgba(20, 20, 20, 0.95) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+    bottom: 65px !important;
+}
+
+.desk-header {
+    color: white !important;
+}
+
+.desk-add-btn {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+}
+
+.desk-item {
+    border-radius: 10px !important;
+}
+
+.desk-item:hover {
+    background: rgba(255,255,255,0.05) !important;
+}
+
+.desk-item.active {
+    border-color: #9bf00b !important;
+    background: rgba(155, 240, 11, 0.05) !important;
+}
+
+.desk-preview {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.desk-name {
+    color: white !important;
+}
+
+.desk-close:hover {
+    background: rgba(255, 68, 68, 0.2) !important;
+    color: #ff4444 !important;
+}
+
+.desk-shortcuts {
+    color: rgba(255,255,255,0.4) !important;
+}
+
+#desk-indicator {
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 10px !important;
+    color: white !important;
+}
+
+#desk-indicator:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+#desk-prev, #desk-next, #desk-add {
+    color: white !important;
+}
+
+#desk-add {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+#desk-add-quick {
+    background: rgba(255,255,255,0.05) !important;
+    color: white !important;
+    border-radius: 10px !important;
+}
+
+#desk-add-quick:hover {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+/* Xbox Settings Window */
+#settings-window .settings-title {
+    color: #9bf00b !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#settings-window .settings-card {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+}
+
+#settings-window .modern-input {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+#settings-window .modern-input:focus {
+    border-color: #9bf00b !important;
+    box-shadow: 0 0 0 3px rgba(155, 240, 11, 0.1) !important;
+}
+
+#settings-window .modern-btn {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#settings-window .modern-btn:hover {
+    box-shadow: 0 4px 20px rgba(155, 240, 11, 0.3) !important;
+}
+
+#settings-window select {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+#settings-window select option {
+    background: #1a1a1a !important;
+    color: white !important;
+}
+
+/* Xbox Welcome Modal */
+#welcome-modal {
+    background: rgba(0,0,0,0.8) !important;
+}
+
+.welcome-box {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+}
+
+.welcome-box h2 {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.welcome-box button {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+}
+
+.welcome-box button:hover {
+    box-shadow: 0 4px 20px rgba(155, 240, 11, 0.4) !important;
+}
+
+/* Xbox Update Modal */
+#update-modal {
+    background: rgba(0,0,0,0.9) !important;
+}
+
+.update-box {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+}
+
+.update-box h2 {
+    color: #9bf00b !important;
+}
+
+.update-countdown-btn.active {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+/* Xbox Creator Screen */
+#creator-screen {
+    background: #000 !important;
+}
+
+#creator-text {
+    color: white !important;
+    text-shadow: 0 0 40px rgba(155, 240, 11, 0.5) !important;
+}
+
+/* Xbox Notifications */
+.notification {
+    background: rgba(30, 30, 30, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+}
+
+.notif-content strong {
+    color: white !important;
+}
+
+.notif-content p {
+    color: rgba(255,255,255,0.6) !important;
+}
+
+/* Xbox File Explorer */
+#files-window .file-item {
+    color: white !important;
+}
+
+#files-window .file-item:hover {
+    background: rgba(255,255,255,0.05) !important;
+}
+
+#files-window .f-icon {
+    font-size: 42px;
+}
+
+/* Xbox Wordpad */
+#wordpad-window .browser-toolbar {
+    background: #252525 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+#wordpad-window .browser-toolbar button {
+    color: white !important;
+}
+
+#wordpad-window #wordpad-editor {
+    color: white !important;
+    background: #1a1a1a !important;
+}
+
+/* Xbox Calculator */
+#calc-window .calc-bg {
+    background: #1a1a1a !important;
+}
+
+#calc-display {
+    color: white !important;
+}
+
+.calc-btn {
+    background: rgba(255,255,255,0.05) !important;
+    color: white !important;
+}
+
+.calc-btn:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+.calc-btn.action-light {
+    background: rgba(255,255,255,0.1) !important;
+    color: #9bf00b !important;
+}
+
+.calc-btn.action-blue {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+/* Xbox About Blank Modal */
+.aboutblank-box {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+}
+
+.aboutblank-box h2 {
+    color: white !important;
+}
+
+.ab-btn.always {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+.ab-btn.just-once {
+    background: rgba(155, 240, 11, 0.3) !important;
+    color: #9bf00b !important;
+}
+
+/* Xbox Desktop Icons */
+.desktop-icon {
+    color: white !important;
+}
+
+.desktop-icon:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+/* Xbox Link Creator */
+#linkcreator-window .modern-input {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+#linkcreator-window #lc-result {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* Xbox Server Warning Banner */
+#server-warning-banner {
+    background: linear-gradient(135deg, #107C10, #9bf00b) !important;
+    color: #000 !important;
+}
+
+/* Xbox Snap Preview */
+#snap-preview {
+    background: rgba(155, 240, 11, 0.15) !important;
+    border: 2px solid rgba(155, 240, 11, 0.3) !important;
+}
+
+/* Xbox Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Xbox Body & Global */
+body, html {
+    background-color: #000 !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+body[data-theme="dark"] {
+    --sys-base: rgba(20, 20, 20, 0.9);
+    --sys-surface: rgba(30, 30, 30, 0.95);
+    --sys-header: #252525;
+    --sys-primary: #9bf00b;
+    --sys-text: #ffffff;
+    --sys-text-muted: rgba(255,255,255,0.5);
+    --sys-border: rgba(255,255,255,0.1);
+}
+
+/* Xbox Focus States for Arrow Key Navigation */
+.xbox-focusable:focus {
+    outline: 3px solid #9bf00b !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 20px rgba(155, 240, 11, 0.3) !important;
+}
+
+.xbox-focusable {
+    transition: all 0.2s;
+}
+
+/* Xbox Guide Menu */
+.xbox-guide-content {
+    background: linear-gradient(135deg, #1a1a1a, #0d0d0d) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 16px !important;
+}
+
+.xbox-guide-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.xbox-guide-header h2 {
+    color: white !important;
+}
+
+/* Xbox Keyboard Navigation Hints */
+.xbox-nav-hint {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: rgba(255,255,255,0.6);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.xbox-nav-hint.visible {
+    opacity: 1;
+}
+
+
+/* ===== BOOT SCREEN OVERRIDE ===== */
+#boot-screen {
+    background: #000 !important;
+}
+
+
+/* BOOT SCREEN BACKGROUND FIX */
+#boot-screen { background-color: #000 !important; }
+
+/* Hide desktop elements when Xbox dashboard is active */
+#desktop:has(#xbox-dashboard.active) #desktop-icons-container,
+#desktop:has(#xbox-dashboard.active) #context-menu,
+#desktop:has(#xbox-dashboard.active) #launcher-context-menu,
+#desktop:has(#xbox-dashboard.active) #snap-preview {
+    display: none !important;
 }
