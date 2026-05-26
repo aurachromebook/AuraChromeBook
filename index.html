@@ -16,16 +16,10 @@
 <body data-theme="dark">
 
     <div id="boot-screen">
-        <div class="boot-logo-xbox">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="45" stroke="#9bf00b" stroke-width="3" fill="none"/>
-                <path d="M50 15 L50 50 L75 75" stroke="#9bf00b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <path d="M50 50 L25 75" stroke="#9bf00b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <circle cx="50" cy="50" r="8" fill="#9bf00b"/>
-            </svg>
+        <div class="boot-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px; color: #8ab4f8;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
         </div>
-        <div class="boot-loader-xbox"></div>
-        <div class="boot-text-xbox">Echo OS for Xbox</div>
+        <div class="boot-loader"></div>
     </div>
 
     <!-- Account Loading Screen -->
@@ -56,19 +50,21 @@
         </div>
     </div>
 
-    <!-- Update V2.1 Modal -->
+    <!-- Update V2.3 Modal -->
     <div id="update-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center;">
         <div class="update-box" style="background: var(--sys-surface); border-radius: var(--radius-lg); padding: 30px; width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--sys-border);">
             <h2 style="margin: 0 0 20px 0; color: var(--sys-primary); font-size: 24px;">🎉 Echo OS Update <span style="font-size:14px;color:var(--sys-text-muted)">V2.3</span></h2>
             <div style="background: rgba(128,128,128,0.1); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
                 <h3 style="margin: 0 0 15px 0; color: var(--sys-text); font-size: 16px;">What's New:</h3>
                 <ul style="margin: 0; padding-left: 20px; color: var(--sys-text); font-size: 14px; line-height: 1.6;">
-                    <li><strong>🏠 Added That's Not My Neighbor</strong> - Job simulator horror game</li>
-                    <li><strong>🏎️ Added Drift Hunters</strong> - Drift racing with customizable cars</li>
-                    <li><strong>🧱 Added Hypper Sandbox</strong> - 3D physics sandbox playground</li>
-                    <li><strong>💜 Added MiSide</strong> - Psychological horror adventure</li>
-                    <li><strong>🚗 Added Fake GTA V</strong> - Open-world driving action</li>
-                    <li><strong>🔊 Added Soundboard</strong> - Play sounds and effects</li>
+                    <li><strong>🎤 Fixed FNF</strong> - Friday Night Funkin now loads correctly</li>
+                    <li><strong>⛏️ Fixed Eaglercraft Lag</strong> - Performance improvements</li>
+                    <li><strong>🚗 Fixed Escape Road</strong> - Escape Road now works properly</li>
+                    <li><strong>🏎️ Fixed Escape Road 2</strong> - Escape Road 2 now works properly</li>
+                    <li><strong>📱 Fixed Bitlife</strong> - Bitlife loading issues resolved</li>
+                    <li><strong>💬 Added Chat</strong> - New Echo Chat app with DM notifications</li>
+                    <li><strong>✨ Added New Entering Screen</strong> - "Created By Darden" creator screen</li>
+                    <li><strong>🚔 Fixed GTA Vice City</strong> - GTA Vice City now loads correctly</li>
                 </ul>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
@@ -243,36 +239,13 @@
     </div>
 
     <!-- Creator Screen -->
-
+    <div id="creator-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99996; justify-content: center; align-items: center; opacity: 0; transition: opacity 1s ease-in;">
+        <div id="creator-text" style="color: white; font-size: 48px; font-weight: 300; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; opacity: 0; transition: opacity 2s ease-in-out; text-align: center; letter-spacing: 4px; text-transform: uppercase;">
+            Created By Darden
+        </div>
     </div>
 
     <div id="desktop">
-        <!-- Xbox Dashboard Home Screen -->
-        
-
-        <!-- Xbox Guide Overlay -->
-        <div id="xbox-guide">
-            <div class="xbox-guide-content">
-                <div class="xbox-guide-header">
-                    <h2>Xbox Guide</h2>
-                    <button class="xbox-guide-close" onclick="toggleXboxGuide()">✕</button>
-                </div>
-                <div style="padding:30px; display:flex; flex-direction:column; gap:15px;">
-                    <button class="xbox-nav-tab" style="text-align:left; padding:15px 20px;" onclick="toggleXboxGuide(); switchXboxTab('home')">🏠 Home</button>
-                    <button class="xbox-nav-tab" style="text-align:left; padding:15px 20px;" onclick="toggleXboxGuide(); switchXboxTab('mygames')">🎮 My Games</button>
-                    <button class="xbox-nav-tab" style="text-align:left; padding:15px 20px;" onclick="toggleXboxGuide(); switchXboxTab('store')">🛒 Microsoft Store</button>
-                    <button class="xbox-nav-tab" style="text-align:left; padding:15px 20px;" onclick="toggleXboxGuide(); switchXboxTab('apps')">📱 Apps</button>
-                    <button class="xbox-nav-tab" style="text-align:left; padding:15px 20px;" onclick="toggleXboxGuide(); openApp('settings-window')">⚙️ Settings</button>
-                    <button class="xbox-nav-tab" style="text-align:left; padding:15px 20px;" onclick="toggleXboxGuide(); lockSystem()">🔒 Lock Console</button>
-                    <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:10px; padding-top:15px;">
-                        <p style="color:rgba(255,255,255,0.4); font-size:12px; margin:0;">Press Xbox button or ESC to toggle Guide</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Xbox Navigation Hint -->
-        <div id="xbox-nav-hint" class="xbox-nav-hint">Use Arrow Keys to navigate • Enter to select • ESC for Guide</div>
         <div id="context-menu" style="display: none;">
             <div class="context-item" onclick="location.reload()">🔄 Refresh</div>
             <div class="context-item" onclick="openApp('settings-window')">🖼️ Set wallpaper</div>
@@ -461,14 +434,14 @@
 
                 <h3 class="settings-title">System Updates</h3>
                 <div class="settings-card">
-                    <strong style="display: block; margin-bottom: 5px;">Echo OS v2.3</strong>
+                    <strong style="display: block; margin-bottom: 5px;">Echo OS v2.1</strong>
                     <ul style="font-size: 13px; color: var(--sys-text-muted); margin-top: 0; margin-bottom: 15px; padding-left: 20px;">
-                        <li>🏠 Added That's Not My Neighbor - Job simulator horror game</li>
-                        <li>🏎️ Added Drift Hunters - Drift racing with customizable cars</li>
-                        <li>🧱 Added Hypper Sandbox - 3D physics sandbox playground</li>
-                        <li>💜 Added MiSide - Psychological horror adventure</li>
-                        <li>🚗 Added Fake GTA V - Open-world driving action</li>
-                        <li>🔊 Added Soundboard - Play sounds and effects</li>
+                        <li>🏠 Added That's Not My Neighbor - Check IDs and spot impostors</li>
+                        <li>🏎️ Added Drift Hunters - High-speed drifting racing game</li>
+                        <li>🧱 Added Hypper Sandbox - Build and create in sandbox physics</li>
+                        <li>💜 Added MiSide - Anime horror adventure game</li>
+                        <li>🚗 Added Fake GTA V - Parody open-world driving chaos</li>
+                        <li>🔊 Added SoundBoard - Interactive sound effects app</li>
                     </ul>
                     <button onclick="alert('Your system is up to date!')" class="modern-btn">Check for Updates</button>
                 </div>
@@ -482,7 +455,7 @@
         </div>
 
         <div class="window" id="store-window" style="display: none; width: 900px; height: 650px;">
-            <div class="window-header" id="store-window-header"><span class="window-title">🛒 Microsoft Store</span><div><button class="win-btn" onclick="minimizeApp('store-window')">−</button><button class="win-btn" onclick="maximizeApp('store-window')">□</button><button class="win-btn close-btn" onclick="closeApp('store-window')">✕</button></div></div>
+            <div class="window-header" id="store-window-header"><span class="window-title">🛍️ Play Store</span><div><button class="win-btn" onclick="minimizeApp('store-window')">−</button><button class="win-btn" onclick="maximizeApp('store-window')">□</button><button class="win-btn close-btn" onclick="closeApp('store-window')">✕</button></div></div>
             <div class="window-content store-bg" style="padding: 0; display: flex; flex-direction: column;">
                 <div id="new-play-store" style="display: flex; height: 100%; background: #1a1a2e; color: #e8eaed; font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif; position: relative;">
 
@@ -584,12 +557,12 @@
 
                             <!-- SETTINGS TAB -->
                             <div id="ps-tab-settings" class="ps-tab" style="display: none;">
-                                <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Microsoft Store Settings</h3>
+                                <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 500;">Play Store Settings</h3>
                                 <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
                                     <h4 style="margin: 0 0 10px; font-size: 14px; color: #9aa0a6;">Data Usage</h4>
                                     <p style="margin: 0; font-size: 13px;">Apps are installed locally in your browser storage.</p>
                                 </div>
-                                <button onclick="clearPlayStoreData()" style="background: rgba(234, 67, 53, 0.2); color: #ea4335; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 500; transition: 0.2s;">🗑️ Clear All Microsoft Store Data</button>
+                                <button onclick="clearPlayStoreData()" style="background: rgba(234, 67, 53, 0.2); color: #ea4335; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 500; transition: 0.2s;">🗑️ Clear All Play Store Data</button>
                             </div>
 
                         </div>
@@ -646,13 +619,13 @@
         <div class="window" id="1v1lol-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="1v1lol-window-header"><span class="window-title">🔫 1v1.LOL</span><div><button class="win-btn" onclick="minimizeApp('1v1lol-window')">−</button><button class="win-btn" onclick="maximizeApp('1v1lol-window')">□</button><button class="win-btn close-btn" onclick="closeApp('1v1lol-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/1v1 LOL.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div>
         </div>
         <div class="window" id="bitlife-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="bitlife-window-header"><span class="window-title">📱 Bitlife</span><div><button class="win-btn" onclick="minimizeApp('bitlife-window')">−</button><button class="win-btn" onclick="maximizeApp('bitlife-window')">□</button><button class="win-btn close-btn" onclick="closeApp('bitlife-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/bitlife.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="footballbros-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="footballbros-window-header"><span class="window-title">🏈 Football Bros</span><div><button class="win-btn" onclick="minimizeApp('footballbros-window')">−</button><button class="win-btn" onclick="maximizeApp('footballbros-window')">□</button><button class="win-btn close-btn" onclick="closeApp('footballbros-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/football-bros.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div>
+        <div class="window" id="footballbros-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="footballbros-window-header"><span class="window-title">🏈 Football Bros</span><div><button class="win-btn" onclick="minimizeApp('footballbros-window')">−</button><button class="win-btn" onclick="maximizeApp('footballbros-window')">□</button><button class="win-btn close-btn" onclick="closeApp('footballbros-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/football-bros.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="notmyneigh-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="notmyneigh-window-header"><span class="window-title">🏠 That's Not My Neighbor</span><div><button class="win-btn" onclick="minimizeApp('notmyneigh-window')">−</button><button class="win-btn" onclick="maximizeApp('notmyneigh-window')">□</button><button class="win-btn close-btn" onclick="closeApp('notmyneigh-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/not-my-neigh.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="soundboard-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="soundboard-window-header"><span class="window-title">🔊 SoundBoard</span><div><button class="win-btn" onclick="minimizeApp('soundboard-window')">−</button><button class="win-btn" onclick="maximizeApp('soundboard-window')">□</button><button class="win-btn close-btn" onclick="closeApp('soundboard-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/SoundBoard.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="hypper-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="hypper-window-header"><span class="window-title">🧱 Hypper Sandbox</span><div><button class="win-btn" onclick="minimizeApp('hypper-window')">−</button><button class="win-btn" onclick="maximizeApp('hypper-window')">□</button><button class="win-btn close-btn" onclick="closeApp('hypper-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/HypperSand.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="miside-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="miside-window-header"><span class="window-title">💜 MiSide</span><div><button class="win-btn" onclick="minimizeApp('miside-window')">−</button><button class="win-btn" onclick="maximizeApp('miside-window')">□</button><button class="win-btn close-btn" onclick="closeApp('miside-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/miside.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
         <div class="window" id="fakegta-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="fakegta-window-header"><span class="window-title">🚗 Fake GTA V</span><div><button class="win-btn" onclick="minimizeApp('fakegta-window')">−</button><button class="win-btn" onclick="maximizeApp('fakegta-window')">□</button><button class="win-btn close-btn" onclick="closeApp('fakegta-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/ParkingGTV.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
-        <div class="window" id="drifthunters-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="drifthunters-window-header"><span class="window-title">🏎️ Drift Hunters</span><div><button class="win-btn" onclick="minimizeApp('drifthunters-window')">−</button><button class="win-btn" onclick="maximizeApp('drifthunters-window')">□</button><button class="win-btn close-btn" onclick="closeApp('drifthunters-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/DriftHunters.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div></div>
+        <div class="window" id="drifthunters-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="drifthunters-window-header"><span class="window-title">🏎️ Drift Hunters</span><div><button class="win-btn" onclick="minimizeApp('drifthunters-window')">−</button><button class="win-btn" onclick="maximizeApp('drifthunters-window')">□</button><button class="win-btn close-btn" onclick="closeApp('drifthunters-window')">✕</button></div></div><div class="window-content"><iframe data-src="Games/DriftHunters.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
+        <div class="window" id="soundboard-window" style="display: none; width: 800px; height: 600px;"><div class="window-header" id="soundboard-window-header"><span class="window-title">🔊 SoundBoard</span><div><button class="win-btn" onclick="minimizeApp('soundboard-window')">−</button><button class="win-btn" onclick="maximizeApp('soundboard-window')">□</button><button class="win-btn close-btn" onclick="closeApp('soundboard-window')">✕</button></div></div><div class="window-content"><iframe data-src="Apps/SoundBoard.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe></div></div>
 <div class="window" id="linkcreator-window" style="display: none; width: 600px; height: 500px;">
             <div class="window-header" id="linkcreator-window-header">
                 <span class="window-title">🔗 Link Creator</span>
@@ -692,8 +665,6 @@
                 <iframe data-src="Apps/EchoChat.html" src="" width="100%" height="100%" frameborder="0" allow="fullscreen; pointer-lock; keyboard-map;"></iframe>
             </div>
         </div>
-    
-    
 
     <div id="notification-toast-container"></div>
 
@@ -707,7 +678,7 @@
         </div>
         <div class="launcher-grid" id="launcher-list">
             <div class="launcher-item" data-app-id="chrome-window" data-icon="🌐" data-name="Chrome" onclick="openApp('chrome-window')"><div class="l-icon">🌐</div><span class="l-text">Chrome</span></div>
-            <div class="launcher-item" data-app-id="store-window" data-icon="🛍️" data-name="Microsoft Store" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Microsoft Store</span></div>
+            <div class="launcher-item" data-app-id="store-window" data-icon="🛍️" data-name="Play Store" onclick="openApp('store-window')"><div class="l-icon">🛍️</div><span class="l-text">Play Store</span></div>
             <div class="launcher-item" data-app-id="settings-window" data-icon="⚙️" data-name="Settings" onclick="openApp('settings-window')"><div class="l-icon">⚙️</div><span class="l-text">Settings</span></div>
             <div class="launcher-item" data-app-id="wordpad-window" data-icon="📝" data-name="Wordpad" onclick="openApp('wordpad-window')"><div class="l-icon">📝</div><span class="l-text">Wordpad</span></div>
             <div class="launcher-item" data-app-id="calc-window" data-icon="🧮" data-name="Calculator" onclick="openApp('calc-window')"><div class="l-icon">🧮</div><span class="l-text">Calculator</span></div>
@@ -719,13 +690,13 @@
             <div class="launcher-item" data-app-id="1v1lol-window" data-icon="🔫" data-name="1v1.LOL" onclick="openApp('1v1lol-window')"><div class="l-icon">🔫</div><span class="l-text">1v1.LOL</span></div>
             <div class="launcher-item" data-app-id="bitlife-window" data-icon="📱" data-name="Bitlife" onclick="openApp('bitlife-window')"><div class="l-icon">📱</div><span class="l-text">Bitlife</span></div>
             <div class="launcher-item" data-app-id="footballbros-window" data-icon="🏈" data-name="Football Bros" onclick="openApp('footballbros-window')"><div class="l-icon">🏈</div><span class="l-text">Football Bros</span></div>
-            <div class="launcher-item" data-app-id="echochat-window" data-icon="💬" data-name="Echo Chat" onclick="openApp('echochat-window')"><div class="l-icon">💬</div>
+            <div class="launcher-item" data-app-id="echochat-window" data-icon="💬" data-name="Echo Chat" onclick="openApp('echochat-window')"><div class="l-icon">💬</div><span class="l-text">Echo Chat</span></div>
             <div class="launcher-item" data-app-id="notmyneigh-window" data-icon="🏠" data-name="That's Not My Neighbor" onclick="openApp('notmyneigh-window')"><div class="l-icon">🏠</div><span class="l-text">That's Not My Neighbor</span></div>
-            <div class="launcher-item" data-app-id="drifthunters-window" data-icon="🏎️" data-name="Drift Hunters" onclick="openApp('drifthunters-window')"><div class="l-icon">🏎️</div><span class="l-text">Drift Hunters</span></div>
             <div class="launcher-item" data-app-id="hypper-window" data-icon="🧱" data-name="Hypper Sandbox" onclick="openApp('hypper-window')"><div class="l-icon">🧱</div><span class="l-text">Hypper Sandbox</span></div>
             <div class="launcher-item" data-app-id="miside-window" data-icon="💜" data-name="MiSide" onclick="openApp('miside-window')"><div class="l-icon">💜</div><span class="l-text">MiSide</span></div>
             <div class="launcher-item" data-app-id="fakegta-window" data-icon="🚗" data-name="Fake GTA V" onclick="openApp('fakegta-window')"><div class="l-icon">🚗</div><span class="l-text">Fake GTA V</span></div>
-            <div class="launcher-item" data-app-id="soundboard-window" data-icon="🔊" data-name="SoundBoard" onclick="openApp('soundboard-window')"><div class="l-icon">🔊</div><span class="l-text">SoundBoard</span></div><span class="l-text">Echo Chat</span></div>
+            <div class="launcher-item" data-app-id="drifthunters-window" data-icon="🏎️" data-name="Drift Hunters" onclick="openApp('drifthunters-window')"><div class="l-icon">🏎️</div><span class="l-text">Drift Hunters</span></div>
+            <div class="launcher-item" data-app-id="soundboard-window" data-icon="🔊" data-name="SoundBoard" onclick="openApp('soundboard-window')"><div class="l-icon">🔊</div><span class="l-text">SoundBoard</span></div>
         </div>
     </div>
 
@@ -788,7 +759,7 @@
             <button id="desk-add-quick" onclick="event.stopPropagation(); addNewDesk();" title="New Desk">+</button>
             <div id="app-icons">
                 <button class="app-icon" id="taskbar-chrome-window" draggable="true" onclick="toggleApp('chrome-window')" title="Chrome">🌐</button>
-                <button class="app-icon" id="taskbar-store-window" draggable="true" onclick="toggleApp('store-window')" title="Microsoft Store">🛍️</button>
+                <button class="app-icon" id="taskbar-store-window" draggable="true" onclick="toggleApp('store-window')" title="Play Store">🛍️</button>
                 <button class="app-icon" id="taskbar-settings-window" draggable="true" onclick="toggleApp('settings-window')" title="Settings">⚙️</button>
                 <button class="app-icon" id="taskbar-wordpad-window" draggable="true" onclick="toggleApp('wordpad-window')" title="Wordpad">📝</button>
                 <button class="app-icon" id="taskbar-calc-window" draggable="true" onclick="toggleApp('calc-window')" title="Calculator">🧮</button>
@@ -810,76 +781,6 @@
         </div>
     </div>
 
-        </div>
-    <div id="xbox-dashboard">
-            <div class="xbox-top-bar">
-                <div class="xbox-logo-small">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#9bf00b" stroke-width="2" style="width:24px;height:24px;">
-                        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 4"/><circle cx="12" cy="12" r="3"/>
-                    </svg>
-                    Echo OS
-                </div>
-                <div class="xbox-user-info">
-                    <span id="xbox-gamertag-display" class="xbox-gamertag">Player1</span>
-                    <div class="xbox-avatar-small" id="xbox-avatar">🎮</div>
-                </div>
-            </div>
-
-            <div class="xbox-nav-tabs">
-                <button class="xbox-nav-tab active" onclick="switchXboxTab('home')" data-tab="home">Home</button>
-                <button class="xbox-nav-tab" onclick="switchXboxTab('mygames')" data-tab="mygames">My Games</button>
-                <button class="xbox-nav-tab" onclick="switchXboxTab('store')" data-tab="store">Microsoft Store</button>
-                <button class="xbox-nav-tab" onclick="switchXboxTab('apps')" data-tab="apps">Apps</button>
-                <button class="xbox-nav-tab" onclick="switchXboxTab('settings')" data-tab="settings">Settings</button>
-            </div>
-
-            <div class="xbox-content" id="xbox-content-area">
-                <!-- Featured Hero -->
-                <div class="xbox-hero" onclick="openApp('gtavice-window')">
-                    <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1200" alt="Featured" onerror="this.style.display='none'">
-                    <div class="xbox-hero-overlay">
-                        <h1 class="xbox-hero-title">GTA III: Vice City</h1>
-                        <p class="xbox-hero-subtitle">Classic open-world crime adventure</p>
-                        <button class="xbox-hero-btn">▶ Play</button>
-                    </div>
-                </div>
-
-                <!-- Quick Resume -->
-                <div class="xbox-quick-resume" id="xbox-quick-resume" style="display:none;">
-                    <div class="xbox-quick-resume-header">
-                        <span style="font-size:20px;">⚡</span>
-                        <h3>Quick Resume</h3>
-                    </div>
-                    <div class="xbox-games-grid" id="xbox-quick-resume-grid"></div>
-                </div>
-
-                <!-- Game Rows -->
-                <div class="xbox-game-row">
-                    <div class="xbox-row-header">
-                        <h3 class="xbox-row-title">Recently Played</h3>
-                        <span class="xbox-row-see-all" onclick="switchXboxTab('mygames')">See all ></span>
-                    </div>
-                    <div class="xbox-games-grid" id="xbox-recent-games"></div>
-                </div>
-
-                <div class="xbox-game-row">
-                    <div class="xbox-row-header">
-                        <h3 class="xbox-row-title">Installed Games</h3>
-                        <span class="xbox-row-see-all" onclick="switchXboxTab('mygames')">See all ></span>
-                    </div>
-                    <div class="xbox-games-grid" id="xbox-installed-games"></div>
-                </div>
-
-                <div class="xbox-game-row">
-                    <div class="xbox-row-header">
-                        <h3 class="xbox-row-title">All Games</h3>
-                        <span class="xbox-row-see-all" onclick="switchXboxTab('mygames')">See all ></span>
-                    </div>
-                    <div class="xbox-games-grid" id="xbox-all-games"></div>
-                </div>
-            </div>
-        </div>
-    
     <script src="script.js"></script>
 </body>
 </html>
