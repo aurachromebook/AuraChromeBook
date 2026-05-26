@@ -398,13 +398,30 @@ function openApp(appId) {
                 console.log('[Echo OS] Loading app:', appId, 'from', dataSrc);
                 iframe.src = dataSrc;
 
-                // Add load error handling
+                // Hide error overlay when retrying
+                const overlay = document.getElementById(appId + '-error');
+                if (overlay) overlay.classList.remove('show');
+
+                // Set up load error detection
                 iframe.onerror = function() {
-                    console.error('[Echo OS] Failed to load:', appId);
+                    console.error('[Echo OS] iframe error for:', appId);
+                    showGameError(appId);
                 };
-                iframe.onload = function() {
-                    console.log('[Echo OS] Successfully loaded:', appId);
-                };
+
+                // Detect if game fails to initialize within 10 seconds
+                setTimeout(() => {
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        // If the iframe still shows error text or loading, game likely failed
+                        const errorText = iframeDoc.body.innerText;
+                        if (errorText && (errorText.includes('Error loading') || errorText.includes('First-time loading'))) {
+                            console.warn('[Echo OS] Game appears to have failed:', appId);
+                            showGameError(appId);
+                        }
+                    } catch(e) {
+                        // Cross-origin, can't check - assume it worked
+                    }
+                }, 10000);
             }
         }
         appWindow.style.display = 'flex'; 
