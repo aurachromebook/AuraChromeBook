@@ -1669,6 +1669,11 @@ const PS_GAMES = {
 // Play Store Apps Database
 const PS_APPS = {
     'chrome-window': { id: 'chrome-window', name: 'Chrome', icon: '🌐', category: 'browser', rating: 4.9, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Fast, secure web browser with built-in proxy support.', controls: 'Mouse and keyboard' },
+    'notmyneigh-window': { id: 'notmyneigh-window', name: "That's Not My Neighbor", icon: '🏠', category: 'horror', rating: 4.7, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'Job simulator horror game where you check for doppelgangers.', controls: 'Mouse to interact' },
+    'drifthunters-window': { id: 'drifthunters-window', name: 'Drift Hunters', icon: '🏎️', category: 'racing', rating: 4.6, banner: 'https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?q=80&w=800', desc: 'Drift racing game with customizable cars.', controls: 'WASD to drive, Space to brake' },
+    'hypper-window': { id: 'hypper-window', name: 'Hypper Sandbox', icon: '🧱', category: 'simulation', rating: 4.3, banner: 'https://images.unsplash.com/photo-1587573089734-09cb69c0f2b4?q=80&w=800', desc: 'Sandbox building game with creative freedom.', controls: 'WASD to move, Mouse to build' },
+    'miside-window': { id: 'miside-window', name: 'MiSide', icon: '💜', category: 'horror', rating: 4.8, banner: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800', desc: 'Psychological horror adventure with anime aesthetics.', controls: 'WASD to move, Mouse to interact' },
+    'fakegta-window': { id: 'fakegta-window', name: 'Fake GTA V', icon: '🚗', category: 'action', rating: 4.2, banner: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800', desc: 'Open-world driving action inspired by GTA.', controls: 'WASD to drive, Mouse to look' },
     'discord-window': { id: 'discord-window', name: 'Discord', icon: '💬', category: 'social', rating: 4.8, banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800', desc: 'Chat and connect with friends and communities.', controls: 'Mouse and keyboard' },
     'echochat-window': { id: 'echochat-window', name: 'Echo Chat', icon: '💬', category: 'social', rating: 4.9, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Chat with friends and communities in real-time with DM notifications.', controls: 'Mouse and keyboard' },
     'echoflix-window': { id: 'echoflix-window', name: 'EchoFlix', icon: '🎬', category: 'entertainment', rating: 4.7, banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800', desc: 'Stream movies and shows on EchoFlix.', controls: 'Mouse and keyboard' },
@@ -1680,7 +1685,8 @@ const PS_APPS = {
     'robloxanimator-window': { id: 'robloxanimator-window', name: 'Roblox Animator', icon: '🎬', category: 'creative', rating: 4.5, banner: 'https://images.unsplash.com/photo-1616499370260-485b3e5ed653?q=80&w=800', desc: 'Create Roblox animations.', controls: 'Mouse and keyboard' },
     'linkcreator-window': { id: 'linkcreator-window', name: 'Link Creator', icon: '🔗', category: 'productivity', rating: 4.3, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Create and share custom links.', controls: 'Mouse and keyboard' },
     'echochat-window': { id: 'echochat-window', name: 'Echo Chat', icon: '💬', category: 'social', rating: 4.9, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Chat with friends and communities in real-time with DM notifications.', controls: 'Mouse and keyboard' }
-};
+
+    'soundboard-window': { id: 'soundboard-window', name: 'SoundBoard', icon: '🔊', category: 'entertainment', rating: 4.5, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Play sounds and effects for fun.', controls: 'Click to play sounds' },};
 // Pre-installed apps (built into Echo OS, always available)
 const PRE_INSTALLED_APPS = [
     'chrome-window', 'store-window', 'settings-window', 'wordpad-window', 
@@ -3097,7 +3103,13 @@ function trackActiveApps() {
                 'granny2-window': '👵',
                 'pokemon-window': '⚡',
                 '1v1lol-window': '🔫',
-                'echochat-window': '💬'
+                'echochat-window': '💬',
+                'notmyneigh-window': '🏠',
+                'drifthunters-window': '🏎️',
+                'hypper-window': '🧱',
+                'miside-window': '💜',
+                'fakegta-window': '🚗',
+                'soundboard-window': '🔊'
             };
             activeWindows.push({ id: appId, name: name, icon: iconMap[appId] || '📦' });
         }
@@ -3893,3 +3905,163 @@ function saveSecuritySettings() {
 }
 
 // --- Window Memory Management ---
+
+// ===== XBOX SERIES X TRANSFORMATION =====
+let xboxCurrentTab='home',xboxFocusIndex=0,xboxGuideOpen=false;
+
+function initXboxDashboard(){renderXboxDashboard();setupXboxKeyboardNav();}
+
+function switchXboxTab(tabName){
+    xboxCurrentTab=tabName;
+    document.querySelectorAll('.xbox-nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabName));
+    const c=document.getElementById('xbox-content-area');if(!c)return;
+    if(tabName==='home')renderXboxHome(c);
+    else if(tabName==='mygames')renderXboxMyGames(c);
+    else if(tabName==='store'){openApp('store-window');switchXboxTab('home');}
+    else if(tabName==='apps')renderXboxApps(c);
+    else if(tabName==='settings'){openApp('settings-window');switchXboxTab('home');}
+    xboxFocusIndex=0;updateXboxFocus();
+}
+
+function createXboxTile(appId,item,installed){
+    const isGame=PS_GAMES[appId]!==undefined;
+    return '<div class="xbox-game-tile xbox-focusable" data-app-id="'+appId+'" tabindex="0" onclick="xboxLaunchApp(''+appId+'')"><div class="xbox-tile-image"><img src="'+item.banner+'" alt="'+item.name+'" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="xbox-tile-icon" style="display:none;">'+item.icon+'</div>'+(installed?'<span class="xbox-tile-installed">INSTALLED</span>':'')+'</div><div class="xbox-tile-title">'+item.name+'</div><div class="xbox-tile-meta">'+(isGame?'🎮 Game':'📱 App')+' • ⭐'+item.rating+'</div></div>';
+}
+
+function renderXboxHome(c){
+    const recent=getRecentPlays(),installed=JSON.parse(getAccountData('installed_apps')||localStorage.getItem('echo_installed_apps')||'[]');
+    let h='<div class="xbox-hero xbox-focusable" onclick="openApp('gtavice-window')" tabindex="0"><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1200" onerror="this.style.display='none'"><div class="xbox-hero-overlay"><h1 class="xbox-hero-title">GTA III: Vice City</h1><p class="xbox-hero-subtitle">Classic open-world crime adventure</p><button class="xbox-hero-btn xbox-focusable">▶ Play</button></div></div>';
+    if(recent.length>0)h+='<div class="xbox-quick-resume"><div class="xbox-quick-resume-header"><span style="font-size:20px;">⚡</span><h3>Quick Resume</h3></div><div class="xbox-games-grid">'+recent.slice(0,5).map(id=>{const g=PS_GAMES[id];return g?createXboxTile(id,g,true):''}).join('')+'</div></div>';
+    if(recent.length>0)h+='<div class="xbox-game-row"><div class="xbox-row-header"><h3 class="xbox-row-title">Recently Played</h3><span class="xbox-row-see-all" onclick="switchXboxTab('mygames')">See all ></span></div><div class="xbox-games-grid">'+recent.slice(0,8).map(id=>{const g=PS_GAMES[id];return g?createXboxTile(id,g,true):''}).join('')+'</div></div>';
+    if(installed.length>0)h+='<div class="xbox-game-row"><div class="xbox-row-header"><h3 class="xbox-row-title">Installed Games</h3><span class="xbox-row-see-all" onclick="switchXboxTab('mygames')">See all ></span></div><div class="xbox-games-grid">'+installed.slice(0,8).map(a=>{const g=PS_GAMES[a.id];return g?createXboxTile(a.id,g,true):''}).join('')+'</div></div>';
+    h+='<div class="xbox-game-row"><div class="xbox-row-header"><h3 class="xbox-row-title">All Games</h3><span class="xbox-row-see-all" onclick="switchXboxTab('mygames')">See all ></span></div><div class="xbox-games-grid">'+Object.values(PS_GAMES).slice(0,12).map(g=>createXboxTile(g.id,g)).join('')+'</div></div>';
+    c.innerHTML=h;
+}
+
+function renderXboxMyGames(c){
+    const installed=JSON.parse(getAccountData('installed_apps')||localStorage.getItem('echo_installed_apps')||'[]');
+    let h='<div class="xbox-game-row"><div class="xbox-row-header"><h3 class="xbox-row-title">My Games & Apps</h3></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;padding:10px 0;">';
+    PRE_INSTALLED_APPS.forEach(id=>{const g=PS_GAMES[id],a=PS_APPS[id],i=g||a;if(i)h+=createXboxTile(id,i,true);});
+    installed.forEach(a=>{const g=PS_GAMES[a.id];if(g)h+=createXboxTile(a.id,g,true);});
+    Object.values(PS_GAMES).forEach(g=>{const is=installed.find(a=>a.id===g.id)||PRE_INSTALLED_APPS.includes(g.id);if(!is)h+=createXboxTile(g.id,g,false);});
+    h+='</div></div>';c.innerHTML=h;
+}
+
+function renderXboxApps(c){
+    let h='<div class="xbox-game-row"><div class="xbox-row-header"><h3 class="xbox-row-title">Apps</h3></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;padding:10px 0;">';
+    Object.values(PS_APPS).forEach(a=>h+=createXboxTile(a.id,a,true));
+    h+='</div></div>';c.innerHTML=h;
+}
+
+function xboxLaunchApp(appId){openApp(appId);if(PS_GAMES[appId])trackGameOpen(appId);}
+
+function toggleXboxGuide(){const g=document.getElementById('xbox-guide');if(!g)return;xboxGuideOpen=!xboxGuideOpen;g.classList.toggle('active',xboxGuideOpen);}
+
+function setupXboxKeyboardNav(){
+    document.addEventListener('keydown',function(e){
+        if(e.key==='Escape')toggleXboxGuide();
+        const d=document.getElementById('xbox-dashboard');if(!d||d.style.display==='none')return;
+        if(document.querySelector('.window[style*="display: flex"]'))return;
+        const f=d.querySelectorAll('.xbox-focusable,.xbox-nav-tab,.xbox-hero-btn');if(!f.length)return;
+        if(e.key==='ArrowRight'){e.preventDefault();xboxFocusIndex=(xboxFocusIndex+1)%f.length;updateXboxFocus();}
+        else if(e.key==='ArrowLeft'){e.preventDefault();xboxFocusIndex=(xboxFocusIndex-1+f.length)%f.length;updateXboxFocus();}
+        else if(e.key==='ArrowDown'){e.preventDefault();xboxFocusIndex=Math.min(xboxFocusIndex+4,f.length-1);updateXboxFocus();}
+        else if(e.key==='ArrowUp'){e.preventDefault();xboxFocusIndex=Math.max(xboxFocusIndex-4,0);updateXboxFocus();}
+        else if(e.key==='Enter'){e.preventDefault();f[xboxFocusIndex]?.click();}
+    });
+}
+
+function updateXboxFocus(){
+    const d=document.getElementById('xbox-dashboard');if(!d)return;
+    d.querySelectorAll('.xbox-focusable,.xbox-nav-tab,.xbox-hero-btn').forEach((el,i)=>{
+        if(i===xboxFocusIndex){el.style.outline='3px solid #9bf00b';el.style.outlineOffset='3px';el.style.boxShadow='0 0 20px rgba(155,240,11,0.3)';el.focus();}
+        else{el.style.outline='none';el.style.outlineOffset='0';el.style.boxShadow='none';}
+    });
+}
+
+function renderXboxDashboard(){
+    const c=document.getElementById('xbox-content-area');if(c)renderXboxHome(c);
+    const g=document.getElementById('xbox-gamertag-display');
+    if(g&&currentAccount)g.innerText=currentAccount.name||currentAccount.username;
+    else if(g)g.innerText=localStorage.getItem('echo_username')||'Player1';
+}
+
+function initializeXboxDashboard(){
+    const desk=document.getElementById('desktop'),dash=document.getElementById('xbox-dashboard');
+    if(desk)desk.style.display='none';if(dash){dash.style.display='flex';dash.classList.add('active');}
+    initXboxDashboard();
+    updateCalendarWidget();initChromeProxy();initTabCloak();initAboutBlankSettings();initBatterySaver();restoreActiveApps();
+    const wp=getAccountData('wallpaper')||localStorage.getItem('echo_wallpaper');if(wp&&desk)desk.style.backgroundImage="url('"+wp+"')";
+    const apps=JSON.parse(getAccountData('installed_apps')||localStorage.getItem('echo_installed_apps')||'[]');
+    apps.forEach(a=>{restoreAppToLauncher(a.id,a.icon,a.name);if(a.pinned)restoreAppToTaskbar(a.id,a.icon,a.name);});
+    PRE_INSTALLED_APPS.forEach(id=>{const g=PS_GAMES[id],a=PS_APPS[id],i=g||a;if(i&&!document.getElementById('taskbar-'+id))restoreAppToTaskbar(id,i.icon,i.name);});
+    document.querySelectorAll('.app-icon').forEach(makeIconDraggable);
+    document.querySelectorAll('.desktop-icon').forEach(dragDesktopIcon);
+    initLauncherContextMenu();initBattery();renderFiles();initLinkCreator();
+}
+
+// Override key functions for Xbox
+window.initializeDesktop=function(){initializeXboxDashboard();};
+
+window.initializeDesktopWithAccount=function(){
+    if(!currentAccount)return;
+    const saved=getAccountData('setup_complete');
+    if(!saved){const s=document.getElementById('setup-screen');if(s){s.style.display='flex';const n=document.getElementById('setup-name-input');if(n)n.value=currentAccount.name;}}
+    else{initializeXboxDashboard();const p=getAccountData('password');if(p){const l=document.getElementById('lock-screen');if(l){updateLockScreenForAccount();l.style.display='flex';}}else showCreatorScreen();}
+};
+
+window.showAccountLoadingScreen=function(){
+    const ls=document.getElementById('account-loading-screen'),em=document.getElementById('loading-email'),pr=document.getElementById('loading-progress'),de=document.getElementById('loading-details');
+    if(ls)ls.style.display='flex';if(em&&currentAccount)em.innerText=currentAccount.email;
+    const steps=[{p:15,t:'Signing in...'},{p:30,t:'Loading profile...'},{p:45,t:'Syncing game saves...'},{p:60,t:'Loading games and apps...'},{p:75,t:'Preparing dashboard...'},{p:90,t:'Almost there...'},{p:100,t:'Welcome to Echo OS for Xbox!'}];
+    let i=0;const iv=setInterval(()=>{if(i>=steps.length){clearInterval(iv);setTimeout(()=>{if(ls)ls.style.display='none';initializeXboxDashboard();},800);return;}
+    const s=steps[i];if(pr)pr.style.width=s.p+'%';if(de)de.innerText=s.t;i++;},500);
+};
+
+window.showCreatorScreen=function(){
+    const cs=document.getElementById('creator-screen'),ct=document.getElementById('creator-text');
+    if(!cs){initializeXboxDashboard();showUpdateModal();triggerInitialNotifications();return;}
+    cs.style.display='flex';cs.style.opacity='1';setTimeout(()=>{if(ct)ct.style.opacity='1';},100);
+    setTimeout(()=>{if(ct)ct.style.opacity='0';},2500);
+    setTimeout(()=>{cs.style.transition='opacity 1s ease-out';cs.style.opacity='0';setTimeout(()=>{cs.style.display='none';const d=document.getElementById('xbox-dashboard');if(d){d.style.opacity='0';d.style.transition='opacity 1s ease-in';setTimeout(()=>d.style.opacity='1',100);}setTimeout(()=>{showUpdateModal();triggerInitialNotifications();},1000);},1000);},3500);
+};
+
+window.unlockOS=function(){
+    const inp=document.getElementById('lock-password').value,err=document.getElementById('lock-error'),ls=document.getElementById('lock-screen');
+    let cp=null;if(currentAccount)cp=getAccountData('password')||currentAccount.password;else cp=localStorage.getItem('echo_password');
+    const sa=currentAccount?getAccountData('answer'):localStorage.getItem('echo_answer');
+    if(inp===cp||inp===sa){if(ls)ls.style.display='none';document.getElementById('lock-password').value='';if(err)err.style.display='none';showCreatorScreen();}
+    else{if(err)err.style.display='block';}
+};
+
+window.finalizeSetup=function(){
+    localStorage.setItem('echo_setup_complete','true');localStorage.setItem('echo_username',tempUsername);if(tempPassword!=='')localStorage.setItem('echo_password',tempPassword);
+    if(currentAccount){saveAccountData('setup_complete','true');saveAccountData('username',tempUsername);if(tempPassword)saveAccountData('password',tempPassword);}
+    document.getElementById('setup-screen').style.display='none';const lu=document.getElementById('lock-username');if(lu)lu.innerText=tempUsername;
+    initializeXboxDashboard();const wm=document.getElementById('welcome-modal');if(wm)wm.style.display='flex';
+};
+
+window.lockSystem=function(){
+    const ap=currentAccount?getAccountData('password'):localStorage.getItem('echo_password');
+    if(ap){updateLockScreenForAccount();const ls=document.getElementById('lock-screen');if(ls)ls.style.display='flex';}
+    else{notificationMgr.showNotification({title:'No Password Set',message:'Please set a password in Settings first!',icon:'shield-alert'});}
+    const qs=document.getElementById('quick-settings');if(qs)qs.style.display='none';const cm=document.getElementById('context-menu');if(cm)cm.style.display='none';
+    const g=document.getElementById('xbox-guide');if(g)g.classList.remove('active');xboxGuideOpen=false;
+};
+
+// Xbox boot sequence
+window.onload=function(){
+    initAccountDB();
+    const sae=localStorage.getItem('echo_current_account');if(sae)currentAccount=getAccountByEmail(sae);
+    if(localStorage.getItem('echo_theme')==='light'){document.body.setAttribute('data-theme','light');const tt=document.getElementById('theme-text');if(tt)tt.innerText='Light Theme';}
+    setTimeout(()=>{
+        const b=document.getElementById('boot-screen');if(b){b.style.opacity='0';setTimeout(()=>b.style.display='none',800);}
+        const ac=getAllAccounts(),ha=Object.keys(ac).length>0,sc=localStorage.getItem('echo_setup_complete');
+        if(currentAccount)showAccountLoadingScreen();
+        else if(ha)showAccountModal();
+        else if(!sc)showAccountModal();
+        else{initializeXboxDashboard();if(localStorage.getItem('echo_password')){const lu=document.getElementById('lock-username');if(lu)lu.innerText=localStorage.getItem('echo_username')||'Player1';const ls=document.getElementById('lock-screen');if(ls)ls.style.display='flex';}else showCreatorScreen();}
+    },3000);
+};
+
+console.log('Echo OS for Xbox loaded');
