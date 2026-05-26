@@ -1663,12 +1663,7 @@ const PS_GAMES = {
     '1v1lol-window': { id: '1v1lol-window', name: '1v1.LOL', icon: '🔫', category: 'action', rating: 4.7, banner: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800', desc: 'Build and battle in this competitive shooter.', controls: 'WASD to move, Mouse to aim/build' }
 ,
     'bitlife-window': { id: 'bitlife-window', name: 'Bitlife', icon: '📱', category: 'simulation', rating: 4.7, banner: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=800', desc: 'Live your entire life from birth to death in this text-based life simulator.', controls: 'Click to make choices' },
-    'footballbros-window': { id: 'footballbros-window', name: 'Football Bros', icon: '🏈', category: 'sports', rating: 4.6, banner: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800', desc: 'Play football with your bros in this exciting sports game.', controls: 'Arrow keys to move, Space to action' },
-    'notmyneigh-window': { id: 'notmyneigh-window', name: 'That's Not My Neighbor', icon: '🏠', category: 'horror', rating: 4.5, banner: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800', desc: 'Check IDs and spot the impostors in this horror simulation.', controls: 'Mouse to interact' },
-    'hypper-window': { id: 'hypper-window', name: 'Hypper Sandbox', icon: '🧱', category: 'simulation', rating: 4.4, banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800', desc: 'Build and create in this sandbox physics game.', controls: 'Mouse to build, WASD to move' },
-    'miside-window': { id: 'miside-window', name: 'MiSide', icon: '💜', category: 'horror', rating: 4.8, banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800', desc: 'An anime horror adventure that blurs reality.', controls: 'Mouse to interact, Click to advance' },
-    'fakegta-window': { id: 'fakegta-window', name: 'Fake GTA V', icon: '🚗', category: 'action', rating: 4.3, banner: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800', desc: 'Parody open-world driving and chaos simulator.', controls: 'WASD to drive, Mouse to look' },
-    'drifthunters-window': { id: 'drifthunters-window', name: 'Drift Hunters', icon: '🏎️', category: 'racing', rating: 4.7, banner: 'https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?q=80&w=800', desc: 'Drift your way to victory in this high-speed racing game.', controls: 'WASD to drive, Space to brake' }
+    'footballbros-window': { id: 'footballbros-window', name: 'Football Bros', icon: '🏈', category: 'sports', rating: 4.6, banner: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800', desc: 'Play football with your bros in this exciting sports game.', controls: 'Arrow keys to move, Space to action' }
 };
 
 // Play Store Apps Database
@@ -1676,7 +1671,6 @@ const PS_APPS = {
     'chrome-window': { id: 'chrome-window', name: 'Chrome', icon: '🌐', category: 'browser', rating: 4.9, banner: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=800', desc: 'Fast, secure web browser with built-in proxy support.', controls: 'Mouse and keyboard' },
     'discord-window': { id: 'discord-window', name: 'Discord', icon: '💬', category: 'social', rating: 4.8, banner: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=800', desc: 'Chat and connect with friends and communities.', controls: 'Mouse and keyboard' },
     'echochat-window': { id: 'echochat-window', name: 'Echo Chat', icon: '💬', category: 'social', rating: 4.9, banner: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=800', desc: 'Chat with friends and communities in real-time with DM notifications.', controls: 'Mouse and keyboard' },
-    'soundboard-window': { id: 'soundboard-window', name: 'SoundBoard', icon: '🔊', category: 'entertainment', rating: 4.5, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Play sounds and effects with this interactive soundboard.', controls: 'Click to play sounds' },
     'echoflix-window': { id: 'echoflix-window', name: 'EchoFlix', icon: '🎬', category: 'entertainment', rating: 4.7, banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=800', desc: 'Stream movies and shows on EchoFlix.', controls: 'Mouse and keyboard' },
     'echomusic-window': { id: 'echomusic-window', name: 'Echo Music', icon: '🎵', category: 'entertainment', rating: 4.8, banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800', desc: 'Stream music from Spotify and SoundCloud.', controls: 'Mouse and keyboard' },
     'files-window': { id: 'files-window', name: 'Files', icon: '📁', category: 'productivity', rating: 4.5, banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800', desc: 'Manage your local files and documents.', controls: 'Mouse and keyboard' },
@@ -3104,9 +3098,7 @@ function trackActiveApps() {
                 'pokemon-window': '⚡',
                 '1v1lol-window': '🔫',
                 'echochat-window': '💬'
-                            'notmyneigh-window': '🏠', 'hypper-window': '🧱', 'miside-window': '💜',
-                'fakegta-window': '🚗', 'drifthunters-window': '🏎️', 'soundboard-window': '🔊',
-};
+            };
             activeWindows.push({ id: appId, name: name, icon: iconMap[appId] || '📦' });
         }
     });
